@@ -1,0 +1,26 @@
+#!/bin/bash
+
+prod-install-js
+
+#It's necessary to set CLJ_ENV at compile time so that the right config is selected in the public-config macro!!!
+cmd="CLJ_ENV=prod clj -A:revolt:pack:cljs:slf4j  "`
+`"-t clean,info,"`
+`"aum.revolt.task/write-info,"`
+`"aum.revolt.task/copy-newrelic-jar,"`
+`"aum.revolt.task/sass,"`
+`"cljs:compiler.optimizations=advanced,"`
+`"aum.revolt.task/assets,"`
+`"aum.revolt.task/update-html,"`
+`"aum.revolt.task/capsule"
+echo "$(tput setaf 7)$cmd$(tput sgr0)"
+eval $cmd
+
+
+
+
+# "aum.revolt.task/aot,"
+# Not working:
+ # java.lang.IllegalArgumentException: HTTP Host may not be null
+
+ # at digicheck.elastic.core$client.invokeStatic(core.clj:15)
+ # at digicheck.elastic.core$client.invoke(core.clj:14)

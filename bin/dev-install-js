@@ -1,0 +1,9 @@
+#!/bin/bash
+
+cmd="npm install"
+echo "$(tput setaf 7)$cmd$(tput sgr0)"
+eval $cmd
+cmd="npx webpack --config foreign-libs/webpack.dev.js"
+echo "$(tput setaf 7)$cmd$(tput sgr0)"
+eval $cmd
+

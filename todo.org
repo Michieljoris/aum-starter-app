@@ -1,0 +1,6 @@
+#+TITLE: todo
+* Load bugsnag api keys from gitignored .env file in update-html-string
+* Set app name in update-html task config
+* Load revolt.edn from base dir of repo
+* remove material-ui
+* remove duplication between revolt.edn and main.fi

@@ -1,10 +1,10 @@
 (ns user
   (:require  [weasel.repl.websocket]
              [cider.piggieback]
-             [app.environment :refer [environment]]
+             ;; [app.environment :refer [environment]]
              
              [clojure.string :as str]
-             [dev]
+             ;; [dev]
              [taoensso.timbre :as timbre]
              [jansi-clj.core :as jansi :refer :all :exclude [reset]]
              [clojure.pprint :refer (pprint)]
@@ -50,4 +50,4 @@
 
 ;; (pprint integrations/build-info)
 
-(dev/start)
+;; (dev/start)

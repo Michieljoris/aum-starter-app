@@ -17,7 +17,7 @@
  ;;   Directories in the current project to include in the classpath
 
  :paths [
-         "src/app"
+         "src/app/frontend"
          "src/scss"
          "resources" ;;public dir for server and config files
          ]
@@ -43,7 +43,7 @@
         io.aviso/pretty {:mvn/version "0.1.37"  }
         jansi-clj {:mvn/version "0.1.1"}
 
-
+       
         
         ;; org.clojure/core.async {:mvn/version "0.4.490"
         ;;                         :exclusions [org.clojure/tools.reader]}
@@ -56,15 +56,6 @@
         ;; org.omcljs/om {:mvn/version "1.0.0-beta4" :exclusions [cljsjs/react
         ;;                                                        cljsjs/react-dom]}
 
-        ;; dc-util {:git/url "git@github.com:digitalechecklisten/dc-util"
-        ;;          :sha "ef287398e23c18ee55dd5611f44a98bd0c0c8027"
-        ;;          :mvn/version "0.0.0"
-        ;;          }
-
-        ;; aum-next {:git/url "git@github.com:digitalechecklisten/aum-next"
-        ;;           :sha "8caeab095b85425a7a0f4be0c1569941bb29b440"
-        ;;           :mvn/version "0.0.0"
-        ;;           }
 
         ;; com.cognitect/transit-clj  {:mvn/version "0.8.313"}
 
@@ -100,8 +91,6 @@
         ;; devcards {:mvn/version "0.2.6" :exclusions [cljsjs/react cljsjs/react-dom
         ;;                                             org.clojure/clojurescript]}
 
-        ;; binaryage/dirac        {:mvn/version "RELEASE"  }
-        ;; thheller/shadow-cljs {:mvn/version "2.8.2"}
         ;;Slamhound rips your namespace form apart and reconstructs it.
         ;; slamhound {:mvn/version "1.5.5"}
         ;; nightlight {:mvn/version "2.3.2"  }
@@ -233,12 +222,12 @@
  ;;     :extra-paths - vector of additional paths to add to the classpath
  ;;     :classpath-overrides - map of lib to path that overrides the result of resolving deps
 
- :aliases {:revolt {:extra-paths ["src-revolt"]
+ :aliases {:revolt {:extra-paths ["src-aum"]
                     :extra-deps {
                                  defunkt/revolt {:mvn/version "1.2.0"}
                                  deraen/sass4clj {:mvn/version "0.3.1"}
                                  }
-                    :main-opts   ["-m" "bilby.revolt.bootstrap" 
+                    :main-opts   ["-m" "aum.revolt.bootstrap"
                                   "-c" "revolt.edn"]}
            :nrepl {:extra-deps {
                                 ;; nrepl -------------------
@@ -257,28 +246,28 @@
                        }
            :git-deps {
                       :override-deps {
-                                      dc-util {:git/url "git@github.com:michieljoris/clojure-utils"
-                                               :sha "ef287398e23c18ee55dd5611f44a98bd0c0c8027"
-                                               :mvn/version "0.0.0"
-                                               }
+                                      clojure-utils {:git/url "git@github.com:michieljoris/clojure-utils"
+                                                     :sha "ef287398e23c18ee55dd5611f44a98bd0c0c8027"
+                                                     :mvn/version "0.0.0"
+                                                     }
 
-                                      aum-next {:git/url "git@github.com:michieljoris/aum-next"
-                                                :sha "0efcde35d29fc0a72876f46a87a80f9ba25967e9"
-                                                :mvn/version "0.0.0"
-                                                }
+                                      aum {:git/url "git@github.com:michieljoris/aum-next"
+                                           :sha "0efcde35d29fc0a72876f46a87a80f9ba25967e9"
+                                           :mvn/version "0.0.0"
+                                           }
                                       }
 
                       }
 
            :local-deps {
                         :override-deps {
-                                        dc-util {:local/root "../../clojure-utils"
-                                                 :mvn/version "0.0.0"
-                                                 }
+                                        clojure-utils {:local/root "../../clojure-utils"
+                                                       :mvn/version "0.0.0"
+                                                       }
 
-                                        aum-next {:local/root "../../aum-next"
-                                                  :mvn/version "0.0.0"
-                                                  }
+                                        aum {:local/root "../../aum"
+                                             :mvn/version "0.0.0"
+                                             }
 
                                         }
                         }
@@ -344,7 +333,7 @@
            ;; dependencies for packaging tasks
            :pack {:extra-deps {co.paralleluniverse/capsule {:mvn/version "1.0.3"}
                                co.paralleluniverse/capsule-maven {:mvn/version "1.0.3"}}
-                  :main-opts   ["-m" "bilby.revolt.bootstrap"
+                  :main-opts   ["-m" "aum.revolt.bootstrap"
                                 "-c" "revolt.edn"]}
 
            ;; Tool to simplify workflow with Git-based Clojure dependencies
