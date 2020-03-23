@@ -8,7 +8,7 @@
 
 (defn bugsnag-link-tag [api-key environment version]
   (letfn [(wrap-with-quotes [s] (str "\"" s "\""))]
-    (str "<script type=text/javascript src=/admin_new/" "bugsnag.min.js data-apikey="
+    (str "<script type=text/javascript src=/app/" "bugsnag.min.js data-apikey="
          (wrap-with-quotes api-key)  " data-releasestage="
          (wrap-with-quotes environment) " data-appversion="
          (wrap-with-quotes version) "></script>" )))
@@ -18,10 +18,11 @@
                                        :as options}]
   (let [{:keys [bugsnag-api-key-frontend
                 include-build-info-in-html
-                app-name
+                app-name path
                 load-user-ns]} (get options (or (keyword env) :dev))
         bugsnag-ph "<!--bugsnag-->"
-        app-dev-ph "<!--app-dev-->"
+        app-js-ph "<!--app-js-ph-->"
+        app-dev-js-ph "<!--app-dev-js-ph-->"
         build-json-ph "<!--build.json-->"
         app-name-ph "<!--app-name-->"
         html-string
@@ -36,9 +37,14 @@
                                                                      "\",sha:\"" sha
                                                                      "\",env:\"" env
                                                                      "\"}</script>"))
-          load-user-ns (str/replace app-dev-ph
-                                    "<script type=\"text/javascript\" src=\"/admin_new/app-dev.js\"></script>"))]
-    (str/replace html-string (re-pattern (str/join "|" [bugsnag-ph app-dev-ph build-json-ph])) "")))
+          load-user-ns (str/replace app-dev-js-ph
+                                    (str "<script type=\"text/javascript\" src=\"/" path "/app-dev.js\"></script>"))
+          true (str/replace app-js-ph
+                            (str "<script type=\"text/javascript\" src=\"/" path "/app.js\"></script>"))
+          
+          )
+        ]
+    (str/replace html-string (re-pattern (str/join "|" [bugsnag-ph app-dev-js-ph build-json-ph])) "")))
 
 
 

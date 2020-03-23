@@ -13,9 +13,11 @@
 
                                :dev {:load-user-ns true ;; add script link to app.html that loads the user namespace, also see figwheel-main.edn
                                      :include-build-info-in-html false
-                                     :app-name "pagora"}
+                                     :path "app"
+                                     :app-name "Pagora"}
                                :prod {:load-user-ns false;; add script link to app.html that loads the user namespace, also see figwheel-main.edn
                                       :include-build-info-in-html true
+                                      :path "app"
                                       :app-name "pagora"
                                       ;;TODO load from env!!
                                       :bugsnag-api-key-frontend "3464720f5367914849487b96cb428fc8" ;anything but nil adds the bugsnag script tag in app.html
