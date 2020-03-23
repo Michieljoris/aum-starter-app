@@ -1,0 +1,23 @@
+{
+ :watch-dirs [;; "src"
+              "src-frontend"
+              ;; "bilby-libs-frontend"
+              "aum-next/src"
+              ;; "src/"
+              "src-om"
+              "src-dev/cljs"]
+ :css-dirs ["target/assets/public/admin_new"]
+ :open-url false ;;"http://localhost:[[server-port]]/admin.html"
+ ;; :pprint-config true
+ :reload-dependents false
+ :reload-clj-files #{:cljc}
+ ;; :reload-clj-files true
+ :client-log-level :warning
+
+ ;; :log-level :error
+ :rebel-readline true
+ ;;produces admin_new/app-dev.js, load this in admin.html to enable weasel repl
+ :extra-main-files {:dev {:main cljs.user}}
+
+
+ }

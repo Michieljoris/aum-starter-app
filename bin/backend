@@ -1,0 +1,7 @@
+cmd="CLJ_ENV=dev clj "`
+    `"-A:revolt:dev:local-deps:nrepl:slf4j "`
+    `"-p watch,bilby.revolt.plugin/nrepl-piggieback,rebel "`
+    `"-t info,bilby.revolt.task/write-info,bilby.revolt.task/sass,"`
+    `"bilby.revolt.task/update-html"
+echo "$(tput setaf 7)$cmd$(tput sgr0)"
+eval $cmd

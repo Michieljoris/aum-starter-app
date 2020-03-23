@@ -1,0 +1,107 @@
+{:main app.core
+ ;; :build-inputs [:main]
+ :output-to "target/assets/public/admin_new/app.js"
+ :output-dir "target/assets/public/admin_new/out"
+ :asset-path "out",
+ :parallel-build       true
+ :devcards             true
+ :verbose              false
+ :compiler-stats       true
+ :install-deps true
+ ;; :npm-deps {:xregexp "4.2.0"}
+ ;; :aot-cache            true
+ :source-map-timestamp true
+
+ ;; https://github.com/bhauman/lein-figwheel/issues/88
+ ;; :closure-defines {"goog.DEBUG" false}
+ :recompile-dependents false
+
+ :pretty-print         true
+
+ :fn-invoke-direct true
+
+ ;; :pseudo-names true
+
+ :external-config      {:devtools/config {:features-to-install    [:formatters :hints]
+                                          :fn-symbol              "F"
+                                          :print-config-overrides true}
+                        }
+ ;; :preloads [devtools.preload]
+ ;; :preloads [figwheel.core
+ ;;            figwheel.main
+ ;;            figwheel.repl.preload
+ ;;            devtools.preload
+ ;;            figwheel.main.evalback]
+ ,
+ :aot-cache false,
+ ;; :closure-defines {figwheel.repl/connect-url
+ ;;                   "ws://localhost:9500/figwheel-connect?fwprocess=b96800&fwbuild=dev"}
+ ,
+ ;; :repl-requires ([figwheel.repl :refer-macros [conns focus]]
+ ;;                 [figwheel.main
+ ;;                  :refer-macros
+ ;;                  [stop-builds start-builds build-once reset clean status]])
+
+ ;; :npm-deps false
+
+ ;; :modules {:cljs-base {:output-to "public/admin_new/base.js"}
+ ;;           ;; :vendor    {:entries #{re-frame.core}
+ ;;           ;;             :output-to "scripts/vendor.js"}
+ ;;           :main      {:entries #{app.core}
+ ;;                       :output-to "public/admin_new/dev.js"}}
+
+ :infer-externs true
+ :externs ["foreign-libs-externs.ext.js"
+           "cryptojs.ext.js"
+           "moment.ext.js"
+           "react.ext.js"
+           "react-dom.ext.js"]
+ :foreign-libs [
+                ;; {:file "foreign-libs/bugsnag.js" :provides ["js.npm.bugsnag"]}
+                ;; {:file "foreign-libs/dragula.js" :provides ["js.dragula"]}
+
+                ;;unused
+                ;; {:file "node_modules/cryptojs/lib/Crypto.js"
+                ;;  :provides ["cryptojs.core"]}
+                ;; {:file "node_modules/cryptojs/lib/MD5.js"
+                ;;  :provides ["cryptojs.md5"]
+                ;;  :requires ["cryptojs.core"]}
+
+                ;; Needed for snapshot tests and test-runner
+                {:file "node_modules/alasql/dist/alasql.js" :provides ["bilby.js.alasql"]}
+                {:file "node_modules/lz-string/libs/lz-string.js" :provides ["bilby.js.lz-string"]}
+                ;; {:file "bilby/js/setImmediate.js" :provides ["bilby.js.setimmediate"]}
+                {:file "bilby/js/diff_match_patch.js" :provides ["bilby.js.diff-match-patch"]}
+                {:file "bilby/js/highlight.js" :provides ["bilby.js.highlight"]}
+                {:file "bilby/js/vkbeautify.js" :provides ["bilby.js.vkbeautify"]}
+
+                ;;webpacked:
+                {:file "foreign-libs/index.bundle.js"
+                 :provides ["react" "react-dom"
+                            "material-ui"
+                            "material-ui-styles"
+                            ;; "material-ui-icons"
+                            "dragula"
+                            "bugsnag"
+                            "moment"
+                            "react-datetime"
+                            "react-smooth-dnd"
+                            "react-sortable"
+                            "react-beautiful-dnd"
+                            "atlas-kit-tree"
+                            ]
+                 :global-exports {
+                                  react React
+                                  react-dom ReactDOM
+                                  material-ui MaterialUI
+                                  material-ui-styles MaterialUIStyles
+                                  ;; material-ui-icons MaterialUISvgIcons
+                                  dragula Dragula
+                                  bugsnag Bugsnag
+                                  moment moment
+                                  react-datetime ReactDatetime
+                                  react-smooth-dnd ReactSmoothDnd
+                                  react-sortable ReactSortable
+                                  react-beautiful-dnd ReactBeautifulDnd
+                                  atlas-kit-tree AtlasKitTree
+                                  }}]}

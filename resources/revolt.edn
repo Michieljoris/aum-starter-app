@@ -1,0 +1,170 @@
+{
+ ;; tasks
+
+ :bilby.revolt.task/aot    {:exclude-namespaces ["bilby.revolt." "revolt."]
+                            :extra-namespaces [;; mount.core
+                                               clojure.tools.reader.reader-types
+                                               ;; clojure.tools.logging.impl
+                                               ]}
+
+ :bilby.revolt.task/write-info   {:path "resources/build.json"}
+
+ :bilby.revolt.task/update-html {:src-path "resources/admin-template.html"
+                                 :dest-path "resources/admin.html"
+
+                                 :dev {:load-user-ns true ;; add script link to admin.html that loads the user namespace, also see figwheel-main.edn
+                                       :include-build-info-in-html false}
+                                 :prod {:load-user-ns false;; add script link to admin.html that loads the user namespace, also see figwheel-main.edn
+                                        :include-build-info-in-html true
+                                        :bugsnag-api-key-frontend "3464720f5367914849487b96cb428fc8" ;anything but nil adds the bugsnag script tag in admin.html
+                                        :bugsnag-api-key-server "d87f64fd8593faed9e04f531efc6a082"}
+                                 }
+
+ ;;This should match the version in deps.edn!!!!!
+ :bilby.revolt.task/copy-newrelic-jar {:version "4.2.0"}
+ 
+ :revolt.task/info   {:name "dc-admin"
+                      :package dc-admin
+                      :version "0.0.1"
+                      :description "dc-admin"}
+
+ :revolt.task/test   {:report :pretty}
+
+ :bilby.revolt.task/sass   {:source-path "scss"
+                            :output-dir "public/admin_new"}
+
+ :bilby.revolt.task/assets {:assets-paths ["assets"]
+                            :exclude-paths ["assets/admin_new"]
+                            :public-path "public/"
+                            :gzip true
+                            :update-with-exts ["html"]}
+
+ :revolt.task/codox  {:source-paths ["src"]
+                      :source-uri "http://github.com/mbuczko/revolt-edge/blob/{version}/{filepath}#L{line}"
+                      :namespaces [edge.http
+                                   edge.middleware]}
+
+ :revolt.task/cljs   {:compiler {:output-dir "public/admin_new/out"
+                                 :asset-path "/admin_new/out"
+                                 :preloads [devtools.preload]
+
+                                 :parallel-build       true
+                                 :devcards             true
+                                 :verbose              false
+                                 :compiler-stats       true
+                                 ;; :aot-cache            true
+                                 :source-map-timestamp true
+
+                                 ;; :npm-deps false
+                                 ;; :install-deps true
+                                 ;; :npm-deps {:xregexp "4.2.0"}
+
+                                 ;; https://github.com/bhauman/lein-figwheel/issues/88
+                                 ;; :closure-defines {"goog.DEBUG" false}
+                                 :recompile-dependents false
+
+                                 :pretty-print         true
+
+                                 :fn-invoke-direct true
+
+                                 ;; :pseudo-names true
+
+                                 :external-config      {:devtools/config {:features-to-install    [:formatters :hints]
+                                                                          :fn-symbol              "F"
+                                                                          :print-config-overrides true}
+                                                        }
+                                 :main "app.core"
+                                 :output-to "public/admin_new/app.js"
+                                 ;; :modules {:cljs-base {:output-to "public/admin_new/base.js"}
+                                 ;;           ;; :vendor    {:entries #{re-frame.core}
+                                 ;;           ;;             :output-to "scripts/vendor.js"}
+                                 ;;           :main      {:entries #{app.core}
+                                 ;;                       :output-to "public/admin_new/dev.js"}}
+
+                                 :infer-externs true
+                                 :externs ["foreign-libs-externs.ext.js"
+                                           "cryptojs.ext.js"
+                                           "moment.ext.js"
+                                           "react.ext.js"
+                                           "react-dom.ext.js"]
+                                 :foreign-libs [
+                                                ;; {:file "foreign-libs/bugsnag.js" :provides ["js.npm.bugsnag"]}
+                                                ;; {:file "foreign-libs/dragula.js" :provides ["js.dragula"]}
+
+                                                ;;unused
+                                                ;; {:file "node_modules/cryptojs/lib/Crypto.js"
+                                                ;;  :provides ["cryptojs.core"]}
+                                                ;; {:file "node_modules/cryptojs/lib/MD5.js"
+                                                ;;  :provides ["cryptojs.md5"]
+                                                ;;  :requires ["cryptojs.core"]}
+
+                                                ;; Needed for snapshot tests and test-runner
+                                                {:file "node_modules/alasql/dist/alasql.js" :provides ["bilby.js.alasql"]}
+                                                {:file "node_modules/lz-string/libs/lz-string.js" :provides ["bilby.js.lz-string"]}
+                                                ;; {:file "bilby/js/setImmediate.js" :provides ["bilby.js.setimmediate"]}
+                                                {:file "bilby/js/diff_match_patch.js" :provides ["bilby.js.diff-match-patch"]}
+                                                {:file "bilby/js/highlight.js" :provides ["bilby.js.highlight"]}
+                                                {:file "bilby/js/vkbeautify.js" :provides ["bilby.js.vkbeautify"]}
+
+                                                ;;webpacked:
+                                                {:file "foreign-libs/index.bundle.js"
+                                                 :provides ["react" "react-dom"
+                                                            "material-ui"
+                                                            "material-ui-styles"
+                                                            ;; "material-ui-icons"
+                                                            "dragula"
+                                                            "bugsnag"
+                                                            "moment"
+                                                            "react-datetime"
+                                                            "react-smooth-dnd"
+                                                            "react-sortable"
+                                                            "react-beautiful-dnd"
+                                                            "atlas-kit-tree"
+                                                            ]
+                                                 :global-exports {
+                                                                  react React
+                                                                  react-dom ReactDOM
+                                                                  material-ui MaterialUI
+                                                                  material-ui-styles MaterialUIStyles
+                                                                  ;; material-ui-icons MaterialUISvgIcons
+                                                                  dragula Dragula
+                                                                  bugsnag Bugsnag
+                                                                  moment moment
+                                                                  react-datetime ReactDatetime
+                                                                  react-smooth-dnd ReactSmoothDnd
+                                                                  react-sortable ReactSortable
+                                                                  react-beautiful-dnd ReactBeautifulDnd
+                                                                  atlas-kit-tree AtlasKitTree
+                                                                  }}]
+                                 }
+                      ;;Compiler config gets merged with each build
+                      :builds [{:id "main"
+                                :source-paths ["src" "src-om"]}]}
+
+ :bilby.revolt.task/capsule {:exclude-paths #{"test" "src/cljs"}
+                             ;; :aliases [:git-deps]
+                             :output-jar "dist/app.jar"
+                             :capsule-type :fat
+                             :main "app.core"
+                             :min-java-version "1.8.0"
+                             :jvm-args "-server"
+                             :system-properties "ENV=prod"
+                             :caplets {"MavenCapsule" [["Repositories" "central clojars(https://repo.clojars.org/)"]
+                                                       ["Allow-Snapshots" "true"]]}}
+
+ ;; plugins
+
+ :revolt.plugin/nrepl {:port 5600}
+ :bilby.revolt.plugin/nrepl-piggieback {:port 5700}
+
+ :revolt.plugin/rebel {:init-ns "user"
+                       :init-banner "Welcome to the rebel.\nStart/stop/reset the app with (dev/start), (dev/stop), (dev/reset)\nStart an nrepl session and run (user/cljs-repl) for a cljs repl"}
+
+ :revolt.plugin/watch {:on-change {:bilby.revolt.task/sass "glob:scss/*.scss"
+                                   ;; :revolt.task/test "glob:**/*.clj"
+                                   }}
+
+ :revolt.plugin/figwheel {:client-print-to [:console]
+                          ;; :watch-dirs ["src/clj" "src-om" "src/frontend"]
+                          ;; :npm {:bundles {"dist/index.bundle.js" "src/webpack/index.js"}}
+                          :builds ["main"]}}
