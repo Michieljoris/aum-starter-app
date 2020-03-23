@@ -1,7 +1,8 @@
 #!/bin/bash
 
 cmd="CLJ_ENV=dev clj "`
-    `"-A:revolt:dev:local-deps:nrepl:slf4j "`
+    `"-A:revolt:dev "`
+    `"-A:local-deps:nrepl:slf4j "`
     `"-p watch,aum.revolt.plugin/nrepl-piggieback,rebel "`
     `"-t info,aum.revolt.task/write-info,aum.revolt.task/sass,"`
     `"aum.revolt.task/update-html"

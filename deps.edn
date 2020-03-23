@@ -260,21 +260,21 @@
                       }
 
            :local-deps {
-                        :override-deps {
-                                        clojure-utils {:local/root "../../clojure-utils"
-                                                       :mvn/version "0.0.0"
-                                                       }
+                        ;; :override-deps {
+                        ;;                 clojure-utils {:local/root "../../clojure-utils"
+                        ;;                                :mvn/version "0.0.0"
+                        ;;                                }
 
-                                        aum {:local/root "../../aum"
-                                             :mvn/version "0.0.0"
-                                             }
+                        ;;                 aum {:local/root "../../aum"
+                        ;;                      :mvn/version "0.0.0"
+                        ;;                      }
 
-                                        }
+                        ;;                 }
                         }
 
            :dev {:extra-deps  {
                                ;; dev tools-----------------------
-                               com.bhauman/figwheel-main {:mvn/version "0.2.0"}
+                               com.bhauman/figwheel-main {:mvn/version "0.2.3"}
                                cider/piggieback {:mvn/version "0.4.0"}
                                weasel {:mvn/version "0.7.0"
                                        :exclusions [org.clojure/clojurescript]}
@@ -286,7 +286,7 @@
                  ;;classpath:
                  :extra-paths ["target/assets"
                                "src/dev/clj"
-                               "src/dev/cljs"
+                               ;; "src/dev/cljs"
                                "src/test"
                                ]
                  }
