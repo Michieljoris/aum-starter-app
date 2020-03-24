@@ -8,7 +8,7 @@
    [pagora.aum.security :as security]
    [pagora.clj-utils.core :as cu]
 
-   [om.util :as om-util]
+   [pagora.aum.om.util :as om-util]
 
    [clojure.set :refer [difference]]
    [cuerdas.core :as str]

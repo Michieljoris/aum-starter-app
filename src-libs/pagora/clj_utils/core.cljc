@@ -87,3 +87,22 @@
      {:msg (goog.object/get e "message")
       :context (goog.object/get e "data")
       :stacktrace (goog.object/get e "stack")}))
+
+(def ^:private uuid-regex
+  (let [x "[0-9a-fA-F]"] (re-pattern (str
+    "^" x x x x x x x x "-" x x x x "-" x x x x "-" x x x x "-" x x x x x x x x x x x x "$"))))
+
+#?(:clj
+   (defn is-uuid?
+     [uuid-str]
+     (try
+       (re-find uuid-regex uuid-str)
+       (catch Exception e))))
+
+
+#?(:cljs
+   (defn is-uuid?
+     [uuid-str]
+     (try
+       (re-find uuid-regex uuid-str)
+       (catch :default e))))
