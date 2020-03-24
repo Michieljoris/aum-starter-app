@@ -57,6 +57,26 @@
         ring/ring-json {:mvn/version "0.4.0"}
         clj-bugsnag {:mvn/version "0.2.9"}
 
+        ;; Bcrypt for use with passwords
+        crypto-password {:mvn/version "0.2.0"}
+
+        com.layerware/hugsql {:mvn/version "0.4.9"}
+
+        clojure.jdbc/clojure.jdbc-c3p0 {:mvn/version "0.3.3"}
+        org.clojure/java.jdbc {:mvn/version "0.7.8"}
+        mysql/mysql-connector-java {:mvn/version "5.1.47"
+                                    ;; "8.0.15"
+                                    }
+
+        com.taoensso/sente {:mvn/version "1.13.1"}
+
+
+
+
+
+
+        ;; pandect {:mvn/version "0.6.1"}
+
         ;; ring/ring-mock {:mvn/version "0.3.2"}
         ;; ring.middleware.conditional {:mvn/version "0.2.0"}
         ;;AUM deps

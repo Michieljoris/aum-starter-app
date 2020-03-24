@@ -1,12 +1,8 @@
 (ns app.config
   (:require
    [pagora.aum.config :refer [make-config]]
-   [integrant.core :as ig]
-   [environ.core :refer [env]]
-   [pagora.clj-utils.core :as cu]
-   [taoensso.timbre.appenders.3rd-party.logstash :refer [logstash-appender]]
+   [database.config :refer [db-config]]
    [taoensso.timbre :as timbre]
-   [jansi-clj.core :as jansi]
    ))
 
 ;; Config keys need to be assigned scalar values (so no maps or vectors) so we
@@ -88,10 +84,11 @@
    :es-url "http://127.0.0.1:9200"
    })
 
-(def config (make-config {:dev {}
-                          :prod prod-config
-                          :staging prod-config
-                          :test test-config}))
+(def config (make-config {:environments {:dev {}
+                                         :prod prod-config
+                                         :staging prod-config
+                                         :test test-config}
+                          :db-config db-config}))
 
 ;;Merged with frontend config, so any config vars, or any other setting you want
 ;;the frontend to have access to add to the map returned by this macro.

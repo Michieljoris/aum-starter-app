@@ -1,7 +1,7 @@
-(ns pagora.aum.backend.web-server.handler
+(ns pagora.aum.web-server.handler
   (:require
 
-   ;; [bilby.security :as security]
+   [pagora.aum.security :as security]
    ;; [app.integrations :as integrations]
 
    [integrant.core :as ig]
@@ -186,12 +186,11 @@
          ;; :version           (:version integrations/build-info)
          ;; A optional function to extract a user object from a ring request map
          ;; Used to count how many users are affected by a crash
-         ;;TODO: uncomment and add bilby.security!!!!
-         ;; :user-from-request (fn [request]
-         ;;                      (security/get-user-by-remember-token {:db-conn   db-conn
-         ;;                                                            :db-config db-config}
-         ;;                                                           request
-         ;;                                                           [:id :group-id]))
+         :user-from-request (fn [request]
+                              (security/get-user-by-remember-token {:db-conn   db-conn
+                                                                    :db-config db-config}
+                                                                   request
+                                                                   [:id :group-id]))
          })
        (wrap-cookies)                                        ;; Needed for bugsnag (it's not included with wrap-defaults)
        ;;TODO: in production this should show something less scary than a

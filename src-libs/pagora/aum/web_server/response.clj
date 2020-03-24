@@ -1,17 +1,14 @@
-(ns pagora.aum.backend.web-server.response
+(ns pagora.aum.web-server.response
   (:require
-            ;; [dc-admin.backend.app.config :refer [config]]
-            ;; [bilby.security :as security]
-
-            [cheshire.core :as json]
-            [cheshire.generate :as gen]
-            [ring.util.response :refer [content-type response status]]
-            [taoensso.timbre :as timbre :refer [debug]]
-            [clojure.string :as str])
+   [pagora.aum.security :as security]
+   [cheshire.core :as json]
+   [cheshire.generate :as gen]
+   [ring.util.response :refer [content-type response status]]
+   [taoensso.timbre :as timbre :refer [debug]]
+   [clojure.string :as str])
   (:import (com.fasterxml.jackson.core JsonGenerator JsonFactory JsonGenerator$Feature)
            (java.io StringWriter Writer))
   )
-
 
 (gen/add-encoder org.joda.time.DateTime
                  (fn [c jsonGenerator]

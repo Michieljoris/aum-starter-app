@@ -5,7 +5,7 @@
              [taoensso.timbre :as timbre]
              [integrant.core :as ig]
              [integrant.repl :as ig-repl]
-             [pagora.aum.backend.integrant :refer [make-ig-config]]))
+             [pagora.aum.integrant :refer [make-ig-config]]))
 
 (def weasel-repl-env (weasel.repl.websocket/repl-env :ip "0.0.0.0" :port 9001))
 
@@ -25,6 +25,7 @@
     (timbre/info (into [] (ig/load-namespaces ig-config)))
     (ig-repl/set-prep! (constantly ig-config))
     ))
+
 
 
 

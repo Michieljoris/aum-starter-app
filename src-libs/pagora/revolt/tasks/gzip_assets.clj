@@ -11,24 +11,24 @@
 ;;Copied from org.martinklepsch.boot-gzip
 
 
-(defn invoke [{:keys [public-path assets] :as ctx} options target]
-  (utils/timed
-   "GZIP-ASSETS"
-   (let [assets-path (str (utils/ensure-relative-path target "assets") "/" public-path "/")]
-     (loop [assets assets ctx ctx]
-       (if-let [[asset fingerprintend-asset] (first assets)]
-         (let [in (io/file (str assets-path fingerprintend-asset))
-               target (str fingerprintend-asset ".gz")
-               out (io/file assets-path target)]
-           (gzip-file in out)
-           (let [origin-size (.length in)
-                 new-size    (.length out)]
-             (println (format "Gzipped %s (%s) to %s (%s), saving %s%%\n"
-                              fingerprintend-asset (bytes->human-readable origin-size)
-                              target (bytes->human-readable new-size)
-                              (percent-saved origin-size new-size))))
-           (recur (rest assets) (update-in ctx [:assets asset] #(str % ".gz"))))
-         ctx)))))
+;; (defn invoke [{:keys [public-path assets] :as ctx} options target]
+;;   (utils/timed
+;;    "GZIP-ASSETS"
+;;    (let [assets-path (str (utils/ensure-relative-path target "assets") "/" public-path "/")]
+;;      (loop [assets assets ctx ctx]
+;;        (if-let [[asset fingerprintend-asset] (first assets)]
+;;          (let [in (io/file (str assets-path fingerprintend-asset))
+;;                target (str fingerprintend-asset ".gz")
+;;                out (io/file assets-path target)]
+;;            (gzip-file in out)
+;;            (let [origin-size (.length in)
+;;                  new-size    (.length out)]
+;;              (println (format "Gzipped %s (%s) to %s (%s), saving %s%%\n"
+;;                               fingerprintend-asset (bytes->human-readable origin-size)
+;;                               target (bytes->human-readable new-size)
+;;                               (percent-saved origin-size new-size))))
+;;            (recur (rest assets) (update-in ctx [:assets asset] #(str % ".gz"))))
+;;          ctx)))))
 
 ;; (pprint (invoke {:public-path "public/"
 ;;           :assets {"admin_new/app.css"

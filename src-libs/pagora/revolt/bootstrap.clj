@@ -28,7 +28,7 @@
 
   ;; :dependencies (fn [_] (apply conj mvn-deps
 
-  ;;                              ;;For copying to bilby dir.
+  ;;                              ;;For copying to root dir.
   ;;                              ['com.newrelic.agent.java/newrelic-agent new-relic-version]
 
   ;;                              ;;We can just conj this

@@ -1,4 +1,4 @@
-(ns pagora.aum.backend.web-server.core
+(ns pagora.aum.web-server.core
   (:require
    [integrant.core :as ig]
    [org.httpkit.server :as httpkit]

@@ -137,9 +137,9 @@
                   [k (get-env-var-or-v k (get config k))])
                 (keys config))))
 
-(defn make-config [configs]
+(defn make-config [{:keys [environments db-config]}]
   (let [environment (or (keyword (env :clj-env)) :dev)
-        config (get configs environment)
+        config (get environments environment)
         config (merge default-config parser-config config)
         config (merge config (config-from-env config))
         mysql-database {:url (:db-url config)
@@ -167,7 +167,7 @@
                       :logstash-port (cu/parse-natural-number (:logstash-port config))
                       :limit-max (cu/parse-natural-number (:limit-max config))
                       :obs-endpoint (str "https://" (:obs-bucket config) ".obs.otc.t-systems.com")
-                      )
+                      :db-config db-config)
         config (update config :gz-mime-types #(cond
                                                 (true? %) #{"text/css" "text/javascript"}
                                                 (and % (not-empty %)) %

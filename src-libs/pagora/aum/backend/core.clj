@@ -1,9 +1,9 @@
 (ns pagora.aum.backend.core
   (:require
-   [pagora.aum.backend.integrant :refer [make-ig-config]]
-   ;; [pagora.aum.backend.web-server.web-server]
-   ;; [pagora.aum.backend.web-server.handler]
-   ;; [pagora.aum.backend.web-server.routes]
+   [pagora.aum.integrant :refer [make-ig-config]]
+   ;; [pagora.aum.web-server.web-server]
+   ;; [pagora.aum.web-server.handler]
+   ;; [pagora.aum.web-server.routes]
    [taoensso.timbre :as timbre]
    [integrant.core :as ig]
    ))
