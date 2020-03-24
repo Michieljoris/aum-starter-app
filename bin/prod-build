@@ -5,13 +5,13 @@ prod-install-js
 #It's necessary to set CLJ_ENV at compile time so that the right config is selected in the public-config macro!!!
 cmd="CLJ_ENV=prod clj -A:revolt:pack:cljs:slf4j  "`
 `"-t clean,info,"`
-`"aum.revolt.task/write-info,"`
-`"aum.revolt.task/copy-newrelic-jar,"`
-`"aum.revolt.task/sass,"`
+`"pagora.revolt.task/write-info,"`
+`"pagora.revolt.task/copy-newrelic-jar,"`
+`"pagora.revolt.task/sass,"`
 `"cljs:compiler.optimizations=advanced,"`
-`"aum.revolt.task/assets,"`
-`"aum.revolt.task/update-html,"`
-`"aum.revolt.task/capsule"
+`"pagora.revolt.task/assets,"`
+`"pagora.revolt.task/update-html,"`
+`"pagora.revolt.task/capsule"
 echo "$(tput setaf 7)$cmd$(tput sgr0)"
 eval $cmd
 

@@ -2,7 +2,7 @@
  :watch-dirs [;; "src"
               "src-frontend"
               ;; "bilby-libs-frontend"
-              "aum-next/src"
+              "pagora/aum/src"
               ;; "src/"
               "src-om"
               "src-dev/cljs"]

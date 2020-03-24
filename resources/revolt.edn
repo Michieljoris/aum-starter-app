@@ -1,14 +1,14 @@
 {
  ;; Tasks
- :aum.revolt.task/aot    {:exclude-namespaces ["aum.revolt." "revolt."]
+ :pagora.revolt.task/aot    {:exclude-namespaces ["pagora.revolt." "revolt."]
                           :extra-namespaces [;; mount.core
                                              clojure.tools.reader.reader-types
                                              ;; clojure.tools.logging.impl
                                              ]}
 
- :aum.revolt.task/write-info   {:path "resources/build-info.json"}
+ :pagora.revolt.task/write-info   {:path "resources/build-info.json"}
 
- :aum.revolt.task/update-html {:src-path "resources/app-template.html"
+ :pagora.revolt.task/update-html {:src-path "resources/app-template.html"
                                :dest-path "resources/app.html"
 
                                :dev {:load-user-ns true ;; add script link to app.html that loads the user namespace, also see figwheel-main.edn
@@ -25,19 +25,19 @@
                                }
 
  ;;This should match the version in deps.edn!!!!!
- ;; :aum.revolt.task/copy-newrelic-jar {:version "4.2.0"}
+ ;; :pagora.revolt.task/copy-newrelic-jar {:version "4.2.0"}
  
- :aum.task/info   {:name "pagora-app"
+ :pagora.task/info   {:name "pagora-app"
                    :package pagora-app
                    :version "0.0.1"
                    :description "pagora app"}
 
  :revolt.task/test   {:report :pretty}
 
- :aum.revolt.task/sass   {:source-path "scss"
+ :pagora.revolt.task/sass   {:source-path "scss"
                           :output-dir "public/app"}
 
- :aum.revolt.task/assets {:assets-paths ["assets"]
+ :pagora.revolt.task/assets {:assets-paths ["assets"]
                           :exclude-paths ["assets/app"]
                           :public-path "public/"
                           :gzip true
@@ -63,7 +63,7 @@
                                  ;; :install-deps true
                                  ;; :npm-deps {:xregexp "4.2.0"}
 
-                                 ;; https://github.com/bhauman/lein-figwheel/issues/88
+                                 ;; https://github.com/bhpagoraan/lein-figwheel/issues/88
                                  ;; :closure-defines {"goog.DEBUG" false}
                                  :recompile-dependents false
 
@@ -103,12 +103,12 @@
                                                 ;;  :requires ["cryptojs.core"]}
 
                                                 ;; Needed for snapshot tests and test-runner
-                                                {:file "node_modules/alasql/dist/alasql.js" :provides ["aum.js.alasql"]}
-                                                {:file "node_modules/lz-string/libs/lz-string.js" :provides ["aum.js.lz-string"]}
-                                                ;; {:file "aum/js/setImmediate.js" :provides ["aum.js.setimmediate"]}
-                                                {:file "aum/js/diff_match_patch.js" :provides ["aum.js.diff-match-patch"]}
-                                                {:file "aum/js/highlight.js" :provides ["aum.js.highlight"]}
-                                                {:file "aum/js/vkbeautify.js" :provides ["aum.js.vkbeautify"]}
+                                                {:file "node_modules/alasql/dist/alasql.js" :provides ["pagora.js.alasql"]}
+                                                {:file "node_modules/lz-string/libs/lz-string.js" :provides ["pagora.js.lz-string"]}
+                                                ;; {:file "pagora/js/setImmediate.js" :provides ["pagora.js.setimmediate"]}
+                                                {:file "pagora/js/diff_match_patch.js" :provides ["pagora.js.diff-match-patch"]}
+                                                {:file "pagora/js/highlight.js" :provides ["pagora.js.highlight"]}
+                                                {:file "pagora/js/vkbeautify.js" :provides ["pagora.js.vkbeautify"]}
 
                                                 ;;webpacked:
                                                 {:file "foreign-libs/index.bundle.js"
@@ -145,7 +145,7 @@
                       :builds [{:id "main"
                                 :source-paths ["src" "src-om"]}]}
 
- :aum.revolt.task/capsule {:exclude-paths #{"test" "src/cljs"}
+ :pagora.revolt.task/capsule {:exclude-paths #{"test" "src/cljs"}
                              ;; :aliases [:git-deps]
                              :output-jar "dist/app.jar"
                              :capsule-type :fat
@@ -159,12 +159,12 @@
  ;; plugins
 
  :revolt.plugin/nrepl {:port 5600}
- :aum.revolt.plugin/nrepl-piggieback {:port 5700}
+ :pagora.revolt.plugin/nrepl-piggieback {:port 5700}
 
- :revolt.plugin/rebel {:init-ns "aum.dev.user"
+ :revolt.plugin/rebel {:init-ns "user"
                        :init-banner "Welcome to the rebel.\nStart/stop/reset the app with (dev/start), (dev/stop), (dev/reset)\nStart an nrepl session and run (user/cljs-repl) for a cljs repl"}
 
- :revolt.plugin/watch {:on-change {:aum.revolt.task/sass "glob:scss/*.scss"
+ :revolt.plugin/watch {:on-change {:pagora.revolt.task/sass "glob:scss/*.scss"
                                    ;; :revolt.task/test "glob:**/*.clj"
                                    }}
 
