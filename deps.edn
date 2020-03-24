@@ -70,6 +70,8 @@
 
         com.taoensso/sente {:mvn/version "1.13.1"}
 
+        com.taoensso/tufte {:mvn/version "2.1.0"}
+
 
 
 

@@ -1,7 +1,7 @@
 (ns app.config
   (:require
-   [pagora.aum.config :refer [make-config]]
-   [database.config :refer [db-config]]
+   [pagora.aum.config :as aum]
+   [app.database.config :refer [db-config]]
    [taoensso.timbre :as timbre]
    ))
 
@@ -84,11 +84,11 @@
    :es-url "http://127.0.0.1:9200"
    })
 
-(def config (make-config {:environments {:dev {}
-                                         :prod prod-config
-                                         :staging prod-config
-                                         :test test-config}
-                          :db-config db-config}))
+(def config (aum/make-config {:environments {:dev {}
+                                             :prod prod-config
+                                             :staging prod-config
+                                             :test test-config}
+                              :db-config db-config}))
 
 ;;Merged with frontend config, so any config vars, or any other setting you want
 ;;the frontend to have access to add to the map returned by this macro.

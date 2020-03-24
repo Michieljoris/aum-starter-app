@@ -62,3 +62,28 @@
 
 (defn keyword->underscored-string [k]
   (if k (hyphen->underscore (name k))))
+
+(defn deep-merge-concat-vectors
+  "Deep merges two maps. As per normal merge, values in b overwrite
+  values in a, however vectors are concatenated, with duplicates
+  removed. "
+  [a b]
+  (merge-with (fn [x y]
+                (cond (and (map? x) (map? y)) (deep-merge-concat-vectors x y)
+                      (and (or (vector? x) (nil? x))
+                           (or (vector? y) (nil? y))
+                           (or (vector? x) (vector? y))) (vec (distinct (concat x y)))
+                      :else y))
+              a b))
+
+#?(:clj
+   (defn parse-ex-info [^Exception e]
+     {:msg (or (.getMessage e) (.toString e))
+      :context (ex-data e)
+      :stacktrace (.getStackTrace e)}))
+
+#?(:cljs
+   (defn parse-ex-info [e]
+     {:msg (goog.object/get e "message")
+      :context (goog.object/get e "data")
+      :stacktrace (goog.object/get e "stack")}))
