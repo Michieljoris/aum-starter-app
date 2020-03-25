@@ -73,7 +73,7 @@
                :sql sql}))
 
 (defmethod ig/init-key ::parser-env [_ {:keys [config db-conn]}]
-  (timbre/info :#g "Starting parser-env")
+  (timbre/info :#g "[INTEGRANT] creating parser-env")
   (make-parser-env {:parser-config config
                     :db-config (:db-config config) ;;description of tables, their names, joins, crud permissions and validations
                     :db-conn #?(:clj db-conn :cljs @db-conn)
@@ -141,6 +141,6 @@
 (defn make-parser [parser-env]
   (parser parser-env))
 
-(defmethod ig/init-key ::parser [_ {:keys [config parser-env]}]
-  (timbre/info :#g "Starting parser")
+(defmethod ig/init-key ::parser [k {:keys [config parser-env]}]
+  (timbre/info :#g "[INTEGRANT] creating" (name k))
   (make-parser {:parser-env #?(:clj parser-env :cljs @parser-env)}))

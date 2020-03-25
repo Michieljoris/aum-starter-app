@@ -1,8 +1,7 @@
 (ns pagora.aum.websockets.sente
   (:require [pagora.aum.security :as security]
-            [parser.core :refer [parser-env]]
+            [pagora.aum.util :as au]
             [taoensso.sente :as sente]
-            [common.util :as u]
             [taoensso.timbre :as timbre]
             [taoensso.sente.server-adapters.http-kit :refer [get-sch-adapter]]))
 
@@ -12,7 +11,7 @@
   [env req]
   ;; (timbre/info "Getting user id for sente!!!!!!!")
   (let [user-id (:id (security/get-user-by-remember-token env req [:id]))]
-    (u/user-id->uid user-id)))
+    (au/user-id->uid user-id)))
 
 ;; (get-user-id {:cookies {"remember_token" {:value "f830c933-9ee9-4e40-8796-59428f448e32"}} })
 

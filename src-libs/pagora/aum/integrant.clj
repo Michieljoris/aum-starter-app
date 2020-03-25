@@ -12,9 +12,11 @@
    {:config config
     :routes (ig/ref :pagora.aum.web-server.routes/routes)}
 
-   :pagora.aum.web-server.core/httpkit
+   :pagora.aum.web-server.core/httpkit-server
    {:server-options server
     :handler (ig/ref :pagora.aum.web-server.handler/handler)}
+
+
 
    :pagora.aum.database.connection/db-conn
    {:config config}
@@ -26,8 +28,14 @@
   
    :pagora.aum.parser.core/parser
    {:config config
-    :parser-env (ig/ref :pagora.aum.parser.core/parser-env)}}
+    :parser-env (ig/ref :pagora.aum.parser.core/parser-env)}
 
+   :pagora.aum.websockets.core/websockets
+   {:config config
+    :parser (ig/ref :pagora.aum.parser.core/parser)
+    :parser-env (ig/ref :pagora.aum.parser.core/parser-env)}
+   }
+ 
   )
 
 (def namespaces-with-defmethods

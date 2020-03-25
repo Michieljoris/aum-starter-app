@@ -469,3 +469,9 @@
       (if denormalize?
         {:record result}
         {:table-data table-data :record (get-in table-data [(table->table-by-id table) id])}))))
+
+(defn user-id->uid [user-id]
+  (keyword (str "uid-" (or user-id "nil"))))
+
+(defn is-development? [{:keys [clj-env]}]
+  (= clj-env :dev))

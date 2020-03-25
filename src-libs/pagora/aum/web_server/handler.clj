@@ -206,5 +206,6 @@
    :headers {"Content-Type" "text/html"}
    :body    "Hello HTTP!"})
 
-(defmethod ig/init-key ::handler [_ {:keys [routes config]}]
+(defmethod ig/init-key ::handler [k {:keys [routes config]}]
+  (timbre/info :#g "[INTEGRANT] creating" (name k))
   (make-handler config routes))

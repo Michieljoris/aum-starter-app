@@ -1,5 +1,6 @@
 (ns pagora.aum.websockets.core
   (:require
+   [integrant.core :as ig]
    [websockets.sente :as sente]
    [taoensso.sente :as taensso-sente]
    [taoensso.timbre :as timbre]
@@ -20,20 +21,24 @@
   {"/chsk" {:get { "" sente/ring-ajax-get-or-ws-handshake }
             :post { ""  sente/ring-ajax-post }}})
 
-(defn start-router! []
+(defn start-router! [config parser-env]
   (let [stop-fn (taensso-sente/start-chsk-router! sente/ch-chsk event-msg-handler*
                                                   {:simple-auto-threading? true})]
-    ;; (info "Started sente router")
     stop-fn))
 
-(defn stop-router! [stop-fn]
-  (stop-fn)
-  ;; (timbre/info "Stopped sente router")
-  )
+(defmethod ig/init-key ::websockets [k {:keys [config parser-env]}]
+  (timbre/info :#g "[INTEGRANT] creating" (name k))
+  {:stop-fn (start-router! config parser-env)
+   :config config})
 
-(mount/defstate ^{:on-reload :noop} sente-router
-  :start (start-router!)
-  :stop (stop-router! sente-router))
+(defmethod ig/halt-key! ::websockets [k {:keys [stop-fn config]}]
+  (timbre/info :#g "[INTEGRANT] halting" (name k))
+  (timbre/info "Stopping websockets!!!")
+  (stop-fn))
+
+;; (mount/defstate ^{:on-reload :noop} sente-router
+;;   :start
+;;   :stop (stop-router! sente-router))
 
 
 

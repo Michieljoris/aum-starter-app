@@ -14,7 +14,7 @@
                        [om.next.cache :as c]])
             [pagora.aum.om.next.impl.parser :as parser]
 
-            [pagora.aum.debug.core :refer [mark-point now-in-ms warn-when]]
+            [pagora.aum.dev.debug :refer [mark-point now-in-ms warn-when]]
             [pagora.aum.om.db-to-tree :refer [db->tree]]
             ;; [om.tree-to-db :refer [tree->db]]
             ;; [om.reconciler :refer [Reconciler]]

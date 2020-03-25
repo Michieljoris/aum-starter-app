@@ -1,4 +1,4 @@
-(ns  pagora.aum.debug.core
+(ns  pagora.aum.dev.debug
   (:require
    [taoensso.timbre :as timbre]
    [cuerdas.core :as str]

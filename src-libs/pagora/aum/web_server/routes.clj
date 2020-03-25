@@ -82,6 +82,7 @@
            true resp/not-found}
           routes)]))
 
-(defmethod ig/init-key ::routes [_ {:keys [config]}]
+(defmethod ig/init-key ::routes [k {:keys [config]}]
+  (timbre/info :#g "[INTEGRANT] creating" (name k))
   (make-routes config))
 

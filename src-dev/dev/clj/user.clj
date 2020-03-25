@@ -1,7 +1,7 @@
 (ns user
   (:require
    [app.config :refer [config]]
-   [pagora.aum.dev :as dev]
+   [pagora.aum.dev.core :as dev]
    [integrant.repl :refer [clear go halt init prep reset reset-all]]
    [integrant.repl.state :as ig-state]
 
