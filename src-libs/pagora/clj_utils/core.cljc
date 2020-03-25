@@ -1,8 +1,7 @@
 (ns pagora.clj-utils.core
   (:require
    [cuerdas.core :as str]
-   [clojure.walk :as walk]
-   ))
+   [clojure.walk :as walk]))
 
 (defn parse-natural-number
   "Reads and returns an integer from a string, or the param itself if
@@ -99,10 +98,45 @@
        (re-find uuid-regex uuid-str)
        (catch Exception e))))
 
-
 #?(:cljs
    (defn is-uuid?
      [uuid-str]
      (try
        (re-find uuid-regex uuid-str)
        (catch :default e))))
+
+#?(:cljs
+   (defn debounce [f interval]
+     (let [timeout (atom nil)]
+       (fn [& args]
+         (when-not (nil? @timeout)
+           (.disposeInternal @timeout))
+         (reset! timeout (Delay. #(apply f args)))
+         (.start @timeout interval)))))
+
+(defn atom? [x]
+  #?(:clj  (instance? clojure.lang.Atom x)
+     :cljs (satisfies? IAtom x)))
+
+#?(:cljs
+   (defn from-now
+     ([t some-moment] (from-now some-moment :nl))
+     ([t some-moment locale]
+      (let [some-moment (js/moment some-moment)
+            now (js/moment)
+            tzOffset (getTimezoneOffsetInMinutes)
+            some-moment (.subtract some-moment tzOffset "minutes")]
+        (.locale js/moment (name locale))
+        (cond
+          ;; (not (.isValid some-moment)) (t "Date not valid")
+          (not (.isValid some-moment)) ""
+          (.isAfter some-moment (.subtract now 21 "hours")) (.fromNow some-moment false)
+          (.isAfter some-moment (.subtract now 48 "hours")) (str (t "Yesterday at") " " (.format some-moment "LT"))
+          :else (.format some-moment (str "LL [" (t "at") "] LT")))))))
+
+(defn escape-sql-like-term
+   "Returns string that can be used as term after LIKE in a sql
+  query by escaping specific sql chars ([, ], _ and %). Regex works
+  differently in clj then cljs"
+   [s]
+   (str "%" (str/replace s #"(\[|\]|\_|\%)" "\\\\$1") "%"))

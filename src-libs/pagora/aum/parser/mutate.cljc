@@ -1,15 +1,11 @@
 (ns pagora.aum.parser.mutate
   (:require [pagora.aum.database.query :refer [sql]]
             [pagora.aum.security :refer [get-validation-fun get-whitelist logout]]
-
-            [bilby.parser.mutate-save-mods :refer [save-mods-transaction]]
             [pagora.clj-utils.core :as cu]
-
-            [bilby.util :as bu]
-
+            [pagora.aum.parser.mutate-save-mods :refer [save-mods-transaction]]
+            [pagora.aum.util :as au]
             [clojure.set :as set]
             [taoensso.timbre :as timbre :refer [info warn spy]]))
-
 
 ;;for repl-ing
 ;;(ns-unmap *ns* 'mutate))
@@ -132,7 +128,7 @@
   (let [method (if (cu/is-uuid? id) :create :update)
         tempids (atom nil)
         table-data (when (= method :update)
-                     (bu/perform-query env [(list {table ['*]} {:where [:id := id]})]))
+                     (au/perform-query env [(list {table ['*]} {:where [:id := id]})]))
         ;; _ (timbre/info "mutate-save-record" table-data)
         env (assoc env
                    :tempids tempids
@@ -146,14 +142,14 @@
 (defmethod mutate 'admin/save-record
   [{:keys [user parser state] :as env} _ params]
   (let [{:keys [record-id] :as result} (mutate-save-record env params)
-        {:keys [table-data]} (bu/read-record env (assoc params :id record-id))]
+        {:keys [table-data]} (au/read-record env (assoc params :id record-id))]
     (swap! state update :table-data #(cu/deep-merge-concat-vectors % table-data))
     (select-keys result [:tempids :keys])))
 
 "Retrieves current record and calls sql fn to delete it."
 (defmethod mutate 'admin/delete-record
   [{:keys [user parser] :as env} key {:keys [table id]}]
-  (let [table-data  (bu/perform-query env [(list {table ['*]} {:where [:id := id]})])
+  (let [table-data  (au/perform-query env [(list {table ['*]} {:where [:id := id]})])
         natural-number-id (cu/parse-natural-number id)
         table-by-id (keyword (str (name table) "/by-id"))
         current-record (get-in table-data [table-by-id natural-number-id])]
@@ -163,7 +159,7 @@
 ;; (defmethod mutate 'admin/save-records
 ;;   [{:keys [user parser state] :as env} _ params]
 ;;   (let [{:keys [record-id] :as result} (mutate-save-record env params)
-;;         {:keys [table-data]} (bu/read-record env (assoc params :id record-id))]
+;;         {:keys [table-data]} (au/read-record env (assoc params :id record-id))]
 ;;     (swap! state update :table-data #(cu/deep-merge-concat-vectors % table-data))
 ;;     (select-keys result [:tempids :keys])))
 

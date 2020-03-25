@@ -2,13 +2,7 @@
   (:require
    [websockets.sente :as sente]
    [taoensso.sente :as taensso-sente]
-   [bilby.security :as security]
-   [common.util :as u]
-   [mount.core :as mount]
-   [parser.core :refer [parser-env]]
-   [taoensso
-    [timbre :as timbre]]
-   [taoensso.sente.server-adapters.http-kit :refer [get-sch-adapter]]
+   [taoensso.timbre :as timbre]
    [websockets.dispatcher :refer [event-msg-handler*]]))
 
 ;; ;; debug fn
@@ -16,7 +10,7 @@
   (sente/chsk-send! :taoensso.sente/nil-uid [:some/request-id {:name "michiel"}])
   )
 
-;; ;; We can watch this atom for changes if we like
+;; We can watch this atom for changes if we like
 (add-watch sente/connected-uids :connected-uids
   (fn [_ _ old new]
     (when (not= old new)

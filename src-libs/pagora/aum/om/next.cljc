@@ -119,11 +119,11 @@
        (fn [[name [this :as args] & body]]
          `(~name [this#]
            (let [~this this#]
-             (binding [om.next/*reconciler* (om.next/get-reconciler this#)
-                       om.next/*depth*      (inc (om.next/depth this#))
-                       om.next/*shared*     (om.next/shared this#)
-                       om.next/*instrument* (om.next/instrument this#)
-                       om.next/*parent*     this#]
+             (binding [pagora.aum.om.next/*reconciler* (om.next/get-reconciler this#)
+                       pagora.aum.om.next/*depth*      (inc (om.next/depth this#))
+                       pagora.aum.om.next/*shared*     (om.next/shared this#)
+                       pagora.aum.om.next/*instrument* (om.next/instrument this#)
+                       pagora.aum.om.next/*parent*     this#]
                (let [ret# (do ~@body)
                      props# (:props this#)]
                  (when-not @(:omcljs$mounted? props#)
@@ -133,18 +133,18 @@
        (fn [[name [this :as args] & body]]
          `(~name [this#]
            (let [~this    this#
-                 indexer# (get-in (om.next/get-reconciler this#) [:config :indexer])]
+                 indexer# (get-in (pagora.aum.om.next/get-reconciler this#) [:config :indexer])]
              (when-not (nil? indexer#)
-               (om.next.protocols/index-component! indexer# this#))
+               (pagora.aum.om.next.protocols/index-component! indexer# this#))
              ~@body)))}
       :defaults
       `{~'initLocalState
         ([this#])
         ~'componentWillMount
         ([this#]
-         (let [indexer# (get-in (om.next/get-reconciler this#) [:config :indexer])]
+         (let [indexer# (get-in (pagora.aum.om.next/get-reconciler this#) [:config :indexer])]
            (when-not (nil? indexer#)
-             (om.next.protocols/index-component! indexer# this#))))
+             (pagora.aum.om.next.protocols/index-component! indexer# this#))))
         ~'render
         ([this#])}}))
 
@@ -159,70 +159,70 @@
     (fn [[name [this next-props :as args] & body]]
       `(~name [this# next-props#]
          (let [~this this#
-               ~next-props (om.next/-next-props next-props# this#)]
+               ~next-props (pagora.aum.om.next/-next-props next-props# this#)]
            ~@body)))
     'componentWillUpdate
     (fn [[name [this next-props next-state :as args] & body]]
       `(~name [this# next-props# next-state#]
          (let [~this       this#
-               ~next-props (om.next/-next-props next-props# this#)
+               ~next-props (pagora.aum.om.next/-next-props next-props# this#)
                ~next-state (or (goog.object/get next-state# "omcljs$pendingState")
                                (goog.object/get next-state# "omcljs$state"))
                ret#        (do ~@body)]
-           (when (cljs.core/implements? om.next/Ident this#)
-             (let [ident# (om.next/ident this# (om.next/props this#))
-                   next-ident# (om.next/ident this# ~next-props)]
+           (when (cljs.core/implements? pagora.aum.om.next/Ident this#)
+             (let [ident# (pagora.aum.om.next/ident this# (om.next/props this#))
+                   next-ident# (pagora.aum.om.next/ident this# ~next-props)]
                (when (not= ident# next-ident#)
-                 (let [idxr# (get-in (om.next/get-reconciler this#) [:config :indexer])]
+                 (let [idxr# (get-in (pagora.aum.om.next/get-reconciler this#) [:config :indexer])]
                    (when-not (nil? idxr#)
                      (swap! (:indexes idxr#)
                        (fn [indexes#]
                          (-> indexes#
                            (update-in [:ref->components ident#] disj this#)
                            (update-in [:ref->components next-ident#] (fnil conj #{}) this#)))))))))
-           (om.next/merge-pending-props! this#)
-           (om.next/merge-pending-state! this#)
+           (pagora.aum.om.next/merge-pending-props! this#)
+           (pagora.aum.om.next/merge-pending-state! this#)
            ret#)))
     'componentDidUpdate
     (fn [[name [this prev-props prev-state :as args] & body]]
       `(~name [this# prev-props# prev-state#]
          (let [~this       this#
-               ~prev-props (om.next/-prev-props prev-props# this#)
+               ~prev-props (pagora.aum.om.next/-prev-props prev-props# this#)
                ~prev-state (goog.object/get prev-state# "omcljs$previousState")]
            ~@body
-           (om.next/clear-prev-props! this#))))
+           (pagora.aum.om.next/clear-prev-props! this#))))
     'componentWillMount
     (fn [[name [this :as args] & body]]
       `(~name [this#]
          (let [~this    this#
-               indexer# (get-in (om.next/get-reconciler this#) [:config :indexer])]
+               indexer# (get-in (pagora.aum.om.next/get-reconciler this#) [:config :indexer])]
            (when-not (nil? indexer#)
-             (om.next.protocols/index-component! indexer# this#))
+             (pagora.aum.om.next.protocols/index-component! indexer# this#))
            ~@body)))
     'componentWillUnmount
     (fn [[name [this :as args] & body]]
       `(~name [this#]
          (let [~this    this#
-               r#       (om.next/get-reconciler this#)
+               r#       (pagora.aum.om.next/get-reconciler this#)
                cfg#     (:config r#)
                st#      (:state cfg#)
                indexer# (:indexer cfg#)]
            (when (and (not (nil? st#))
-                      (get-in @st# [:om.next/queries this#]))
-             (swap! st# update-in [:om.next/queries] dissoc this#))
+                      (get-in @st# [:pagora.aum.om.next/queries this#]))
+             (swap! st# update-in [:pagora.aum.om.next/queries] dissoc this#))
            (when-not (nil? indexer#)
-             (om.next.protocols/drop-component! indexer# this#))
+             (pagora.aum.om.next.protocols/drop-component! indexer# this#))
            ~@body)))
     'render
     (fn [[name [this :as args] & body]]
       `(~name [this#]
          (let [~this this#]
            ;; (timbre/info :#b "+++++++++++++++++++++++++++++++++++++++++++++")
-           (binding [om.next/*reconciler* (om.next/get-reconciler this#)
-                     om.next/*depth*      (inc (om.next/depth this#))
-                     om.next/*shared*     (om.next/shared this#)
-                     om.next/*instrument* (om.next/instrument this#)
-                     om.next/*parent*     this#]
+           (binding [pagora.aum.om.next/*reconciler* (pagora.aum.om.next/get-reconciler this#)
+                     pagora.aum.om.next/*depth*      (inc (om.next/depth this#))
+                     pagora.aum.om.next/*shared*     (pagora.aum.om.next/shared this#)
+                     pagora.aum.om.next/*instrument* (pagora.aum.om.next/instrument this#)
+                     pagora.aum.om.next/*parent*     this#]
              ;; (timbre/info "from body of ")
              ;; (js/console.log this#)
             ~@body))))}
@@ -239,7 +239,7 @@
       (let [next-children# (. next-props# -children)
             next-props# (goog.object/get next-props# "omcljs$value")
             next-props# (cond-> next-props#
-                          (instance? om.next/OmProps next-props#) om.next/unwrap)]
+                          (instance? pagora.aum.om.next/OmProps next-props#) pagora.aum.om.next/unwrap)]
         (or (not= (om.next/props this#)
                   next-props#)
             (and (.. this# ~'-state)
@@ -249,38 +249,38 @@
                   next-children#))))
      ~'componentWillUpdate
      ([this# next-props# next-state#]
-      (when (cljs.core/implements? om.next/Ident this#)
-        (let [ident# (om.next/ident this# (om.next/props this#))
-              next-ident# (om.next/ident this# (om.next/-next-props next-props# this#))]
+      (when (cljs.core/implements? pagora.aum.om.next/Ident this#)
+        (let [ident# (pagora.aum.om.next/ident this# (pagora.aum.om.next/props this#))
+              next-ident# (pagora.aum.om.next/ident this# (pagora.aum.om.next/-next-props next-props# this#))]
           (when (not= ident# next-ident#)
-            (let [idxr# (get-in (om.next/get-reconciler this#) [:config :indexer])]
+            (let [idxr# (get-in (pagora.aum.om.next/get-reconciler this#) [:config :indexer])]
               (when-not (nil? idxr#)
                 (swap! (:indexes idxr#)
                   (fn [indexes#]
                     (-> indexes#
                       (update-in [:ref->components ident#] disj this#)
                       (update-in [:ref->components next-ident#] (fnil conj #{}) this#)))))))))
-       (om.next/merge-pending-props! this#)
-       (om.next/merge-pending-state! this#))
+       (pagora.aum.om.next/merge-pending-props! this#)
+       (pagora.aum.om.next/merge-pending-state! this#))
      ~'componentDidUpdate
      ([this# prev-props# prev-state#]
-       (om.next/clear-prev-props! this#))
+       (pagora.aum.om.next/clear-prev-props! this#))
      ~'componentWillMount
      ([this#]
-       (let [indexer# (get-in (om.next/get-reconciler this#) [:config :indexer])]
+       (let [indexer# (get-in (pagora.aum.om.next/get-reconciler this#) [:config :indexer])]
          (when-not (nil? indexer#)
-           (om.next.protocols/index-component! indexer# this#))))
+           (pagora.aum.om.next.protocols/index-component! indexer# this#))))
      ~'componentWillUnmount
      ([this#]
-       (let [r#       (om.next/get-reconciler this#)
+       (let [r#       (pagora.aum.om.next/get-reconciler this#)
              cfg#     (:config r#)
              st#      (:state cfg#)
              indexer# (:indexer cfg#)]
          (when (and (not (nil? st#))
-                    (get-in @st# [:om.next/queries this#]))
-           (swap! st# update-in [:om.next/queries] dissoc this#))
+                    (get-in @st# [:pagora.aum.om.next/queries this#]))
+           (swap! st# update-in [:pagora.aum.om.next/queries] dissoc this#))
          (when-not (nil? indexer#)
-           (om.next.protocols/drop-component! indexer# this#))))}})
+           (pagora.aum.om.next.protocols/drop-component! indexer# this#))))}})
 
 ;; Takes dt seq and 'reshapes' existing react methods to om-next versions.
 ;; Basically prepending code to passed in code. If react method isn't defined,
@@ -416,7 +416,7 @@
           (declare ~name)
           (defrecord ~klass-name [~'state ~'refs ~'props ~'children]
             ;; TODO: non-lifecycle methods defined in the JS prototype - António
-            om.next.protocols/IReactLifecycle
+            pagora.aum.om.next.protocols/IReactLifecycle
             ~@(rest (reshape obj-dt reshape-map-clj))
 
             ~@other-protocols
@@ -427,7 +427,7 @@
                 (list* (symbol (str name "_proto"))
                   non-lifecycle-dt))
 
-            om.next.protocols/IReactComponent
+            pagora.aum.om.next.protocols/IReactComponent
             (~'-render [this#]
              (p/componentWillMount this#)
              (p/render this#)))
@@ -529,7 +529,7 @@
         fn-scope (:fn-scope env)
         fn-name (some-> fn-scope first :name str)]
     (when-not (:elide-asserts opts)
-      `(let [l# om.next/*logger*]
+      `(let [l# pagora.aum.om.next/*logger*]
          (when-not ~condition
            (goog.log/error l#
              (str "Invariant Violation"
@@ -719,7 +719,7 @@
 
 (defn get-query
   "Return a IQuery/IParams instance bound query. Works for component classes
-   and component instances. See also om.next/full-query."
+   and component instances. See also pagora.aum.om.next/full-query."
   [x]
   (when #?(:clj  (iquery? x)
            :cljs (implements? IQuery x))
@@ -778,7 +778,7 @@
 #?(:clj
    (defn factory
      "Create a factory constructor from a component class created with
-      om.next/defui."
+      pagora.aum.om.next/defui."
      ([class]
       (factory class nil))
      ([class {:keys [validator keyfn instrument?]
@@ -822,7 +822,7 @@
 #?(:cljs
    (defn factory
      "Create a factory constructor from a component class created with
-      om.next/defui."
+      pagora.aum.om.next/defui."
      ([class] (factory class nil))
      ([class {:keys [validator keyfn instrument?]
               :or {instrument? true} :as opts}]
@@ -868,7 +868,7 @@
   #?(:cljs {:tag boolean})
   [x]
   (if-not (nil? x)
-    #?(:clj  (or (instance? om.next.protocols.IReactComponent x)
+    #?(:clj  (or (instance? pagora.aum.om.next.protocols.IReactComponent x)
                  (satisfies? p/IReactComponent x))
        :cljs (true? (. x -om$isComponent)))
     false))
@@ -1154,7 +1154,7 @@
      (apply f (get-state component) arg0 arg1 arg2 arg3 arg-rest))))
 
 (defn get-rendered-state
-  "Get the rendered state of component. om.next/get-state always returns the
+  "Get the rendered state of component. pagora.aum.om.next/get-state always returns the
    up-to-date state."
   ([component]
    (get-rendered-state component []))
@@ -1978,7 +1978,7 @@
 
 (defn full-query
   "Returns the absolute query for a given component, not relative like
-   om.next/get-query."
+   pagora.aum.om.next/get-query."
   ([component]
    (when (iquery? component)
      (if (nil? (path component))
@@ -2413,7 +2413,7 @@
                    (mark-point :processing-component c)
                    (let [computed   (get-computed (props c))
                          next-raw-props (ui->props env c)
-                         next-props     (om.next/computed next-raw-props computed)]
+                         next-props     (pagora.aum.om.next/computed next-raw-props computed)]
 
                      ;;Call react willReceiveProps hook if props have changed
                      (when (and
@@ -2695,7 +2695,7 @@
            instrument tx-listen
            easy-reads]
     :or {ui->props    default-ui->props
-         indexer      om.next/indexer
+         indexer      pagora.aum.om.next/indexer
          merge-sends  #(merge-with into %1 %2)
          remotes      [:remote]
          merge        default-merge
@@ -2768,7 +2768,7 @@
   #?(:cljs {:tag boolean})
   [x]
   #?(:cljs (implements? p/IReconciler x)
-     :clj  (or (instance? om.next.protocols.IReconciler x)
+     :clj  (or (instance? pagora.aum.om.next.protocols.IReconciler x)
                (satisfies? p/IReconciler x))))
 
 (defn app-state

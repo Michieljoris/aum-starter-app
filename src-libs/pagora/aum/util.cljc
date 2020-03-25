@@ -1,20 +1,16 @@
 (ns pagora.aum.util
   #?(:cljs
      (:require-macros
-      [digicheck.macros :refer [assert-x]]))
+      [pagora.clj-utils.macros :refer [assert-x]]))
+
   (:require
-   [clojure.set :as set :refer [rename-keys]]
-   ;; [bilby.app-config :refer [config]]
-
-   [clojure.pprint :refer [pprint]]
-
    #?(:clj
-      [digicheck.macros :refer [assert-x]])
+      [pagora.clj-utils.macros :refer [assert-x]])
 
-   [clojure.walk :as walk]
-   [cognitect.transit :as transit]
+   [clojure.set :as set :refer [rename-keys]]
+   [clojure.pprint :refer [pprint]]
    [pagora.aum.om.util :as om-util]
-   [digicheck.common.util :as du]
+   [pagora.clj-utils.core :as cu]
    [cuerdas.core :as str]
    [pagora.aum.om.next :as om]
    [taoensso.timbre :as timbre]))
@@ -105,14 +101,14 @@
 
 #?(:cljs
    (def transact-debounced
-     (du/debounce (fn [this query]
+     (cu/debounce (fn [this query]
                     (om/transact! this query))
                   300)))
 
 (defn select-keys-in-page-state
   [state table-or-path keys]
   (let [path (if (keyword? table-or-path) [:table table-or-path] table-or-path)
-        app-state (if (du/atom? state) @state state)
+        app-state (if (cu/atom? state) @state state)
         {:keys [app/page]} app-state
         page-state-path (concat [:client/page-state page] path)]
      (select-keys (get-in app-state page-state-path) keys)))
@@ -185,7 +181,7 @@
   (let [where-filters (filter-map->where-clauses filters filter-map)
         where-filters (if (seq where-filters) [(if or-filters :or :and) where-filters])
         where-search (if (and (seq search-fields) (not (empty? search-term)))
-                       [:or (mapv #(vector % :like (du/escape-sql-like-term search-term))
+                       [:or (mapv #(vector % :like (cu/escape-sql-like-term search-term))
                                   search-fields)])
         where (into [] (remove nil? [where-filters where-search extra-clause]))]
     (when (seq where) (conj [:and] where))))
@@ -195,7 +191,7 @@
   set in page state for the current route (as set in app state) and
   table"
   [state table]
-  (let [app-state (if (du/atom? state) @state state)
+  (let [app-state (if (cu/atom? state) @state state)
         {:keys [app/page]} app-state]
     (get-in app-state [:client/page-state page :table table :selected-id])))
 
@@ -211,14 +207,16 @@
   route, :client/unsaved-records maps tables to a list of unsaved
   record ids for the table. If any of the edits-tables are not empty
   this fn returns true"
-  [app-state current-route]
+  [app-state current-route config]
+  (timbre/info :#r "Fix this fn!!!! We have to pass config in!!!!")
   (let [{:keys [edits-tables]} (config {:page (keyword (name current-route))})
         unsaved-records-by-table (select-keys (:client/unsaved-records app-state) edits-tables)]
     (some not-empty (vals unsaved-records-by-table))))
 
 (defn get-dirty-routes
-  ([state] (get-dirty-routes identity state))
-  ([t state]
+  ([state config] (get-dirty-routes identity state config))
+  ([t state config]
+   (timbre/info :#r "Fix this fn!!!! We have to pass config in!!!!")
    (let [{:keys [client/unsaved-records]} @state
          dirty-routes (reduce (fn [routes [route page-state]]
                                 (let [{:keys [edits-tables]} (config {:page (keyword (name route))})]
@@ -310,15 +308,15 @@
 #?(:cljs
    (defn print-record [uuid record key]
      (let [meta-record (-> record meta :record)]
-       (pprint (str (or uuid "[uuid]") " " (get record key)  " " (du/from-now identity (:updated-at record)) " :is-dirty? " (:is-dirty? record)))
-       (pprint (str "Meta: " (get  meta-record key) " " (du/from-now identity (:updated-at  meta-record)) " :is-dirty? " (:is-dirty?  meta-record))))))
+       (pprint (str (or uuid "[uuid]") " " (get record key)  " " (cu/from-now identity (:updated-at record)) " :is-dirty? " (:is-dirty? record)))
+       (pprint (str "Meta: " (get  meta-record key) " " (cu/from-now identity (:updated-at  meta-record)) " :is-dirty? " (:is-dirty?  meta-record))))))
 
 #?(:clj
    (defn print-record [uuid record key]
      (let [meta-record (-> record meta :record)]
-       (println (str  "Record:" record  " " ;; (du/from-now identity (:updated-at record))
+       (println (str  "Record:" record  " " ;; (cu/from-now identity (:updated-at record))
                     ))
-       (println (str "Meta: " meta-record " " ;; (du/from-now identity (:updated-at  meta-record))
+       (println (str "Meta: " meta-record " " ;; (cu/from-now identity (:updated-at  meta-record))
                     )))))
 
 #?(:cljs

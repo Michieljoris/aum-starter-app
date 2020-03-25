@@ -44,7 +44,7 @@
   (:require [clojure.set :as set]
             [taoensso.timbre :as timbre]
             [om.util :as util]
-            [bilby.debug :refer [mark-point]]
+            [pagora.aum.debug.core :refer [mark-point]]
             #?@(:clj [[taoensso.tufte :as tufte :refer (defnp p profiled profile)]]
                 :cljs [[taoensso.tufte :as tufte :refer-macros (defnp p profiled profile)]])
             ))
