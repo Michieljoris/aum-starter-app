@@ -17,13 +17,12 @@
   (let [aum-config (aum/init {:environments environments
                               :db-config db-config})]
     (dev/init aum-config)
-    ;; (dev/go)
+    (dev/go)
     ))
 
 (restart)
-(dev/go)
 
-;; (dev/go)
+(dev/go)
 ;; (dev/halt)
 ;; (dev/reset)
 

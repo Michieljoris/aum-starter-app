@@ -21,7 +21,7 @@
 
 (defmethod process-user :default
   [env user]
-  (assoc user :role "norole"))
+  (assoc user :role "no-role"))
 
 #?(:clj
    (defn make-uuid

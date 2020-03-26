@@ -1,4 +1,4 @@
-(ns om.Reconciler
+(ns pagora.aum.om.Reconciler
   (:refer-clojure :exclude #?(:clj  [deftype replace var? force]
                               :cljs [var? key replace force]))
   #?(:cljs (:require-macros [om.next :refer [defui invariant]]))
