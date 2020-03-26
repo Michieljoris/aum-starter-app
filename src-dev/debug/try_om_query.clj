@@ -1,10 +1,11 @@
 (ns debug.try-om-query
   (:require
+   [pagora.aum.dev.core :as dev]
    [pagora.clj-utils.core :as du]
    [pagora.aum.database.inspect :as db-inspect]
    [cuerdas.core :as str]
    [pagora.aum.database.schema :as schema]
-   ;; [app.parser-config :refer [parser-config]]
+   [pagora.aum.config :refer [parser-config]]
    [taoensso.timbre :as timbre :refer [error info warn]]
    [jansi-clj.core :as jansi]
    [pagora.aum.database.jdbc-defaults :as jdbc-defaults]
@@ -22,7 +23,7 @@
    ;; [dc-admin.backend.app.config :refer [config]]
    [app.database.config :refer [db-config]]
    ;; [database.connection :refer [db-conn]]
-   [pagora.aum.parser :as pagora.aum]
+   [pagora.aum.parser.core :as pagora.aum]
 
    [pagora.aum.database.query :as query]
    ;;Do not remove. Loads pagora.aum multimethods for validating sql fn and processing
@@ -39,41 +40,47 @@
    [fipp.edn :refer (pprint) :rename {pprint fipp}]
    [clojure.set :as set]
    [pagora.aum.database.inspect :as db-inspect]
+   [pagora.clj-utils.database.connection :refer [make-db-connection]]
    )
   )
 
+
+
 ;; Try out the parser as actually used for the app:
 (comment
-  (let [query '[(admin/save-user
-                 {:table :user,
-                  ;; :id 1,
-                  :query nil,
-                  :mods {:name "user 2"},
-                  :_post-remote {:param-keys [:id :table :query]}})]
+  (let [
+        query [{:user [:id :name]}]
+        ;; query '[(admin/save-user
+        ;;          {:table :user,
+        ;;           ;; :id 1,
+        ;;           :query nil,
+        ;;           :mods {:name "user 2"},
+        ;;           :_post-remote {:param-keys [:id :table :query]}})]
 
         do-query (fn [query]
                    (println "++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-                   (let [db-conn (db-connection/make-db-connection {:url "//localhost:3306/"
-                                                                    :db-name "foo"
-                                                                    :print-spec true
-                                                                    :use-ssl false
-                                                                    :user "root"
-                                                                    :password ""})
+                   (let [db-conn (make-db-connection {:url "//localhost:3306/"
+                                                      :db-name "foo"
+                                                      :print-spec true
+                                                      :use-ssl false
+                                                      :user "root"
+                                                      :password ""})
                          raw-schema (schema/get-schema db-conn)
                          schema     (schema/make-condensed-schema raw-schema)
                          ;; schema (security/secure-schema  schema db-config)
                          ;; _ (pprint (get schema "users"))
                          state      (atom {:status :ok})
                          user {:id 1990 :some-user "afoobar" :role "super-admin" :group-id 62 :subgroup-ids [154]}
-                         env        {:parser-config (merge config {;; :allow-root true
-                                                                   :print-exceptions true
-                                                                   :normalize true})
+                         env        {:parser-config (merge parser-config {;; :allow-root true
+                                                                          :print-exceptions true
+                                                                          :normalize true})
                                      :db-conn       db-conn
                                      :db-config     db-config
                                      :schema        (security/secure-schema schema db-config)
                                      :raw-schema    raw-schema
                                      :state         state
                                      :user          user}
+                         parser (:pagora.aum.parser.core/parser (dev/ig-system))
                          result    (parser env query)]
                      (do
                        (info "State:")

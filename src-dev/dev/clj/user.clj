@@ -22,12 +22,13 @@
 
 (restart)
 
-(dev/go)
+;; (dev/go)
 ;; (dev/halt)
 ;; (dev/reset)
 
 ;; (def routes (:pagora.aum.web-server.routes/routes (dev/ig-system)))
-;; (pprint routes)
+;; (def parser (:pagora.aum.parser.core/parser (dev/ig-system)))
+;; (pprint parser)
 
 ;; (def version (clojure.string/trim (slurp "version")))
 
