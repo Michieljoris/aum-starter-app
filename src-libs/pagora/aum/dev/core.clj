@@ -4,23 +4,28 @@
    [taoensso.timbre :as timbre]
    [integrant.core :as ig]
    [integrant.repl :as ig-repl]
-   [pagora.aum.integrant :refer [make-ig-config]])
-  )
+   [integrant.repl.state :as ig-state]
+   [pagora.aum.core :as aum]))
 
 (defn print-local-cp []
   (let [cp (seq (.getURLs (java.lang.ClassLoader/getSystemClassLoader)))
         cp (remove #(str/ends-with? % ".jar") cp)]
     (println (clojure.string/join "\n" cp))))
 
-;; (timbre/info :#w "++++++++++ Loaded user namespace ++++++++++")
-(defn init [config]
-  (let [ig-config (make-ig-config config)]
-    (timbre/info (into [] (ig/load-namespaces ig-config)))
-    (ig-repl/set-prep! (constantly ig-config))
-    ))
+(defn init
+  "Sets up integrant for development. After calling this fn it's possible to call
+  dev/go, dev/halt and dev/reset etc"
+  [{:keys [ig-system-config]}]
+  (let [_ :foo]
+    (timbre/info (into [] (ig/load-namespaces ig-system-config)))
+    (ig-repl/set-prep! (constantly ig-system-config))))
 
-;; (ig-repl/halt)
-;; (ig-repl/clear)
-;; (print-local-cp)
-
-;; (def version (clojure.string/trim (slurp "version")))
+(def go ig-repl/go)
+(def clear ig-repl/clear)
+(def halt ig-repl/halt)
+(def suspend ig-repl/suspend)
+(def resume ig-repl/resume)
+(def reset ig-repl/reset)
+(def reset-all ig-repl/reset-all)
+(defn ig-system []
+  ig-state/system)

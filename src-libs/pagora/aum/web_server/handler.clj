@@ -207,5 +207,5 @@
    :body    "Hello HTTP!"})
 
 (defmethod ig/init-key ::handler [k {:keys [routes config]}]
-  (timbre/info :#g "[INTEGRANT] creating" (name k))
+  (when (:integrant-log config) (timbre/info :#g "[INTEGRANT] creating" (name k)))
   (make-handler config routes))

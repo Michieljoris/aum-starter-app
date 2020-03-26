@@ -84,6 +84,7 @@
    :http-log false
    :timbre-log-level :info
    :print-exceptions true
+   :integrant-log true
 
    :logstash-host "0.0.0.0"
    :logstash-port 12345
@@ -95,6 +96,7 @@
 
    ;; Whether to set correct type and encoding for requested files that end in a .gz extension
    :gz-mime-types false ;; defaults to: #{"text/css" "text/javascript"}
+   :disable-login? false
 
    ;;Elasticsearch
    :es-url "http://127.0.0.1:9200"
@@ -137,7 +139,7 @@
                   [k (get-env-var-or-v k (get config k))])
                 (keys config))))
 
-(defn make-config [{:keys [environments db-config]}]
+(defn make-app-config [environments]
   (let [environment (or (keyword (env :clj-env)) :dev)
         config (get environments environment)
         config (merge default-config parser-config config)
@@ -166,8 +168,7 @@
                               :ip (:nrepl-host config)}
                       :logstash-port (cu/parse-natural-number (:logstash-port config))
                       :limit-max (cu/parse-natural-number (:limit-max config))
-                      :obs-endpoint (str "https://" (:obs-bucket config) ".obs.otc.t-systems.com")
-                      :db-config db-config)
+                      :obs-endpoint (str "https://" (:obs-bucket config) ".obs.otc.t-systems.com"))
         config (update config :gz-mime-types #(cond
                                                 (true? %) #{"text/css" "text/javascript"}
                                                 (and % (not-empty %)) %

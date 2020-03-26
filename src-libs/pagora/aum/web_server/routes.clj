@@ -83,6 +83,6 @@
           routes)]))
 
 (defmethod ig/init-key ::routes [k {:keys [config]}]
-  (timbre/info :#g "[INTEGRANT] creating" (name k))
+  (when (:integrant-log config) (timbre/info :#g "[INTEGRANT] creating" (name k)))
   (make-routes config))
 

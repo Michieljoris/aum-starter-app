@@ -6,18 +6,19 @@
              [websockets.sente :as sente]
              ;;           ;; [pagora.aum.test.snapshot :as snapshot]
              ])
-
-   [parser.core :as p]
-
    [pagora.aum.util :as au]
    [pagora.aum.security :as security]
    [pagora.aum.om.next.impl.parser :as omp]
    [clojure.pprint :refer [pprint]]
    [taoensso.timbre :as timbre]))
 
-(defn parser [] #?(:clj p/parser :cljs @p/parser))
-(defn parser-env [] #?(:clj p/parser-env :cljs @p/parser-env))
 
+;; Sente multimethod event handler, dispatches on event-id ------------
+(defmulti event-msg-handler
+  (fn [{:keys [id]} {:keys [config parser parser-env websocket]}]
+    id))
+
+;; Helper fns -----------
 (defn get-user-by-ev-msg
   "Checks if remember token in db for uid is still valid, if so,
   returns user associated"
@@ -27,52 +28,41 @@
     (when (and (not= uid :uid-nil) (= (au/user-id->uid user-id) uid))
       user)))
 
-;; (reset! sente/debug-mode?_ true) ; Uncomment for extra debug info
+(defn mutation? [query]
+  (some (comp symbol? :dispatch-key) (:children (omp/query->ast query))))
 
-;; Sente multimethod event handler, dispatches on event-id
-(defmulti event-msg-handler :id)
+(defn send-response [{:keys [uid reply-fn query response config]}]
+  (when (get-in config [:query-log])
+    (timbre/info :#w (if (mutation? query) "Mutation" "Read")" reply sent ")
+    (when (au/is-development? config) (pprint response)))
+  (reply-fn response))
 
-;; Root handler
-(defn event-msg-handler* [{:as ev-msg :keys [id ?data event]}]
-  ;; (timbre/infof "EVENT: %s" event)
-  ;; Debug here
-  (event-msg-handler ev-msg)) ;; Call multimethod
 
 ;; Handlers ----------
-
-;; Handshake
 (defmethod event-msg-handler :chsk/handshake
-  [{:as ev-msg :keys [?data]}]
+  [{:keys [?data]} _]
   (let [[?uid ?csrf-token ?handshake-data] ?data]
     (timbre/debugf "Handshake: %s" ?data)))
 
-;; Pinging from client
 (defmethod event-msg-handler :chsk/ws-ping
-  [{:as ev-msg :keys [event id ?data ring-req ?reply-fn send-fn]}]
+;; Pinging from client
+  [{:keys [event id ?data ring-req ?reply-fn send-fn]} _]
   (let [session (:session ring-req)
         uid     (:uid     session)]
     ;; (timbre/debugf "Ping event: %s" event)
     (when ?reply-fn
       (?reply-fn {:umatched-event-as-echoed-from-from-server event}))))
 
-(defn mutation? [query]
-  (some (comp symbol? :dispatch-key) (:children (omp/query->ast query))))
-
-(defn send-response [uid reply-fn query response]
-  (when (get-in (config) [:query-log])
-    (timbre/info :#w (if (mutation? query) "Mutation" "Read")" reply sent ")
-    (when (au/is-development? config) (pprint response)))
-  (reply-fn response))
-
-;; "Process a query (read/mutation) from client"
-(defn handle-app-query
-  [{:as ev-msg :keys [?data ?reply-fn uid]}]
+;; Process a query (read/mutation) from client
+(defmethod event-msg-handler :app/query
+  [{:keys [?data ?reply-fn uid] :as ev-msg }
+   {:keys [config parser parser-env websocket]}]
   (do ;; try
     (let [query      ?data
           query-type (if (mutation? query) "Mutation" "Read")
           parser-env (parser-env)]
 
-      (when (get-in (config) [:query-log])
+      (when (:query-log config)
         (if (au/is-development? config)
           (do
             (timbre/info :#w query-type " received: ")
@@ -87,29 +77,29 @@
                                (let [user-role (app-security/calc-role parser-env user)
                                      user      (select-keys user (security/get-whitelist parser-env :read :user
                                                                                          (assoc user :role user-role)))
-                                     user      (app-security/process-user parser-env user user-role)]
-                                 ( (parser) {:user user
-                                             :push (fn [response]
-                                                     ;; (timbre/info (str "Pushing response to " uid ":"))
-                                                     (pprint response)
-                                                     ;;TODO-MERGE: mock this in
-                                                     ;;mock-mode. This is used for
-                                                     ;;lawcat/chin responses
-                                                     #?(:clj
-                                                        (sente/chsk-send! uid [:app/broadcast response])))
-                                             } query))
+                                     user      (app-security/process-user parser-env user user-role)
+                                     {:keys [chsk-send!]} websocket]
+                                 (parser {:user user
+                                          :push (fn [response]
+                                                  ;; (timbre/info (str "Pushing response to " uid ":"))
+                                                  (pprint response)
+                                                  ;;TODO-MERGE: mock this in mock-mode.
+                                                  #?(:clj
+                                                     (chsk-send! uid [:app/broadcast response])))}
+                                         query))
                                {:authenticated? false})}]
-        (when ?reply-fn                  ;query
+        (when ?reply-fn           
           (let [state    (-> parser-env :state deref)
                 response (merge (select-keys state [:status :table-data :original-table-data :warnings :tempids])
                                 response)]
-            (if (:simulate-network-latency (config))
+            (if (:simulate-network-latency config)
               (do
-                (timbre/info :#y "Simulating network latency of " (/ (:latency (config)) 1000.0) " seconds")
+                (timbre/info :#y "Simulating network latency of " (/ (:latency config) 1000.0) " seconds")
                 #?(:clj (Thread/sleep (:latency (config))))
-                (send-response uid ?reply-fn query response))
-              (send-response uid ?reply-fn query response))))
-        ))
+                (send-response {:uid uid :?reply-fn :?reply-fn :query query :response response
+                                :config config}))
+              (send-response {:uid uid :?reply-fn :?reply-fn :query query :response response
+                              :config config}))))))
     ;; (catch #?(:clj Exception :cljs :default) e
     ;;     (timbre/info e)
     ;;   (let [{:keys [msg context stacktrace] :as error} (cu/parse-ex-info e)]
@@ -118,7 +108,8 @@
     ;;       :value {:message msg :query ?data :context context :stacktrace [:not-returned]}})))
     ))
 
-(defmethod event-msg-handler :app/call-external-api [{:keys [?data ?reply-fn]}]
+(defmethod event-msg-handler :app/call-external-api
+  [{:keys [?data ?reply-fn]} _]
   (timbre/info "?data" ?data)
   ;;TODO validate (:id ?data) is a number!!!
   (let [{:keys [username password url]} ?data]
@@ -128,34 +119,31 @@
                                          (?reply-fn result))
                           :username username :password password}))))
 
-(defmethod event-msg-handler :app/query [ev-msg]
-  (handle-app-query ev-msg))
-
 (defmethod event-msg-handler :app/list-table-cols
-  [{:as ev-msg :keys [?data ?reply-fn]}]
+  [{:as ev-msg :keys [?data ?reply-fn]} {:keys [parser-env]}]
   (let [{:keys [table type]} ?data
-        user (get-user-by-ev-msg p/parser-env ev-msg)]
-    (?reply-fn (security/get-whitelist p/parser-env type table user))))
+        user (get-user-by-ev-msg parser-env ev-msg)]
+    (?reply-fn (security/get-whitelist parser-env type table user))))
 
 ;; (security/get-whitelist (assoc p/parser-env :db-config database.config/db-config) :read :question {:id 1 :role "group-admi"})
 
 ;; #?(:clj
 ;;    (defmethod event-msg-handler :app/get-build
-;;      [{:as ev-msg :keys [?data ?reply-fn]}]
+;;      [{:as ev-msg :keys [?data ?reply-fn]} _]
 ;;      (?reply-fn integrations/build-info)))
 
 (def snapshot-file-name "/test/cljs/tests/snapshot_data.cljs" )
 
 ;; #?(:clj
 ;;    (defmethod event-msg-handler :tests/update-snapshot
-;;      [{:as ev-msg :keys [?data ?reply-fn]}]
+;;      [{:as ev-msg :keys [?data ?reply-fn]} _]
 ;;      (let [{:keys [path actual-result]} ?data]
 ;;        (timbre/info ?data)
 ;;        (snapshot/update-snapshot-data snapshot-file-name path actual-result)
 ;;        (?reply-fn :ok))))
 
 (defmethod event-msg-handler :app/test
-  [{:as ev-msg :keys [event id ?data ring-req ?reply-fn send-fn uid connected-uids]}]
+  [{:keys [event id ?data ring-req ?reply-fn send-fn uid connected-uids]} _]
   ("Test received!!!" timbre/info)
   ;; (pprint ev-msg)
   (timbre/info ?data)
@@ -164,11 +152,10 @@
     (?reply-fn (:test-received ?data))))
 
 (defmethod event-msg-handler :app/login
-  [{:keys [?data ?reply-fn]}]
-  (when (au/is-development? config)
+  [{:keys [?data ?reply-fn]} {:keys [config parser-env]}]
+  (when (not (:disable-login? config))
     (timbre/info "Login:" (assoc ?data :password "***"))
-    (let [parser-env (parser-env)
-          user (security/login parser-env ?data)
+    (let [user (security/login parser-env ?data)
           user-role (app-security/calc-role parser-env user)
           response {:authenticated (boolean (:remember-token user))
                     :remember-token (:remember-token user)
@@ -177,9 +164,9 @@
         ;; (timbre/info response)
         (?reply-fn response)))))
 
-(defmethod event-msg-handler :app/logout [{:keys [?reply-fn] :as ev-msg}]
-  (let [parser-env (parser-env)
-        user (get-user-by-ev-msg parser-env ev-msg)
+(defmethod event-msg-handler :app/logout
+  [{:keys [?reply-fn] :as ev-msg} {:keys [parser-env]}]
+  (let [user (get-user-by-ev-msg parser-env ev-msg)
         response {:response (security/logout parser-env user)}]
     (when ?reply-fn
       ;; (timbre/info response)
@@ -268,3 +255,6 @@
 ;;   (json/read-str "")
 ;;   (catch Exception e
 ;;     (timbre/warn (.toString e))))
+
+
+;; (reset! sente/debug-mode?_ true) ; Uncomment for extra debug info

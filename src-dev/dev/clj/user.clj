@@ -1,9 +1,10 @@
 (ns user
   (:require
-   [app.config :refer [config]]
    [pagora.aum.dev.core :as dev]
+   [app.config :refer [environments]]
+   [app.database.config :refer [db-config]]
+   [pagora.aum.core :as aum]
    [integrant.repl :refer [clear go halt init prep reset reset-all]]
-   [integrant.repl.state :as ig-state]
 
    [bidi.bidi :as b]
    [integrant.core :as ig]
@@ -13,11 +14,24 @@
 
    [taoensso.timbre :as timbre]))
 
-(dev/init config)
-(go)
+;; (timbre/info :#w "++++++++++ Loaded dev user namespace ++++++++++")
+(defn restart []
+  (let [aum-config (aum/init {:environments environments
+                              :db-config db-config})]
+    (dev/init (:ig-system-config aum-config))
+    (dev/go)))
 
-;; (def routes (:pagora.aum.web-server.routes/routes ig-state/system))
+(restart)
+
+;; (dev/go)
+;; (dev/halt)
+;; (dev/reset)
+
+;; (def routes (:pagora.aum.web-server.routes/routes (dev/ig-system)))
 ;; (pprint routes)
+
+;; (def version (clojure.string/trim (slurp "version")))
+
 
 
 ;; (def routes
