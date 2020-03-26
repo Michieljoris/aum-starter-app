@@ -10,7 +10,9 @@
 
 (def common-config
   {:multimethod-namespaces ['app.security]
-   :pagora-account-id 1})
+   :pagora-account-id 1
+   :timbre-log-level :info
+   })
 
 (def prod-config
   {:db-pool true  ;whether to use c3p0 pool connection
@@ -22,7 +24,6 @@
    :sql-log true ;print actual sql queries being made
    :query-log true
    :http-log false
-   :timbre-log-level :info
    :gz-mime-types true
    :event-store-disabled false})
 

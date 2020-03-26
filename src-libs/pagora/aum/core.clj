@@ -3,6 +3,7 @@
    [pagora.aum.config :refer [make-app-config]]
    [taoensso.timbre :as timbre]
    [integrant.core :as ig]
+   [pagora.clj-utils.timbre :refer [middleware]]
    ))
 
 (defn make-ig-system-config [{:keys [server] :as config}]
@@ -38,7 +39,6 @@
     :parser (ig/ref :pagora.aum.parser.core/parser)
     :parser-env (ig/ref :pagora.aum.parser.core/parser-env)}
    }
- 
   )
 
 (def aum-multimethod-namespaces
@@ -64,6 +64,10 @@
                          (assoc-in [:dev :clj-env] :dev))
         {:keys [multimethod-namespaces] :as app-config} (assoc (make-app-config environments)
                                                                :db-config db-config)
+
+        _ (when-let [timbre-log-level (:timbre-log-level app-config)]
+            (timbre/merge-config! {:level timbre-log-level
+                                   :middleware [middleware]}))
         ig-system-config (make-ig-system-config app-config)
         aum-config {:app-config :app-config
                     :ig-system-config ig-system-config}]
