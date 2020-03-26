@@ -14,6 +14,15 @@
 
 (def ^{:dynamic true} *schema-warnings* true)
 
+(defmulti process-user
+  "foo"
+  (fn [env user role]
+    role))
+
+(defmethod process-user :default
+  [env user]
+  (assoc user :role "norole"))
+
 #?(:clj
    (defn make-uuid
      "UUID generator for user tokens. (password reminder / cookies )"
@@ -222,17 +231,3 @@
       :success
       :fail)))
 
-(defn print-permissions [env method table user]
-  (print "Permissions to" method table "for user" user "are:\n")
-  (pprint (get-permissions env method table user)))
-
-(defn print-validation-fn
-  ([env method table user] (print-validation-fn env method table user nil))
-  ([env method table user some-validation-fn]
-   (let [validation-fn (get-validation-fun (assoc env :user user) table method)]
-     (print "Validation fn for" method table "for user" user "is:\n")
-     (pprint validation-fn)
-     (when some-validation-fn
-       (if (= some-validation-fn validation-fn)
-         (print "The same as passed in validation-fn!!!")
-         (print "OH NO!!!!! Not the same validation fn"))))))

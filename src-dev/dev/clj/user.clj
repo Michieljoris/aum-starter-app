@@ -8,9 +8,7 @@
 
    [bidi.bidi :as b]
    [integrant.core :as ig]
-   [pagora.aum.integrant :refer [make-ig-config]]
    [clojure.pprint :refer [pprint]]
-   ;; [app.backend.core]
 
    [taoensso.timbre :as timbre]))
 
@@ -18,10 +16,12 @@
 (defn restart []
   (let [aum-config (aum/init {:environments environments
                               :db-config db-config})]
-    (dev/init (:ig-system-config aum-config))
-    (dev/go)))
+    (dev/init aum-config)
+    ;; (dev/go)
+    ))
 
 (restart)
+(dev/go)
 
 ;; (dev/go)
 ;; (dev/halt)

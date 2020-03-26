@@ -9,7 +9,8 @@
 ;; CLJ_ENV=prod DB_USER=test DB_PASSWORD=abc DB_URL="//localhost:3306/" DB_NAME=some_db QUERY_LOG=true  SQL_LOG=true HTTP_LOG=false SERVER_PORT=8080 SERVER_IP=0.0.0.0 java -jar prod.jar
 
 (def common-config
-  {:multimethod-namespaces []})
+  {:multimethod-namespaces ['app.security]
+   :pagora-account-id 1})
 
 (def prod-config
   {:db-pool true  ;whether to use c3p0 pool connection

@@ -1,9 +1,7 @@
 (ns pagora.aum.websockets.dispatcher
   (:require
-   [app.security :as app-security]
    #?@(:clj [;; [app.integrations :as integrations]
-             [pagora.clj-utils.network.get :as network]
-             [websockets.sente :as sente]
+             [pagora.clj-utils.network.http-get :as network]
              ;;           ;; [pagora.aum.test.snapshot :as snapshot]
              ])
    [pagora.aum.util :as au]
@@ -11,7 +9,6 @@
    [pagora.aum.om.next.impl.parser :as omp]
    [clojure.pprint :refer [pprint]]
    [taoensso.timbre :as timbre]))
-
 
 ;; Sente multimethod event handler, dispatches on event-id ------------
 (defmulti event-msg-handler
@@ -56,9 +53,10 @@
 ;; Process a query (read/mutation) from client
 (defmethod event-msg-handler :app/query
   [{:keys [?data ?reply-fn uid] :as ev-msg }
-   {:keys [config parser parser-env websocket]}]
+   {:keys [parser parser-env]}]
   (do ;; try
-    (let [query      ?data
+    (let [{:keys [config websocket]} parser-env
+          query      ?data
           query-type (if (mutation? query) "Mutation" "Read")
           parser-env (parser-env)]
 
@@ -74,10 +72,9 @@
 
       (let [user     (get-user-by-ev-msg parser-env ev-msg)
             response {:value (if user
-                               (let [user-role (app-security/calc-role parser-env user)
-                                     user      (select-keys user (security/get-whitelist parser-env :read :user
-                                                                                         (assoc user :role user-role)))
-                                     user      (app-security/process-user parser-env user user-role)
+                               (let [user      (security/process-user parser-env user)
+                                     user      (select-keys user
+                                                            (security/get-whitelist parser-env :read :user user))
                                      {:keys [chsk-send!]} websocket]
                                  (parser {:user user
                                           :push (fn [response]
@@ -114,7 +111,7 @@
   ;;TODO validate (:id ?data) is a number!!!
   (let [{:keys [username password url]} ?data]
     #?(:cljs (timbre/info "TODO-MERGE mock api response")
-       :clj (network/get {:url url :cb (fn [result]
+       :clj (network/http-get {:url url :cb (fn [result]
                                          (timbre/info result)
                                          (?reply-fn result))
                           :username username :password password}))))
@@ -144,7 +141,7 @@
 
 (defmethod event-msg-handler :app/test
   [{:keys [event id ?data ring-req ?reply-fn send-fn uid connected-uids]} _]
-  ("Test received!!!" timbre/info)
+  (timbre/info "Test received!!!")
   ;; (pprint ev-msg)
   (timbre/info ?data)
   (timbre/info "meta:" (meta ?data))
@@ -152,14 +149,15 @@
     (?reply-fn (:test-received ?data))))
 
 (defmethod event-msg-handler :app/login
-  [{:keys [?data ?reply-fn]} {:keys [config parser-env]}]
+  [{:keys [?data ?reply-fn]} {{:keys [config]} :parser-env
+                              :as parser-env}]
   (when (not (:disable-login? config))
     (timbre/info "Login:" (assoc ?data :password "***"))
     (let [user (security/login parser-env ?data)
-          user-role (app-security/calc-role parser-env user)
+          user (security/process-user parser-env user)
           response {:authenticated (boolean (:remember-token user))
                     :remember-token (:remember-token user)
-                    :user-role user-role}]
+                    :user-role (:role user)}]
       (when ?reply-fn
         ;; (timbre/info response)
         (?reply-fn response)))))

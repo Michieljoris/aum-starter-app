@@ -8,6 +8,4 @@
 (defn -main [& args]
   (let [aum-config (aum/init {:environments environments
                               :db-config db-config})]
-    (aum/go aum-config)
-    )
-  )
+    (aum/go aum-config)))

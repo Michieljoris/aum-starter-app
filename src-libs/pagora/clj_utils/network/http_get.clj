@@ -1,4 +1,4 @@
-(ns pagora.clj-utils.network.get
+(ns pagora.clj-utils.network.http-get
   (:require [clojure.data.json :as json]
             ;; [clj-http.client :as client]
             [org.httpkit.client :as http]
@@ -18,7 +18,7 @@
     (timbre/warn {:error msg :info error-info})
     (cb {:error msg :info error-info})))
 
-(defn get [{:keys [url cb username password]}]
+(defn http-get [{:keys [url cb username password]}]
   (let [options (make-options username password)]
     (try
       (http/get url options

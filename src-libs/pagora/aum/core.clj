@@ -42,9 +42,7 @@
   )
 
 (def aum-multimethod-namespaces
-  ['pagora.aum.parser.read
-   'pagora.aum.parser.mutate
-   'pagora.aum.database.validate-sql-fun
+  ['pagora.aum.database.validate-sql-fun
    'pagora.aum.database.process-params
    'pagora.aum.database.process-result
    ;; 'database.query-hooks
@@ -56,8 +54,6 @@
 
 (defn load-namespaces [symbols]
   (doall (->> symbols (map try-require))))
-
-
 
 (defn init
   [{:keys [environments db-config]}]
@@ -71,7 +67,7 @@
         ig-system-config (make-ig-system-config app-config)
         aum-config {:app-config :app-config
                     :ig-system-config ig-system-config}]
-    (load-namespaces (concat aum-multimethod-namespaces multimethod-namespaces))
+    (timbre/info (into [] (load-namespaces (concat aum-multimethod-namespaces multimethod-namespaces))))
     aum-config))
 
 (def ig-system nil)

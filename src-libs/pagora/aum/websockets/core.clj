@@ -6,7 +6,7 @@
    [taoensso.sente :as sente]
    [taoensso.sente.server-adapters.http-kit :refer [get-sch-adapter]]
    [taoensso.timbre :as timbre]
-   [websockets.dispatcher :as dispatcher]
+   [pagora.aum.websockets.dispatcher :as dispatcher]
    ))
 
 (defn get-user-id
@@ -48,10 +48,10 @@
         _ (when watch-connected-uids?
             (add-connected-uids-watch websocket))
         event-msg-handler (fn [ev-msg]
-                            (dispatcher/ev-msg-handler ev-msg {:config config
-                                                               :websocket websocket
-                                                               :parser parser
-                                                               :parser-env parser-env}))
+                            (dispatcher/event-msg-handler ev-msg {:parser parser
+                                                                  :parser-env (assoc parser-env
+                                                                                     :config config
+                                                                                     :websocket websocket)}))
         stop-fn (sente/start-chsk-router! chsk-recv event-msg-handler
                                                   {:simple-auto-threading? true})]
     (assoc websocket

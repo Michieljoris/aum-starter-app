@@ -13,12 +13,12 @@
     (println (clojure.string/join "\n" cp))))
 
 (defn init
-  "Sets up integrant for development. After calling this fn it's possible to call
+  "Pass in aum-config. Sets up integrant for development. After calling this fn it's possible to call
   dev/go, dev/halt and dev/reset etc"
-  [{:keys [ig-system-config]}]
-  (let [_ :foo]
-    (timbre/info (into [] (ig/load-namespaces ig-system-config)))
-    (ig-repl/set-prep! (constantly ig-system-config))))
+  [{:keys [ig-system-config] :as aum-config}]
+  (timbre/info (into [] (ig/load-namespaces ig-system-config)))
+  (ig-repl/set-prep! (constantly ig-system-config))
+  )
 
 (def go ig-repl/go)
 (def clear ig-repl/clear)
