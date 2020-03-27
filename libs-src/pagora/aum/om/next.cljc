@@ -1,36 +1,39 @@
 (ns pagora.aum.om.next
   (:refer-clojure :exclude #?(:clj  [deftype replace var? force]
                               :cljs [var? key replace force]))
-  #?(:cljs (:require-macros [om.next :refer [defui invariant]]))
-  (:require #?@(:clj  [[clojure.main]
-                       [cljs.core :refer [deftype specify! this-as js-arguments]]
-                       [clojure.reflect :as reflect]
-                       [taoensso.tufte :as tufte :refer (defnp p profiled profile)]
-                       [cljs.util]]
-                :cljs [[goog.string :as gstring]
-                       [taoensso.tufte :as tufte :refer-macros (defnp p profiled profile)]
-                       [goog.object :as gobj]
-                       [goog.log :as glog]
-                       [om.next.cache :as c]])
-            [pagora.aum.om.next.impl.parser :as parser]
+  #?(:cljs (:require-macros [pagora.aum.om.next :refer [defui invariant]]))
+  (:require
+   #?@(:clj  [
+              [clojure.main]
+              [cljs.core :refer [deftype specify! this-as js-arguments]]
+              [clojure.reflect :as reflect]
+              ;; [taoensso.tufte :as tufte :refer (defnp p profiled profile)]
+              [cljs.util]
+              ]
+       :cljs [[goog.string :as gstring]
+              [taoensso.tufte :as tufte :refer-macros (defnp p profiled profile)]
+              [goog.object :as gobj]
+              [goog.log :as glog]
+              [pagora.aum.om.next.cache :as c]])
+   [pagora.aum.om.next.impl.parser :as parser]
 
-            [pagora.aum.dev.debug :refer [mark-point now-in-ms warn-when]]
-            [pagora.aum.om.db-to-tree :refer [db->tree]]
-            ;; [om.tree-to-db :refer [tree->db]]
-            ;; [om.reconciler :refer [Reconciler]]
-            [pagora.aum.om.focus :refer [focus-query focus->path]]
-            [pagora.aum.om.misc :refer [query-template replace]]
+   [pagora.aum.dev.debug :refer [mark-point now-in-ms warn-when]]
+   [pagora.aum.om.db-to-tree :refer [db->tree]]
+   ;; [om.tree-to-db :refer [tree->db]]
+   ;; [om.reconciler :refer [Reconciler]]
+   [pagora.aum.om.focus :refer [focus-query focus->path]]
+   [pagora.aum.om.misc :refer [query-template replace]]
             
-            [pagora.aum.om.tempid :as tempid]
-            [pagora.aum.om.transit :as transit]
-            [pagora.aum.om.util :as util]
-            [clojure.zip :as zip]
-            [pagora.aum.om.next.protocols :as p]
-            [clojure.pprint :refer [pprint]]
-            [cljs.analyzer :as ana]
-            [cljs.analyzer.api :as ana-api]
-            [taoensso.timbre :as timbre]
-            [clojure.string :as str])
+   [pagora.aum.om.tempid :as tempid]
+   [pagora.aum.om.transit :as transit]
+   [pagora.aum.om.util :as util]
+   [clojure.zip :as zip]
+   [pagora.aum.om.next.protocols :as p]
+   [clojure.pprint :refer [pprint]]
+   [cljs.analyzer :as ana]
+   [cljs.analyzer.api :as ana-api]
+   [taoensso.timbre :as timbre]
+   [clojure.string :as str])
   #?(:clj  (:import [java.io Writer])
      :cljs (:import [goog.debug Console])))
 

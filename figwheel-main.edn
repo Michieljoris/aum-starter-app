@@ -2,11 +2,12 @@
  :watch-dirs [;; "src"
               "src-frontend"
               ;; "bilby-libs-frontend"
-              "pagora/aum/src"
+              ;; "aum-next/src"
               ;; "src/"
-              "src-om"
-              "src-dev/cljs"]
- :css-dirs ["target/assets/public/admin_new"]
+              ;; "src-om"
+              ;; "src-dev/cljs"
+              ]
+ ;; :css-dirs ["target/assets/public/app"]
  :open-url false ;;"http://localhost:[[server-port]]/admin.html"
  ;; :pprint-config true
  :reload-dependents false

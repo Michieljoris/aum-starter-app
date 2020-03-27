@@ -13,7 +13,8 @@
    [pagora.aum.parser.read :as read]
    [pagora.aum.security :as security]
    [clojure.pprint :refer [pprint]]
-   [taoensso.timbre :as timbre]))
+   [taoensso.timbre :as timbre]
+   ))
 
 (def parser-config-defaults
   {;;Log queries received, and returned edn map

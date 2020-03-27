@@ -1,8 +1,8 @@
-(ns om.dom
+(ns pagora.aum.om.dom
   (:refer-clojure :exclude [map meta time])
   #?(:clj
      (:require [clojure.string :as str]
-               [om.next.protocols :as p]
+               [pagora.aum.om.next.protocols :as p]
                [clojure.core.reducers :as r]
                [om.checksums :as chk])))
 
@@ -382,7 +382,7 @@
 #?(:clj
    (defn- render-component [c]
      (if (or (nil? c)
-             (instance? om.next.protocols.IReactDOMElement c)
+             (instance? pagora.aum.om.next.protocols.IReactDOMElement c)
              (satisfies? p/IReactDOMElement c))
        c
        (recur (p/-render c)))))
@@ -401,11 +401,11 @@
            children (reduce-fn
                       (fn [res c]
                         (let [c' (cond
-                                   (or (instance? om.next.protocols.IReactDOMElement c)
+                                   (or (instance? pagora.aum.om.next.protocols.IReactDOMElement c)
                                        (satisfies? p/IReactDOMElement c))
                                    c
 
-                                   (or (instance? om.next.protocols.IReactComponent c)
+                                   (or (instance? pagora.aum.om.next.protocols.IReactComponent c)
                                        (satisfies? p/IReactComponent c))
                                    (let [rendered (if-let [element (render-component c)]
                                                     element
@@ -589,12 +589,12 @@
 ;; preserves testability without having to compute checksums
 #?(:clj
    (defn- render-to-str* ^StringBuilder [x]
-     {:pre [(or (instance? om.next.protocols.IReactComponent x)
-                (instance? om.next.protocols.IReactDOMElement x)
+     {:pre [(or (instance? pagora.aum.om.next.protocols.IReactComponent x)
+                (instance? pagora.aum.om.next.protocols.IReactDOMElement x)
                 (satisfies? p/IReactComponent x)
                 (satisfies? p/IReactDOMElement x))]}
      (let [element (if-let [element (cond-> x
-                                      (or (instance? om.next.protocols.IReactComponent x)
+                                      (or (instance? pagora.aum.om.next.protocols.IReactComponent x)
                                           (satisfies? p/IReactComponent x))
                                       render-component)]
                      element
@@ -613,11 +613,11 @@
    (defn node
      "Returns the dom node associated with a component's React ref."
      ([component]
-      {:pre [(or (instance? om.next.protocols.IReactComponent component)
+      {:pre [(or (instance? pagora.aum.om.next.protocols.IReactComponent component)
                  (satisfies? p/IReactComponent component))]}
       (p/-render component))
      ([component name]
-      {:pre [(or (instance? om.next.protocols.IReactComponent component)
+      {:pre [(or (instance? pagora.aum.om.next.protocols.IReactComponent component)
                  (satisfies? p/IReactComponent component))]}
       (some-> @(:refs component) (get name) p/-render))))
 

@@ -161,8 +161,8 @@
  :revolt.plugin/nrepl {:port 5600}
  :pagora.revolt.plugin/nrepl-piggieback {:port 5700}
 
- :revolt.plugin/rebel {:init-ns "app.core"
-                       :init-banner "Welcome to the rebel.\nStart/stop/reset the app with (dev/start), (dev/stop), (dev/reset)\nStart an nrepl session and run (user/cljs-repl) for a cljs repl"}
+ :revolt.plugin/rebel {:init-ns "clj.user"
+                       :init-banner "Welcome to the rebel.\n"}
 
  :revolt.plugin/watch {:on-change {:pagora.revolt.task/sass "glob:scss/*.scss"
                                    ;; :revolt.task/test "glob:**/*.clj"

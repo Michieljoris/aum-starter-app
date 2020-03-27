@@ -1,5 +1,5 @@
 (ns pagora.aum.om.next.server
-  (:require [om.next.impl.parser :as parser]
+  (:require [pagora.aum.om.next.impl.parser :as parser]
             [om.transit :as transit]))
 
 (defn parser

@@ -13,7 +13,8 @@
    [pagora.clj-utils.core :as cu]
    [cuerdas.core :as str]
    [pagora.aum.om.next :as om]
-   [taoensso.timbre :as timbre]))
+   [taoensso.timbre :as timbre]
+   ))
 
 ;; om-next ++++++++++++++++++++++++++++++++++++++++++++++++++
 

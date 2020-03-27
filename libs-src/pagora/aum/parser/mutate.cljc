@@ -1,11 +1,12 @@
 (ns pagora.aum.parser.mutate
-  (:require [pagora.aum.database.query :refer [sql]]
-            [pagora.aum.security :refer [get-validation-fun get-whitelist logout]]
-            [pagora.clj-utils.core :as cu]
-            [pagora.aum.parser.mutate-save-mods :refer [save-mods-transaction]]
-            [pagora.aum.util :as au]
-            [clojure.set :as set]
-            [taoensso.timbre :as timbre :refer [info warn spy]]))
+  (:require
+   [pagora.aum.database.query :refer [sql]]
+   [pagora.aum.security :refer [get-validation-fun get-whitelist logout]]
+   [pagora.clj-utils.core :as cu]
+   [pagora.aum.parser.mutate-save-mods :refer [save-mods-transaction]]
+   [pagora.aum.util :as au]
+   [clojure.set :as set]
+   [taoensso.timbre :as timbre]))
 
 ;;for repl-ing
 ;;(ns-unmap *ns* 'mutate))
@@ -39,7 +40,7 @@
                               #?@(:cljs [:default e])
                               (let [{:keys [msg context stacktrace]} (cu/parse-ex-info e)
                                     keys (or (:keys @state) [])]
-                                (info e)
+                                (timbre/info e)
                                 (swap! state update :status (constantly :error))
                                 (swap! state update
                                        :original-table-data #(cu/deep-merge-concat-vectors % (:_original-table-data @state)))
@@ -84,7 +85,7 @@
 
     ;; Let the side effects begin!!!
     (when (pos? (count disallowed-keys))
-      (info :#r "Keys not allowed to set: " (vec disallowed-keys)))
+      (timbre/info :#r "Keys not allowed to set: " (vec disallowed-keys)))
 
     (when (= method :update)
       (if-not natural-number-id (throw (ex-info "id of record to update is not a natural number"
