@@ -1,5 +1,5 @@
 {
-  "name": "pagora app",
+  "name": "Pagora starter app",
   "version": "1.0.0",
   "description": "## Install",
   "main": "index.js",
@@ -9,7 +9,6 @@
   },
   "devDependencies": {
     "@fortawesome/fontawesome-free": "^5.8.0",
-    "acorn": "^6.0.0",
     "alasql": "^0.4.11",
     "jasmine-core": "^2.8.0",
     "karma": "^3.1.4",
@@ -21,7 +20,8 @@
     "webpack-bundle-analyzer": "^3.3.2",
     "webpack-cli": "^3.2.1",
     "webpack-merge": "^4.2.1",
-    "webpack-visualizer-plugin": "^0.1.11"
+    "webpack-visualizer-plugin": "^0.1.11",
+    "karma-cli": "^1.0.1"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -37,20 +37,11 @@
   },
   "homepage": "https://github.com/michieljoris/pagora-app#readme",
   "dependencies": {
-    "@atlaskit/tree": "^5.0.1",
-    "@cljs-oss/module-deps": "^1.1.1",
     "bulma": "0.7.4",
     "cryptojs": "^2.5.3",
-    "karma-cli": "^1.0.1",
-    "material-ui": "0.19.4",
     "moment": "^2.24.0",
     "react": "16.8.4",
-    "react-beautiful-dnd": "^10.1.0",
     "react-datetime": "^2.16.3",
     "react-dom": "16.8.4",
-    "react-smooth-dnd": "^0.8.2",
-    "react-sortablejs": "^1.5.1",
-    "sortablejs": "^1.8.4",
-    "xregexp": "^4.2.0"
   }
 }

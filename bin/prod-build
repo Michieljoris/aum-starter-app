@@ -1,6 +1,6 @@
 #!/bin/bash
 
-prod-install-js
+bin/prod-install-js
 
 #It's necessary to set CLJ_ENV at compile time so that the right config is selected in the public-config macro!!!
 cmd="CLJ_ENV=prod clj -A:revolt:pack:cljs:slf4j  "`

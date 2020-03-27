@@ -18,7 +18,7 @@
 
  :paths [
          "src"
-         "src-libs"
+         "libs-src"
          "src-styling"
          "resources" ;;public dir for server and config files
          ]
@@ -280,6 +280,7 @@
                                     }
                        :extra-paths ["target/assets"
                                      "src-dev/dev/cljs"
+                                     "src-frontend"
                                      ]
                        }
            :git-deps {
@@ -312,8 +313,12 @@
 
            :dev {:extra-deps  {
                                ;; dev tools-----------------------
+
+                               ;;NOTE: figwheel needs to be included here
+                               ;;otherwise the revolt nrepl piggieback plugin
+                               ;;gives errors. Some deps conflict/override?
                                com.bhauman/figwheel-main {:mvn/version "0.2.3"}
-                               cider/piggieback {:mvn/version "0.4.0"}
+                               cider/piggieback {:mvn/version "0.4.2"}
                                weasel {:mvn/version "0.7.0"
                                        :exclusions [org.clojure/clojurescript]}
                                fipp {:mvn/version "0.6.17"}
@@ -323,8 +328,7 @@
                  ;;the server to find them target/assets needs to be added to the
                  ;;classpath:
                  :extra-paths ["target/assets"
-                               "src-dev/dev/clj"
-                               ;; "src/dev/cljs"
+                               "src-dev/dev"
                                "src-dev/test"
                                ]
                  }

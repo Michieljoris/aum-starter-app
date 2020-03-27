@@ -1,4 +1,4 @@
-(ns user
+(ns clj.user
   (:require
    [pagora.aum.dev.core :as dev]
    [app.config :refer [environments]]
