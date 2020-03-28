@@ -1,0 +1,6 @@
+#+TITLE: notes
+
+* figwheel and emacs
+https://docs.cider.mx/cider/cljs/figwheel.html
+https://github.com/bhauman/figwheel-main/blob/master/src/figwheel/main/api.clj
+https://github.com/bhauman/figwheel-main/blob/master/docs/docs/emacs.md

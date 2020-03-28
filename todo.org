@@ -2,15 +2,20 @@
 * Load bugsnag api keys from gitignored .env file in update-html-string
 * Set app name in update-html task config
 * Load revolt.edn from base dir of repo
-* remove material-ui
-* remove duplication between revolt.edn and main.fi
+* remove duplication between revolt.edn and main.figwheel
 * import branches:
+-old-aum master branch!!!!! look at commits
+-admin-misc-fixes
 -user-on-off-switch ??
--export-active-accounts
--init-event-store
--calc-active-users
+-calc-active-users-implementation (includes event-store and export-active-accounts)
 
-* figwheel and emacs
-https://docs.cider.mx/cider/cljs/figwheel.html
-https://github.com/bhauman/figwheel-main/blob/master/src/figwheel/main/api.clj
-https://github.com/bhauman/figwheel-main/blob/master/docs/docs/emacs.md
+* migrate the tests over from aum-old
+* add db migration lib
+* add the test-runner
+* icons
+* foreign libs (react!!)
+* Get template editor working
+->>> data entry design!!!
+* Make simple checklist
+* Get mystack going properly for app
+* Clean up, browse and copy useful stuff from all DC notes to my own pagora notes
