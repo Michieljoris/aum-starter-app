@@ -6,6 +6,7 @@
    [pagora.aum.frontend.config :refer [make-app-config]]
    [pagora.aum.frontend.channel.core :refer [start-channel-listener! channel-msg-handler]]
    [pagora.aum.frontend.channel.msg-handler]
+   [pagora.aum.frontend.reconciler.start :refer [start-reconciler] ]
    [pagora.aum.frontend.websockets.dispatcher :refer [websocket-msg-handler]]
    [pagora.aum.frontend.websockets.core :as websocket]
    [pagora.clj-utils.timbre :refer [console-appender]]
@@ -34,33 +35,31 @@
 ;; ;; This handler is triggered when websocket is ready to send and receive msgs.
 ;; ;; When this is the case we mount our om app.
 (defmethod channel-msg-handler :ws-first-open
-  [{:keys [app-config] :as msg}]
+  [{:keys [aum-config] :as msg}]
   (timbre/info :#b "Websocket opened: " msg)
   ((:chsk-send! websocket/websocket) [:aum/frontend-config nil] 8000
    (fn [resp]
-
-     (timbre/info :#pp (merge app-config resp))))
-
-  ;; (swap! (om/app-state reconciler) assoc
-  ;;        :client/csrf-token (get-in msg [:data :csrf-token]))
-  ;; (mount-app-or-test-runner nil nil)
-  )
+     (let [{:keys [app-config RootComponent]} (update aum-config :app-config merge resp)
+           reconciler (start-reconciler
+                       {:app-config app-config
+                        :app-state {:client/csrf-token (get-in msg [:data :csrf-token])}})]
+       (mount-app-or-test-runner reconciler RootComponent)))))
 
 
-(defn init [{:keys [_]}]
+(defn init [{:keys [RootComponent]}]
   (let  [app-config (make-app-config)]
-
     (set! *warn-on-infer* true)
     (enable-console-print!)
-    (timbre/merge-config! {:level     (get-in app-config [:debug :timbre-level])
+    (timbre/merge-config! {:level (get-in app-config [:debug :timbre-level])
                            :appenders {:console (console-appender)}})
-    app-config))
+    {:app-config app-config
+     :RootComponent RootComponent}))
 
-(defn make-websocket-msg-handler [app-config]
+(defn make-websocket-msg-handler [aum-config]
   (fn [ev-msg]
-    (websocket-msg-handler ev-msg app-config)))
+    (websocket-msg-handler ev-msg aum-config)))
 
-(defn go [app-config]
+(defn go [aum-config]
   (timbre/info :#b "App started")
   (start-channel-listener!)
-  (websocket/start! (make-websocket-msg-handler app-config)))
+  (websocket/start! (make-websocket-msg-handler aum-config)))

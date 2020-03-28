@@ -13,7 +13,7 @@
 
 (defmulti mutate (fn [_ k _] k))
 
-;;The bilby mutate throws on error, here we make sure we return an error key
+;;The aum mutate throws on error, here we make sure we return an error key
 ;;in the value map.
 (defn mutate-handle-errors
   "Includes error handling. To deal with exceptions yourself use mutate*"
@@ -140,7 +140,7 @@
      :record-id record-id
      :method method}))
 
-(defmethod mutate 'admin/save-record
+(defmethod mutate 'aum/save-record
   [{:keys [user parser state] :as env} _ params]
   (let [{:keys [record-id] :as result} (mutate-save-record env params)
         {:keys [table-data]} (au/read-record env (assoc params :id record-id))]
@@ -148,7 +148,7 @@
     (select-keys result [:tempids :keys])))
 
 "Retrieves current record and calls sql fn to delete it."
-(defmethod mutate 'admin/delete-record
+(defmethod mutate 'aum/delete-record
   [{:keys [user parser] :as env} key {:keys [table id]}]
   (let [table-data  (au/perform-query env [(list {table ['*]} {:where [:id := id]})])
         natural-number-id (cu/parse-natural-number id)
@@ -157,16 +157,16 @@
     {:count (sql env :delete-record {:table table :id id :current-record current-record})}))
 
 
-;; (defmethod mutate 'admin/save-records
+;; (defmethod mutate 'aum/save-records
 ;;   [{:keys [user parser state] :as env} _ params]
 ;;   (let [{:keys [record-id] :as result} (mutate-save-record env params)
 ;;         {:keys [table-data]} (au/read-record env (assoc params :id record-id))]
 ;;     (swap! state update :table-data #(cu/deep-merge-concat-vectors % table-data))
 ;;     (select-keys result [:tempids :keys])))
 
-(defmethod mutate 'admin/save-records
+(defmethod mutate 'aum/save-records
   [env _ params]
-  (timbre/info :#r "admin/save-mods")
+  (timbre/info :#r "aum/save-mods")
   (save-mods-transaction env params)
 
   ;; {:tempids @tempids

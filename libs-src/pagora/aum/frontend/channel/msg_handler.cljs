@@ -37,7 +37,7 @@
 
 ;; Server might push data to us.
 (defmethod channel-msg-handler :ws-server-push
-  [{:keys [data app-config] :as msg}]
+  [{:keys [data aum-config] :as msg}]
 
   (let [[event response] data]
     (condp = event

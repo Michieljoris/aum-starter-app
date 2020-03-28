@@ -1,7 +1,10 @@
 (ns pagora.clj-utils.core
   (:require
    [cuerdas.core :as str]
-   [clojure.walk :as walk]))
+   [clojure.walk :as walk])
+  #?(:cljs
+     (:import goog.Delay))
+  )
 
 (defn parse-natural-number
   "Reads and returns an integer from a string, or the param itself if
@@ -62,6 +65,18 @@
 (defn keyword->underscored-string [k]
   (if k (hyphen->underscore (name k))))
 
+(defn deep-merge-maps
+  "Deep merges two maps. As per normal merge, values in b overwrite
+  values in a"
+  [a b]
+  (letfn [(dm [a b]
+            (merge-with (fn [x y]
+                          (cond (and (map? x) (map? y))
+                                (dm x y)
+                                :else y))
+                        a b))]
+    (dm a b)))
+
 (defn deep-merge-concat-vectors
   "Deep merges two maps. As per normal merge, values in b overwrite
   values in a, however vectors are concatenated, with duplicates
@@ -119,6 +134,10 @@
      :cljs (satisfies? IAtom x)))
 
 #?(:cljs
+   (defn getTimezoneOffsetInMinutes []
+     (.getTimezoneOffset (js/Date.))))
+
+#?(:cljs
    (defn from-now
      ([t some-moment] (from-now some-moment :nl))
      ([t some-moment locale]
@@ -140,3 +159,17 @@
   differently in clj then cljs"
    [s]
    (str "%" (str/replace s #"(\[|\]|\_|\%)" "\\\\$1") "%"))
+
+(defn transform-values
+  "Recursively transforms all map values in coll with t."
+  [t coll]
+  (let [f (fn [[k v]] [k (t v)])]
+    (walk/postwalk (fn [x] (if (map? x) (into {} (map f x)) x)) coll)))
+
+(defn string->number [s]
+  (cond
+    (number? s) s
+    (and (string? s) (re-find #"^-?\d+$" s)) (#?(:cljs cljs.reader/read-string)
+                                            #?(:clj read-string)
+                                            s)
+    :else nil))

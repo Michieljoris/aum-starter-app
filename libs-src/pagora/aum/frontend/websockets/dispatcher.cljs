@@ -7,7 +7,7 @@
 
 ;; Sente multimethod event handler, dispatches on event-id
 (defmulti websocket-msg-handler
-  (fn [{:keys [id]} app-config]
+  (fn [{:keys [id]} aum-config]
     id))
 
 (defmethod websocket-msg-handler :default
@@ -17,13 +17,13 @@
 
 ;; Socket state changes
 (defmethod websocket-msg-handler :chsk/state
-  [{:as ev-msg :keys [?data]} app-config]
+  [{:as ev-msg :keys [?data]} aum-config]
   (let [[old-state-map new-state-map] (have vector? ?data)
         channel (get-or-make-channel)]
     (when (:first-open? new-state-map)
-      (put! channel {:event :ws-first-open :data new-state-map :app-config app-config}
+      (put! channel {:event :ws-first-open :data new-state-map :aum-config aum-config}
             #(timbre/debugf "Channel socket successfully established!: %s" new-state-map)))
-    (put! channel {:event :ws-state-change :data new-state-map :app-config app-config}
+    (put! channel {:event :ws-state-change :data new-state-map :aum-config aum-config}
           #(timbre/debugf "Channel socket state change: %s" new-state-map))
     ))
 
@@ -40,7 +40,7 @@
 
 ;; Push event from server
 (defmethod websocket-msg-handler :chsk/recv
-  [{:as ev-msg :keys [id ?data]} app-config]
-  (put! (get-or-make-channel) {:event :ws-server-push :data ?data :app-config app-config}
+  [{:as ev-msg :keys [id ?data]} aum-config]
+  (put! (get-or-make-channel) {:event :ws-server-push :data ?data :aum-config aum-config}
         #(timbre/infof "Push event from server: %s" ?data))
   {:test-feedback :chsk/recv :ev-msg ev-msg})

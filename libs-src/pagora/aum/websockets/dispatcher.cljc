@@ -51,7 +51,7 @@
       (?reply-fn {:umatched-event-as-echoed-from-from-server event}))))
 
 ;; Process a query (read/mutation) from client
-(defmethod event-msg-handler :app/query
+(defmethod event-msg-handler :aum/query
   [{:keys [?data ?reply-fn uid] :as ev-msg }
    {:keys [parser parser-env config websocket]}]
   (do ;; try
@@ -171,8 +171,6 @@
 
 (defmethod event-msg-handler :aum/frontend-config
   [{:keys [?reply-fn id] :as ev-msg} {:keys [config parser-env]}]
-  (timbre/info :#pp {:id id})
-
   (let [user nil ;; (get-user-by-ev-msg parser-env ev-msg)
         ]
     (when ?reply-fn

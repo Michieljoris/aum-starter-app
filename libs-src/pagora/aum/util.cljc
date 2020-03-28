@@ -6,15 +6,13 @@
   (:require
    #?(:clj
       [pagora.clj-utils.macros :refer [assert-x]])
-
    [clojure.set :as set :refer [rename-keys]]
    [clojure.pprint :refer [pprint]]
    [pagora.aum.om.util :as om-util]
    [pagora.clj-utils.core :as cu]
    [cuerdas.core :as str]
    [pagora.aum.om.next :as om]
-   [taoensso.timbre :as timbre]
-   ))
+   [taoensso.timbre :as timbre]))
 
 ;; om-next ++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -72,7 +70,7 @@
 (defn get-ident
   "Gets the first dossier-type ident in seq of keywords"
   [ks table-by-id]
-  (let [ident (first (filter om.util/ident? ks))]
+  (let [ident (first (filter om-util/ident? ks))]
     (if (= (first ident) table-by-id) ident)))
 
 (defn rename-ident-key
@@ -208,19 +206,19 @@
   route, :client/unsaved-records maps tables to a list of unsaved
   record ids for the table. If any of the edits-tables are not empty
   this fn returns true"
-  [app-state current-route config]
+  [app-state current-route app-config]
   (timbre/info :#r "Fix this fn!!!! We have to pass config in!!!!")
-  (let [{:keys [edits-tables]} (config {:page (keyword (name current-route))})
+  (let [{:keys [edits-tables]} (app-config {:page (keyword (name current-route))})
         unsaved-records-by-table (select-keys (:client/unsaved-records app-state) edits-tables)]
     (some not-empty (vals unsaved-records-by-table))))
 
 (defn get-dirty-routes
-  ([state config] (get-dirty-routes identity state config))
-  ([t state config]
+  ([state app-config] (get-dirty-routes identity state app-config))
+  ([t state app-config]
    (timbre/info :#r "Fix this fn!!!! We have to pass config in!!!!")
    (let [{:keys [client/unsaved-records]} @state
          dirty-routes (reduce (fn [routes [route page-state]]
-                                (let [{:keys [edits-tables]} (config {:page (keyword (name route))})]
+                                (let [{:keys [edits-tables]} (app-config {:page (keyword (name route))})]
                                   (if (some seq (vals (select-keys unsaved-records edits-tables)))
                                     (conj routes route)
                                     routes)))
@@ -234,15 +232,15 @@
 
 #?(:cljs
    (defn set-onbeforeunload
-     ([state] (set-onbeforeunload identity state))
-     ([t state]
-      (let [{:keys [dirty-routes dirty-route-names]} (get-dirty-routes state)]
+     ([state app-config] (set-onbeforeunload identity state))
+     ([t state app-config]
+      (let [{:keys [dirty-routes dirty-route-names]} (get-dirty-routes state app-config)]
         (if (seq dirty-routes)
           ;; Dialog box shows standard msg in most browsers, not what's returned. Still trying.
           (aset js/window "onbeforeunload" (fn [e] (let [ret (str (t "You have unsaved changes in") (str " " dirty-route-names "\n")
                                                                   (t "Data will be lost if you leave the page, are you sure?"))]
                                                      (aset e "returnValue" ret)
-                                                     (info ret)
+                                                     (timbre/info ret)
                                                      ret)
                                              ))
           (aset js/window "onbeforeunload" nil))))))
@@ -344,13 +342,13 @@
        ;; (pprint (last h))
        ;; (pprint (uuid? (last h)))
        )
-     (info :#y "current:")
+     (timbre/info :#y "current:")
      (let [{:keys [prev-uuid uuid next-uuid uuid-trail] :as meta-record} (meta record)]
        (print-record uuid record :key)
        (pprint (str (or prev-uuid "[prev-uuid]") " <<< " (or uuid "[current-uuid?]") " >>> " (or next-uuid "[next-uuid]")))
        (pprint (reverse uuid-trail)))
 
-     (info :#b "<< History uuids")))
+     (timbre/info :#b "<< History uuids")))
 
 #?(:clj
    (defn print-history [reconciler table record-id]
