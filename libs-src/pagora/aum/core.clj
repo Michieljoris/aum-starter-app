@@ -50,27 +50,22 @@
    ])
 
 (defn- try-require [sym]
-  (try (do (require sym) sym)
+  (try (do (require sym :reload) sym)
        (catch java.io.FileNotFoundException _)))
 
 (defn load-namespaces [symbols]
   (doall (->> symbols (map try-require))))
 
 (defn init
-  [{:keys [environments db-config]}]
-  (let [environments (-> environments
-                         (assoc-in [:test :clj-env] :test)
-                         (assoc-in [:staging :clj-env] :staging)
-                         (assoc-in [:prod :clj-env] :prod)
-                         (assoc-in [:dev :clj-env] :dev))
-        {:keys [multimethod-namespaces] :as app-config} (assoc (make-app-config environments)
-                                                               :db-config db-config)
-
+  [{:keys [db-config app-config-ns]}]
+  (timbre/info (into [] (load-namespaces [app-config-ns])))
+  (let [{:keys [multimethod-namespaces] :as app-config} (make-app-config)
+        app-config (merge {:db-config db-config} app-config)
         _ (when-let [timbre-log-level (:timbre-log-level app-config)]
             (timbre/merge-config! {:level timbre-log-level
                                    :middleware [middleware]}))
         ig-system-config (make-ig-system-config app-config)
-        aum-config {:app-config :app-config
+        aum-config {:app-config app-config
                     :ig-system-config ig-system-config}]
     (timbre/info (into [] (load-namespaces (concat aum-multimethod-namespaces multimethod-namespaces))))
     aum-config))

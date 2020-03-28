@@ -1,3 +1,10 @@
 #+TITLE: doc
 * dev-backend
 revolt rebel task loads the user namespace
+* misc comment
+
+;; Config keys need to be assigned scalar values (so no maps or vectors) so we
+;; can set them in env vars on the command line
+
+;; Something like the following would run the jar (in the target directory)::
+;; CLJ_ENV=prod DB_USER=test DB_PASSWORD=abc DB_URL="//localhost:3306/" DB_NAME=some_db QUERY_LOG=true  SQL_LOG=true HTTP_LOG=false SERVER_PORT=8080 SERVER_IP=0.0.0.0 java -jar prod.jar

@@ -45,8 +45,6 @@
 ;; Push event from server
 (defmethod websocket-msg-handler :chsk/recv
   [{:as ev-msg :keys [id ?data]}]
-  (timbre/info :#pp {:id id})
-
   (put! (get-or-make-channel) {:event :ws-server-push :data ?data}
         #(timbre/debugf "Push event from server: %s" ?data))
   {:test-feedback :chsk/recv :ev-msg ev-msg})

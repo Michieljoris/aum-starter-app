@@ -1,7 +1,6 @@
 (ns clj.user
   (:require
    [pagora.aum.dev.core :as dev]
-   [app.config :refer [environments]]
    [app.database.config :refer [db-config]]
    [pagora.aum.core :as aum]
    [integrant.repl :refer [clear go halt init prep reset reset-all]]
@@ -14,8 +13,10 @@
 
 ;; (timbre/info :#w "++++++++++ Loaded dev user namespace ++++++++++")
 (defn restart []
-  (let [aum-config (aum/init {:environments environments
-                              :db-config db-config})]
+  (let [aum-config (aum/init {:db-config db-config
+                              :app-config-ns 'app.config})]
+    (timbre/info :#pp {:aum-config (:foo (:app-config aum-config))})
+
     (dev/init aum-config)
     (dev/go)
     ))

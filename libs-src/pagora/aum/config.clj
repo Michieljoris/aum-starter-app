@@ -2,9 +2,9 @@
   (:require
    [environ.core :refer [env]]
    [pagora.clj-utils.core :as cu]
+   [pagora.aum.environment :refer [environment]]
    [taoensso.timbre.appenders.3rd-party.logstash :refer [logstash-appender]]
    [taoensso.timbre :as timbre]
-   [jansi-clj.core :as jansi]
    ))
 
 ;; Config keys need to be assigned scalar values (so no maps or vectors) so we
@@ -36,9 +36,9 @@
    })
 
 
+;;This map should have all possible keys
 (def default-config
-  {:clj-env :dev
-   :locales (array-map :nl {:language "Dutch" :locale :nl}
+  {:locales (array-map :nl {:language "Dutch" :locale :nl}
                        :de {:language "German" :locale :de}
                        :en {:language "English" :locale :en})
    :email-regex #"(?i)^[^\s]+@([\da-z\.-]+)\.([a-z\.]{2,63})$"
@@ -139,39 +139,44 @@
                   [k (get-env-var-or-v k (get config k))])
                 (keys config))))
 
-(defn make-app-config [environments]
-  (let [environment (or (keyword (env :clj-env)) :dev)
-        config (get environments environment)
-        config (merge default-config parser-config config)
-        config (merge config (config-from-env config))
-        mysql-database {:url (:db-url config)
-                        :db-name (:db-name config)
-                        :om-next-test-db-name  (:om-next-test-db-name config)
-                        :user (:db-user config)
-                        :password (:db-password config)
-                        :use-ssl (:db-use-ssl config)
-                        :pool (:db-pool config)
-                        :pool-loglevel (:db-pool-loglevel config)
-                        :min-pool-size (:min-pool-size config)
-                        :initial-pool-size (:initial-pool-size config)
-                        :print-spec (:db-print-spec config)}
-        redis {:host (:redis-host config)
-               :port (or (cu/parse-natural-number (:redis-port config)) 6379)
-               :password (:redis-password config)
+(defmulti config
+  (fn [environment]
+    environment))
+
+(defmethod config :default [_] nil)
+
+(defn make-app-config []
+  (let [app-config (merge (config :common) (config environment))
+        app-config (merge default-config parser-config app-config)
+        app-config (merge app-config (config-from-env app-config) {:env environment :clj-env environment})
+        mysql-database {:url (:db-url app-config)
+                        :db-name (:db-name app-config)
+                        :om-next-test-db-name  (:om-next-test-db-name app-config)
+                        :user (:db-user app-config)
+                        :password (:db-password app-config)
+                        :use-ssl (:db-use-ssl app-config)
+                        :pool (:db-pool app-config)
+                        :pool-loglevel (:db-pool-loglevel app-config)
+                        :min-pool-size (:min-pool-size app-config)
+                        :initial-pool-size (:initial-pool-size app-config)
+                        :print-spec (:db-print-spec app-config)}
+        redis {:host (:redis-host app-config)
+               :port (or (cu/parse-natural-number (:redis-port app-config)) 6379)
+               :password (:redis-password app-config)
                :translation {:prefix "translations."}}
-        config (assoc config
+        app-config (assoc app-config
                       :mysql-database mysql-database
                       :redis redis
-                      :server {:port (cu/parse-natural-number (:server-port config))
-                               :ip (:server-ip config)}
-                      :nrepl {:port (cu/parse-natural-number (:nrepl-port config))
-                              :ip (:nrepl-host config)}
-                      :logstash-port (cu/parse-natural-number (:logstash-port config))
-                      :limit-max (cu/parse-natural-number (:limit-max config))
-                      :obs-endpoint (str "https://" (:obs-bucket config) ".obs.otc.t-systems.com"))
-        config (update config :gz-mime-types #(cond
+                      :server {:port (cu/parse-natural-number (:server-port app-config))
+                               :ip (:server-ip app-config)}
+                      :nrepl {:port (cu/parse-natural-number (:nrepl-port app-config))
+                              :ip (:nrepl-host app-config)}
+                      :logstash-port (cu/parse-natural-number (:logstash-port app-config))
+                      :limit-max (cu/parse-natural-number (:limit-max app-config))
+                      :obs-endpoint (str "https://" (:obs-bucket app-config) ".obs.otc.t-systems.com"))
+        app-config (update app-config :gz-mime-types #(cond
                                                 (true? %) #{"text/css" "text/javascript"}
                                                 (and % (not-empty %)) %
                                                 :else nil))]
-    ;; (clojure.pprint/pprint config)
-    config))
+    ;; (clojure.pprint/pprint app-config)
+    app-config))

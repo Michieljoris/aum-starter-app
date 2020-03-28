@@ -3,7 +3,8 @@
    [goog.dom :refer [getElement]]
    [pagora.aum.om.next :as om]
    [taoensso.timbre :as timbre]
-   [pagora.aum.frontend.channel.core :refer [get-or-make-channel close-channel start-channel-listener! channel-msg-handler]]
+   [pagora.aum.frontend.config :refer [make-app-config]]
+   [pagora.aum.frontend.channel.core :refer [start-channel-listener! channel-msg-handler]]
    [pagora.aum.frontend.channel.msg-handler]
    [pagora.aum.frontend.websockets.dispatcher :refer [websocket-msg-handler*]]
    [pagora.aum.frontend.websockets.core :as websocket]
@@ -40,14 +41,18 @@
   ;; (mount-app-or-test-runner nil nil)
   )
 
-
 (def frontend-config {:debug {:timbre-level :info}})
 
-(defn init [environments config]
-  (set! *warn-on-infer* true)
-  (enable-console-print!)
-  (timbre/merge-config! {:level     (get-in frontend-config [:debug :timbre-level])
-                         :appenders {:console (console-appender)}})
+(defn init [{:keys [_]}]
+  (let  [app-config (make-app-config)]
+
+    (set! *warn-on-infer* true)
+    (enable-console-print!)
+    (timbre/merge-config! {:level     (get-in app-config [:debug :timbre-level])
+                           :appenders {:console (console-appender)}})
+    app-config))
+
+(defn go [aum-config]
+  (timbre/info :#b "App started")
   (start-channel-listener!)
-  (websocket/start! websocket-msg-handler*)
-)
+  (websocket/start! websocket-msg-handler*))

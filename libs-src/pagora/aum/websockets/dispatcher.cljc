@@ -187,7 +187,7 @@
 ;; (get-in req [:cookies "remember_token" :value])
 
 (defmethod event-msg-handler :default
-  [{:as ev-msg :keys [event id ?data ring-req ?reply-fn send-fn uid connected-uids]}]
+  [{:as ev-msg :keys [event id ?data ring-req ?reply-fn send-fn uid connected-uids]} _]
   (let [session (:session ring-req)
         ;; uid     (:uid     session)
         ]
