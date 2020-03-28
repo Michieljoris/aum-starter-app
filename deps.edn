@@ -22,6 +22,7 @@
          "src-styling"
          "resources" ;;public dir for server and config files
          "src-frontend"
+         "target/assets"
          ]
 
  ;; External dependencies
@@ -35,6 +36,7 @@
 
         org.clojure/clojurescript {:mvn/version"1.10.520"}
         com.bhauman/figwheel-main {:mvn/version "0.2.4-SNAPSHOT"}
+        fipp {:mvn/version "0.6.17"}
 
         ;; Html clojure style
         sablono {:mvn/version "0.8.4"}  ; Optional, just for HTML

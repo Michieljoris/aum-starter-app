@@ -19,4 +19,3 @@
    ;; [cuerdas.core :as str]
    ))
 
-(js/console.log *ns*)

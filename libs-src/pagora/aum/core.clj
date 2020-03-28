@@ -8,20 +8,6 @@
 
 (defn make-ig-system-config [{:keys [server] :as config}]
   {
-   :pagora.aum.web-server.routes/routes
-   {:config config}
-
-   :pagora.aum.web-server.handler/handler
-   {:config config
-    :routes (ig/ref :pagora.aum.web-server.routes/routes)}
-
-   :pagora.aum.web-server.core/httpkit-server
-   {:server-options server
-    :config config
-    :handler (ig/ref :pagora.aum.web-server.handler/handler)}
-
-
-
    :pagora.aum.database.connection/db-conn
    {:config config}
 
@@ -38,6 +24,21 @@
    {:config config
     :parser (ig/ref :pagora.aum.parser.core/parser)
     :parser-env (ig/ref :pagora.aum.parser.core/parser-env)}
+
+
+   :pagora.aum.web-server.routes/routes
+   {:config config
+    :websocket (ig/ref :pagora.aum.websockets.core/websocket-listener)}
+
+   :pagora.aum.web-server.handler/handler
+   {:config config
+    :routes (ig/ref :pagora.aum.web-server.routes/routes)}
+
+   :pagora.aum.web-server.core/httpkit-server
+   {:server-options server
+    :config config
+    :handler (ig/ref :pagora.aum.web-server.handler/handler)}
+
    }
   )
 

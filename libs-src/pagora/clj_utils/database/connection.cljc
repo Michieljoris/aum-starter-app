@@ -3,15 +3,16 @@
             #?(:clj
                [jdbc.pool.c3p0 :as pool])
             [taoensso.timbre :as timbre]
-            #?(:cljs [bilby.js.alasql])
-            [jansi-clj.core :as jansi]))
+             ;; #?(:cljs [bilby.js.alasql])
+             ))
 
 
-(defn set-pool-loglevel [loglevel]
-  (System/setProperties
-   (doto (java.util.Properties. (System/getProperties))
-     (.put "com.mchange.v2.log.MLog" "com.mchange.v2.log.FallbackMLog")
-     (.put "com.mchange.v2.log.FallbackMLog.DEFAULT_CUTOFF_LEVEL" loglevel))))
+#?(:clj
+   (defn set-pool-loglevel [loglevel]
+     (System/setProperties
+      (doto (java.util.Properties. (System/getProperties))
+        (.put "com.mchange.v2.log.MLog" "com.mchange.v2.log.FallbackMLog")
+        (.put "com.mchange.v2.log.FallbackMLog.DEFAULT_CUTOFF_LEVEL" loglevel)))))
 
 (defn make-subname [url db-name use-ssl]
   (let [utf-encoding true]
@@ -31,9 +32,9 @@
      ;;                    (.exec (goog.object/getValueByKeys js/alasql "databases" "alasql")
      ;;                           (str "ATTACH " alasql-persistence " DATABASE " db-name)))
      ;;   nil)
-     {:alasql js/alasql :db-name db-name :alasql-persistence alasql-persistence}))
-
-
+     ;; {:alasql js/alasql :db-name db-name :alasql-persistence alasql-persistence}
+     )
+   )
 
 #?(:clj
 (defn make-db-connection [{:keys [user password url db-name use-ssl pool print-spec min-pool-size initial-pool-size
@@ -49,8 +50,8 @@
                  :user  user
                  :password password}]
     (when print-spec
-      (timbre/info (jansi/white "Database details:"))
-      (timbre/info (jansi/white (str "\n" (with-out-str (pprint (assoc db-spec :password "***")))))))
+      (timbre/info :#w "Database details:")
+      (timbre/info :#w (str "\n" (with-out-str (pprint (assoc db-spec :password "***"))))))
     (if pool
       (do
         (when pool-loglevel

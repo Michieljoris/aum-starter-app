@@ -1,4 +1,5 @@
 (ns pagora.aum.parser.mutate-save-mods
+   #?(:cljs (:require-macros [pagora.clj-utils.macros :refer [assert-x]]))
   (:require [pagora.aum.database.query :refer [sql]]
             [pagora.aum.security :refer [get-whitelist]]
             [pagora.aum.database.inspect :as db-inspect]
@@ -6,7 +7,8 @@
             [pagora.clj-utils.core :as cu]
 
             [pagora.aum.util :as bu]
-            [pagora.clj-utils.macros :refer [assert-x]]
+            #?(:clj
+               [pagora.clj-utils.macros :refer [assert-x]])
 
             #?(:clj [clojure.java.jdbc  :as jdbc])
             [clojure.set :as set]

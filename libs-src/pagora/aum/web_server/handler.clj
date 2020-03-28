@@ -174,24 +174,24 @@
        (wrap-with-logger {:logger (make-timbre-logger config)})
        (add-request-id)
        ;; ^^^ Exceptions in fns above get caught by bugsnag and wrap-stacktrace ^^^
-       (bugsnag.ring/wrap-bugsnag
-        {:api-key (:bugsnag-api-key-server config)
-         :environment clj-env
-         ;; Project namespace prefix, used to hide irrelevant stack trace elements
-         ;; :project-ns "your-project-ns-prefix"
-         ;; A optional version for your app, this is displayed in bugsnag.
-         ;; If not provided the latest git sha will be used - this means that
-         ;; the git repo is available when you run your app.
-         ;;TODO: !!!!!!!!
-         ;; :version           (:version integrations/build-info)
-         ;; A optional function to extract a user object from a ring request map
-         ;; Used to count how many users are affected by a crash
-         :user-from-request (fn [request]
-                              (security/get-user-by-remember-token {:db-conn   db-conn
-                                                                    :db-config db-config}
-                                                                   request
-                                                                   [:id :group-id]))
-         })
+       ;; (bugsnag.ring/wrap-bugsnag
+       ;;  {:api-key (:bugsnag-api-key-server config)
+       ;;   :environment clj-env
+       ;;   ;; Project namespace prefix, used to hide irrelevant stack trace elements
+       ;;   ;; :project-ns "your-project-ns-prefix"
+       ;;   ;; A optional version for your app, this is displayed in bugsnag.
+       ;;   ;; If not provided the latest git sha will be used - this means that
+       ;;   ;; the git repo is available when you run your app.
+       ;;   ;;TODO: !!!!!!!!
+       ;;   ;; :version           (:version integrations/build-info)
+       ;;   ;; A optional function to extract a user object from a ring request map
+       ;;   ;; Used to count how many users are affected by a crash
+       ;;   :user-from-request (fn [request]
+       ;;                        (security/get-user-by-remember-token {:db-conn   db-conn
+       ;;                                                              :db-config db-config}
+       ;;                                                             request
+       ;;                                                             [:id :group-id]))
+       ;;   })
        (wrap-cookies)                                        ;; Needed for bugsnag (it's not included with wrap-defaults)
        ;;TODO: in production this should show something less scary than a
        ;;stacktrace. though hopefully will never happen.

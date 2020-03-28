@@ -1,7 +1,6 @@
 (ns pagora.aum.web-server.routes
   (:require
    ;; [web-server.file-transfer :as transfer]
-   ;; [websockets.core :refer [sente-route]]
 
    [pagora.aum.web-server.response :as resp]
 
@@ -71,10 +70,11 @@
   ;; Routes
 (defn make-routes [{:keys [app-path extra-routes] :as config
                     :or {app-path ""
-                         extra-routes (constantly {})}}]
+                         extra-routes (constantly {})}}
+                   {:keys [sente-route]}]
   (let [app-path (str/trim app-path "/")
         routes (merge (aum-routes config)
-                      ;; (sente-route config)
+                      sente-route
                       (extra-routes config)
                       {true resp/not-found})]
     ["" (if (pos? (count app-path))
@@ -82,7 +82,9 @@
            true resp/not-found}
           routes)]))
 
-(defmethod ig/init-key ::routes [k {:keys [config]}]
+(defmethod ig/init-key ::routes [k {:keys [config websocket]}]
   (when (:integrant-log config) (timbre/info :#g "[INTEGRANT] creating" (name k)))
-  (make-routes config))
+  (let [routes (make-routes config websocket)]
 
+    ;; (timbre/info :#pp {:routes routes})
+    routes))

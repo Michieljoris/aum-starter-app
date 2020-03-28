@@ -1,4 +1,4 @@
-{:main app.core
+{:main app.frontend.core
  ;; :build-inputs [:main]
  :output-to "target/assets/public/app/app.js"
  :output-dir "target/assets/public/app/out"

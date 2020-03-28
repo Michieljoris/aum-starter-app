@@ -1,6 +1,7 @@
 {
  :watch-dirs [;; "src"
               "src-frontend"
+              "libs-src"
               ;; "bilby-libs-frontend"
               ;; "aum-next/src"
               ;; "src/"

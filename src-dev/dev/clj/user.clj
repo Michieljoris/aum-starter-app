@@ -28,7 +28,10 @@
 
 ;; (def routes (:pagora.aum.web-server.routes/routes (dev/ig-system)))
 ;; (def parser (:pagora.aum.parser.core/parser (dev/ig-system)))
-;; (pprint parser)
+(let [{:keys [chsk-send!]} (:websocket (:pagora.aum.websockets.core/websocket-listener (dev/ig-system)))]
+  (pprint chsk-send!)
+  (chsk-send! :sente/nil-uid [:some/request-id {:name "michiel"}])
+  )
 
 ;; (def version (clojure.string/trim (slurp "version")))
 
