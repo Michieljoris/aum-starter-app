@@ -1,12 +1,15 @@
 (ns app.core
   (:require
    [pagora.aum.core :as aum]
-   [app.config :refer [environments]]
+   [pagora.aum.config :refer [make-app-config]]
    [app.database.config :refer [db-config]]
    [taoensso.timbre :as timbre]
    ))
 
-(defn -main [& args]
-  (let [aum-config (aum/init {:environments environments
+(defn start-app []
+  (let [aum-config (aum/init {:app-config-ns 'app.config
                               :db-config db-config})]
     (aum/go aum-config)))
+
+(defn -main [& args]
+  (start-app))

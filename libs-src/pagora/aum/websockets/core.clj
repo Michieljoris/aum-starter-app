@@ -14,6 +14,7 @@
   came with the request for the connection."
   [env req]
   ;; (timbre/info "Getting user id for sente!!!!!!!")
+  ;;TODO: enable again
   (let [user-id 1 ;; (:id (security/get-user-by-remember-token env req [:id]))
         ]
     (au/user-id->uid user-id)))
@@ -49,10 +50,12 @@
         _ (when watch-connected-uids?
             (add-connected-uids-watch websocket))
         event-msg-handler (fn [ev-msg]
+                            ;; (timbre/info :#pp {:ev-msg ev-msg})
+
                             (dispatcher/event-msg-handler ev-msg {:parser parser
-                                                                  :parser-env (assoc parser-env
-                                                                                     :config config
-                                                                                     :websocket websocket)}))
+                                                                  :config config
+                                                                  :websocket websocket
+                                                                  :parser-env parser-env}))
         stop-fn (sente/start-chsk-router! chsk-recv event-msg-handler
                                                   {:simple-auto-threading? true})]
     {:websocket websocket
@@ -73,11 +76,3 @@
   (when (:integrant-log config) (timbre/info :#g "[INTEGRANT] halting" (name k)))
   (remove-watch connected-uids :logger)
   (stop-fn))
-
-;; ;; debug fn
-;; (defn sente? []
-;;   (sente/chsk-send! :sente/nil-uid [:some/request-id {:name "michiel"}])
-;;   )
-
-
-;; (get-user-id {:cookies {"remember_token" {:value "f830c933-9ee9-4e40-8796-59428f448e32"}} })

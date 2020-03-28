@@ -14,14 +14,17 @@
 ;; (timbre/info :#w "++++++++++ Loaded dev user namespace ++++++++++")
 (defn restart []
   (let [aum-config (aum/init {:db-config db-config
-                              :app-config-ns 'app.config})]
+                              :app-config-ns 'app.config
+                              :frontend-config-keys [:app-path :locales]})]
     (timbre/info :#pp {:aum-config (:foo (:app-config aum-config))})
 
     (dev/init aum-config)
     (dev/go)
     ))
 
+;;RESTART ====================
 (restart)
+;;RESTART ====================
 
 ;; (dev/go)
 ;; (dev/halt)
@@ -29,10 +32,10 @@
 
 ;; (def routes (:pagora.aum.web-server.routes/routes (dev/ig-system)))
 ;; (def parser (:pagora.aum.parser.core/parser (dev/ig-system)))
-(let [{:keys [chsk-send!]} (:websocket (:pagora.aum.websockets.core/websocket-listener (dev/ig-system)))]
-  (pprint chsk-send!)
-  (chsk-send! :sente/nil-uid [:some/request-id {:name "michiel"}])
-  )
+;; (let [{:keys [chsk-send!]} (:websocket (:pagora.aum.websockets.core/websocket-listener (dev/ig-system)))]
+;;   (pprint chsk-send!)
+;;   (chsk-send! :uid-1 [:some/request-id {:name "michiel"}])
+;;   )
 
 ;; (def version (clojure.string/trim (slurp "version")))
 

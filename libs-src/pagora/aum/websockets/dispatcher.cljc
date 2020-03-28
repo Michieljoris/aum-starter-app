@@ -39,7 +39,7 @@
 (defmethod event-msg-handler :chsk/handshake
   [{:keys [?data]} _]
   (let [[?uid ?csrf-token ?handshake-data] ?data]
-    (timbre/debugf "Handshake: %s" ?data)))
+    (timbre/infof "Handshake: %s" ?data)))
 
 (defmethod event-msg-handler :chsk/ws-ping
 ;; Pinging from client
@@ -53,10 +53,9 @@
 ;; Process a query (read/mutation) from client
 (defmethod event-msg-handler :app/query
   [{:keys [?data ?reply-fn uid] :as ev-msg }
-   {:keys [parser parser-env]}]
+   {:keys [parser parser-env config websocket]}]
   (do ;; try
-    (let [{:keys [config websocket]} parser-env
-          query      ?data
+    (let [query      ?data
           query-type (if (mutation? query) "Mutation" "Read")
           parser-env (parser-env)]
 
@@ -170,6 +169,15 @@
       ;; (timbre/info response)
       (?reply-fn response))))
 
+(defmethod event-msg-handler :aum/frontend-config
+  [{:keys [?reply-fn id] :as ev-msg} {:keys [config parser-env]}]
+  (timbre/info :#pp {:id id})
+
+  (let [user nil ;; (get-user-by-ev-msg parser-env ev-msg)
+        ]
+    (when ?reply-fn
+      (?reply-fn (:frontend-config config)))))
+
 ;; (defn find-handler-fn
 ;;   "Every msg from sente has an id, here we hackishly look for a var in
 ;;   this ns that has the same name"
@@ -187,21 +195,25 @@
 ;; (get-in req [:cookies "remember_token" :value])
 
 (defmethod event-msg-handler :default
-  [{:as ev-msg :keys [event id ?data ring-req ?reply-fn send-fn uid connected-uids]} _]
+  [{:keys [event id ?data ring-req ?reply-fn send-fn uid connected-uids]
+    :as ev-msg} {:keys [config]}]
   (let [session (:session ring-req)
         ;; uid     (:uid     session)
         ]
-    ;; (timbre/info "EVENT in event-msg-handler")
-    ;; (timbre/info {:id id
-    ;;      :uid uid
-    ;;      :event event
-    ;;      :data ?data
-    ;;      :cookies (:cookies ring-req)
-    ;;      :connected-uids connected-uids
-    ;;      :session session
-    ;;      :reply-fn ?reply-fn
-    ;;      })
-    ;; ;;
+    (timbre/info "EVENT in event-msg-handler")
+    (timbre/info :#pp
+                 {:id id
+                  :uid uid
+                  :event event
+                  :data ?data
+                  :cookies (:cookies ring-req)
+                  :connected-uids connected-uids
+                  :session session
+                  :reply-fn ?reply-fn
+                  })
+    ;; (timbre/info :#pp {:frontend-config (:frontend-config config)})
+
+    ;;
     (if-let [handler-fn false ;; (find-handler-fn id)
              ;; authorized? (authorize-ev-msg ev-msg)
              ]

@@ -29,7 +29,7 @@
 
 ;; TODO: enable again
   (timbre/info "Websocket state changed: " msg)
-  ;; (om/transact! reconciler `[(admin/merge-map {:map-to-merge
+  ;; (om/transact! reconciler `[(app/merge-map {:map-to-merge
   ;;                                              {:client/ws-open? ~(get-in msg [:data :open?])}})
   ;;                            :client/ws-open?])
   (websocket/process-queued-send))
@@ -37,11 +37,11 @@
 
 ;; Server might push data to us.
 (defmethod channel-msg-handler :ws-server-push
-  [{:keys [data] :as msg}]
+  [{:keys [data app-config] :as msg}]
 
   (let [[event response] data]
     (condp = event
-      :admin/broadcast (let [om-request {:target :app
+      :app/broadcast (let [om-request {:target :app
                                          :success? (constantly true)
                                          :om-callback (fn [to-be-merged]
                                                         ;; (timbre/info "to be merged from push:")

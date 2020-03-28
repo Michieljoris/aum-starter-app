@@ -6,7 +6,7 @@
    [pagora.aum.frontend.config :refer [make-app-config]]
    [pagora.aum.frontend.channel.core :refer [start-channel-listener! channel-msg-handler]]
    [pagora.aum.frontend.channel.msg-handler]
-   [pagora.aum.frontend.websockets.dispatcher :refer [websocket-msg-handler*]]
+   [pagora.aum.frontend.websockets.dispatcher :refer [websocket-msg-handler]]
    [pagora.aum.frontend.websockets.core :as websocket]
    [pagora.clj-utils.timbre :refer [console-appender]]
    ;; [components.root-component :refer [RootComponent]]
@@ -34,14 +34,18 @@
 ;; ;; This handler is triggered when websocket is ready to send and receive msgs.
 ;; ;; When this is the case we mount our om app.
 (defmethod channel-msg-handler :ws-first-open
-  [msg]
+  [{:keys [app-config] :as msg}]
   (timbre/info :#b "Websocket opened: " msg)
+  ((:chsk-send! websocket/websocket) [:aum/frontend-config nil] 8000
+   (fn [resp]
+
+     (timbre/info :#pp (merge app-config resp))))
+
   ;; (swap! (om/app-state reconciler) assoc
   ;;        :client/csrf-token (get-in msg [:data :csrf-token]))
   ;; (mount-app-or-test-runner nil nil)
   )
 
-(def frontend-config {:debug {:timbre-level :info}})
 
 (defn init [{:keys [_]}]
   (let  [app-config (make-app-config)]
@@ -52,7 +56,11 @@
                            :appenders {:console (console-appender)}})
     app-config))
 
-(defn go [aum-config]
+(defn make-websocket-msg-handler [app-config]
+  (fn [ev-msg]
+    (websocket-msg-handler ev-msg app-config)))
+
+(defn go [app-config]
   (timbre/info :#b "App started")
   (start-channel-listener!)
-  (websocket/start! websocket-msg-handler*))
+  (websocket/start! (make-websocket-msg-handler app-config)))

@@ -57,10 +57,12 @@
   (doall (->> symbols (map try-require))))
 
 (defn init
-  [{:keys [db-config app-config-ns]}]
+  [{:keys [db-config app-config-ns frontend-config-keys]}]
   (timbre/info (into [] (load-namespaces [app-config-ns])))
   (let [{:keys [multimethod-namespaces] :as app-config} (make-app-config)
-        app-config (merge {:db-config db-config} app-config)
+        app-config (merge {:db-config db-config
+                           :frontend-config (select-keys app-config frontend-config-keys)}
+                          app-config)
         _ (when-let [timbre-log-level (:timbre-log-level app-config)]
             (timbre/merge-config! {:level timbre-log-level
                                    :middleware [middleware]}))
