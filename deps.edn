@@ -23,8 +23,8 @@
          "src-frontend"
 
          ;; dev sources
-         ;; "target/assets"
-         ;; "src-dev"
+         "target/assets"
+         "src-dev"
 
          ;;libs, should be moved to own repos
          "libs-src"
@@ -34,7 +34,7 @@
 
 
         ;;dev dependency
-        ;; weasel {:mvn/version "0.7.0"}
+        weasel {:mvn/version "0.7.0"}
 
 
         ;;TODO: move these deps to aum deps.edn
@@ -42,7 +42,7 @@
 
         org.clojure/clojurescript {:mvn/version"1.10.520"}
 
-        ;; com.bhauman/figwheel-main {:mvn/version "0.2.4-SNAPSHOT"}
+        com.bhauman/figwheel-main {:mvn/version "0.2.4-SNAPSHOT"}
         fipp {:mvn/version "0.6.17"}
 
         ;; Html clojure style

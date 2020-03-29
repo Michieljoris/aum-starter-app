@@ -336,7 +336,8 @@
          (timbre/info color "<<<<<<<< " target)
          result)))))
 
-(defn make-reconciler [{:keys [success? remotes state spy-parser? verbose? start-state value-merge-hook remotes logger parser]
+(defn make-reconciler [{:keys [success? state remotes spy-parser? verbose? start-state value-merge-hook
+                               remotes logger parser]
                         :as reconciler-config
                         :or {start-state (atom nil)}}]
   (let [queues {:reads-queue (chan)

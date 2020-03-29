@@ -8,10 +8,14 @@
 
 
 (defui ^:once RootComponent
+  static om/IQuery
+  (query [this]
+    [:client/reload-key])
   Object
   (render [this]
     (html [:div
-           "2 Hello!!!!!"
+           "foo5"
+
            ])
     )
   )

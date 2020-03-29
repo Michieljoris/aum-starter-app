@@ -10,6 +10,9 @@
 
 
 ;; (tufte/add-basic-println-handler! {})
+#?(:cljs
+   (aset js/window "foo" (atom [])))
+
 
 (defn now-in-ms []
   #?(:clj  (System/currentTimeMillis)

@@ -33,6 +33,8 @@
       :app (mount-app reconciler RootComponent))))
 
 
+(defonce aum-state (atom nil))
+
 ;; ;; This handler is triggered when websocket is ready to send and receive msgs.
 ;; ;; When this is the case we mount our om app.
 (defmethod channel-msg-handler :ws-first-open
@@ -41,12 +43,15 @@
   ((:chsk-send! websocket/websocket) [:aum/frontend-config nil] 8000
    (fn [resp]
      (let [{:keys [app-config RootComponent]} (update aum-config :app-config merge resp)
-           ;;TODO: we need to get this reconciler in an atom!!!! or alter-var-root or something
+           app-state {:client/csrf-token (get-in msg [:data :csrf-token])}
            reconciler (start-reconciler
                        {:app-config app-config
-                        :app-state {:client/csrf-token (get-in msg [:data :csrf-token])}})]
+                        :app-state app-state})]
+       (reset! aum-state {:reconciler reconciler
+                          :RootComponent RootComponent
+                          :app-state (om/app-state reconciler)
+                          :app-config app-config})
        (mount-app-or-test-runner reconciler RootComponent)))))
-
 
 (defn init [{:keys [RootComponent]}]
   (let  [app-config (make-app-config)]

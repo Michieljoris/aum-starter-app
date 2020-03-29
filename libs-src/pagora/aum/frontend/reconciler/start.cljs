@@ -23,7 +23,7 @@
                                                 :app-config app-config})})))
 
 (def default-app-state
-  {})
+  {:client/reload-key :foo})
 
 (defn aum-remote [query response-cb]
   ;; (timbre/info :#b query)
@@ -39,7 +39,7 @@
 
 (defn start-reconciler
   [{:keys [app-state app-config parser remotes value-merge-hooks]}]
-  (aum/make-reconciler {:state (merge default-app-state app-state)
+  (aum/make-reconciler {:state (atom (merge default-app-state app-state))
                         :verbose? (-> app-config :debug :send)
                         :easy-reads true
                         :pathopt true

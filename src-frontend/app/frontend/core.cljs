@@ -5,9 +5,8 @@
    [taoensso.timbre :as timbre]
    [app.frontend.root-component :refer [RootComponent]]
    ))
+;; ^:figwheel-no-load
 
-(let [aum-config (aum/init {:RootComponent RootComponent})]
-  ;; (aum/go aum-config)
-  )
-
-
+(defonce start
+  (let [aum-config (aum/init {:RootComponent RootComponent})]
+    (aum/go aum-config)))
