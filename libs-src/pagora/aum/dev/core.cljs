@@ -7,7 +7,6 @@
 (defn ^:after-load figwheel-reload-callback []
   "Gets called on source changes"
   (timbre/info :#g "=============== RELOAD ===============")
-  ;; (timbre/info :#pp @aum/aum-state)
   (let [{:keys [reconciler app-state app-config RootComponent]} @aum/aum-state]
     (when (om/mounted? (om/class->any reconciler RootComponent))
       ;; We should query for client/reload-key in root cmp and

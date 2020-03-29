@@ -3,10 +3,10 @@
    [app.frontend.config] ;;needs to be required
    [pagora.aum.frontend.core :as aum]
    [taoensso.timbre :as timbre]
-   [app.frontend.root-component :refer [RootComponent]]
-   ))
+   [app.frontend.root-component :refer [RootComponent]]))
 ;; ^:figwheel-no-load
 
 (defonce start
-  (let [aum-config (aum/init {:RootComponent RootComponent})]
+  (let [aum-config (aum/init {:RootComponent RootComponent
+                              :app-state {:client/foo :from-app}})]
     (aum/go aum-config)))

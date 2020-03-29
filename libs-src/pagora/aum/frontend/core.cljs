@@ -42,8 +42,8 @@
   (timbre/info :#b "Websocket opened: " msg)
   ((:chsk-send! websocket/websocket) [:aum/frontend-config nil] 8000
    (fn [resp]
-     (let [{:keys [app-config RootComponent]} (update aum-config :app-config merge resp)
-           app-state {:client/csrf-token (get-in msg [:data :csrf-token])}
+     (let [{:keys [app-config RootComponent app-state]} (update aum-config :app-config merge resp)
+           app-state (merge app-state {:client/csrf-token (get-in msg [:data :csrf-token])})
            reconciler (start-reconciler
                        {:app-config app-config
                         :app-state app-state})]
@@ -53,14 +53,13 @@
                           :app-config app-config})
        (mount-app-or-test-runner reconciler RootComponent)))))
 
-(defn init [{:keys [RootComponent]}]
+(defn init [aum-config]
   (let  [app-config (make-app-config)]
     (set! *warn-on-infer* true)
     (enable-console-print!)
     (timbre/merge-config! {:level (get-in app-config [:debug :timbre-level])
                            :appenders {:console (console-appender)}})
-    {:app-config app-config
-     :RootComponent RootComponent}))
+    (assoc aum-config :app-config app-config)))
 
 (defn make-websocket-msg-handler [aum-config]
   (fn [ev-msg]
