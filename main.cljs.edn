@@ -51,58 +51,39 @@
  ;;                       :output-to "public/admin_new/dev.js"}}
 
  :infer-externs true
- ;; :externs ["foreign-libs-externs.ext.js"
- ;;           "cryptojs.ext.js"
- ;;           "moment.ext.js"
- ;;           "react.ext.js"
- ;;           "react-dom.ext.js"]
- ;; :foreign-libs [
- ;;                ;; {:file "foreign-libs/bugsnag.js" :provides ["js.npm.bugsnag"]}
- ;;                ;; {:file "foreign-libs/dragula.js" :provides ["js.dragula"]}
+ :externs [;; "foreign-libs-externs.ext.js"
+           ;; "cryptojs.ext.js"
+           ;; "moment.ext.js"
+           "react.ext.js"
+           "react-dom.ext.js"]
+ :foreign-libs [
+                ;; {:file "foreign-libs/bugsnag.js" :provides ["js.npm.bugsnag"]}
+                ;; {:file "foreign-libs/dragula.js" :provides ["js.dragula"]}
 
- ;;                ;;unused
- ;;                ;; {:file "node_modules/cryptojs/lib/Crypto.js"
- ;;                ;;  :provides ["cryptojs.core"]}
- ;;                ;; {:file "node_modules/cryptojs/lib/MD5.js"
- ;;                ;;  :provides ["cryptojs.md5"]
- ;;                ;;  :requires ["cryptojs.core"]}
+                ;;unused
+                ;; {:file "node_modules/cryptojs/lib/Crypto.js"
+                ;;  :provides ["cryptojs.core"]}
+                ;; {:file "node_modules/cryptojs/lib/MD5.js"
+                ;;  :provides ["cryptojs.md5"]
+                ;;  :requires ["cryptojs.core"]}
 
- ;;                ;; Needed for snapshot tests and test-runner
- ;;                {:file "node_modules/alasql/dist/alasql.js" :provides ["bilby.js.alasql"]}
- ;;                {:file "node_modules/lz-string/libs/lz-string.js" :provides ["bilby.js.lz-string"]}
- ;;                ;; {:file "bilby/js/setImmediate.js" :provides ["bilby.js.setimmediate"]}
- ;;                {:file "bilby/js/diff_match_patch.js" :provides ["bilby.js.diff-match-patch"]}
- ;;                {:file "bilby/js/highlight.js" :provides ["bilby.js.highlight"]}
- ;;                {:file "bilby/js/vkbeautify.js" :provides ["bilby.js.vkbeautify"]}
+                ;; Needed for snapshot tests and test-runner
+                {:file "node_modules/alasql/dist/alasql.js"
+                 :provides ["js.alasql"]}
+                ;; {:file "node_modules/lz-string/libs/lz-string.js" :provides ["aum.js.lz-string"]}
+                ;; {:file "aum/js/setImmediate.js" :provides ["aum.js.setimmediate"]}
+                ;; {:file "aum/js/diff_match_patch.js" :provides ["aum.js.diff-match-patch"]}
+                ;; {:file "aum/js/highlight.js" :provides ["aum.js.highlight"]}
+                ;; {:file "aum/js/vkbeautify.js" :provides ["aum.js.vkbeautify"]}
 
- ;;                ;;webpacked:
- ;;                {:file "foreign-libs/index.bundle.js"
- ;;                 :provides ["react" "react-dom"
- ;;                            "material-ui"
- ;;                            "material-ui-styles"
- ;;                            ;; "material-ui-icons"
- ;;                            "dragula"
- ;;                            "bugsnag"
- ;;                            "moment"
- ;;                            "react-datetime"
- ;;                            "react-smooth-dnd"
- ;;                            "react-sortable"
- ;;                            "react-beautiful-dnd"
- ;;                            "atlas-kit-tree"
- ;;                            ]
- ;;                 :global-exports {
- ;;                                  react React
- ;;                                  react-dom ReactDOM
- ;;                                  material-ui MaterialUI
- ;;                                  material-ui-styles MaterialUIStyles
- ;;                                  ;; material-ui-icons MaterialUISvgIcons
- ;;                                  dragula Dragula
- ;;                                  bugsnag Bugsnag
- ;;                                  moment moment
- ;;                                  react-datetime ReactDatetime
- ;;                                  react-smooth-dnd ReactSmoothDnd
- ;;                                  react-sortable ReactSortable
- ;;                                  react-beautiful-dnd ReactBeautifulDnd
- ;;                                  atlas-kit-tree AtlasKitTree
- ;;                                  }}]
- }
+                ;;webpacked:
+                {:file "foreign-libs/index.bundle.js"
+                 :provides ["js.react"
+                            "js.react-dom"
+                            "js.moment"
+                            "js.react-datetime"]
+                 :global-exports {
+                                  js.react React
+                                  js.react-dom ReactDOM
+                                  js.moment moment
+                                  js.react.datetime ReactDatetime}}]}

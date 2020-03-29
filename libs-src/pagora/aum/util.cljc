@@ -232,7 +232,8 @@
 
 #?(:cljs
    (defn set-onbeforeunload
-     ([state app-config] (set-onbeforeunload identity state))
+     ;;TODO-MIGRATE: fix and feed in app-config!!!!
+     ([state] (set-onbeforeunload identity state {}))
      ([t state app-config]
       (let [{:keys [dirty-routes dirty-route-names]} (get-dirty-routes state app-config)]
         (if (seq dirty-routes)

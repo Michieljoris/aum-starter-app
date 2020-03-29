@@ -4,7 +4,8 @@
    [pagora.aum.frontend.core :as aum]
    [sablono.core :as html :refer-macros [html]]
    [taoensso.timbre :as timbre]
-   [om.next :as om :refer-macros [defui]]
+   [pagora.aum.om.next :as om :refer-macros [defui]]
+   [js.react :as react]
    ))
 
 (defui ^:once RootComponent
@@ -17,9 +18,10 @@
     )
   )
 
-
 (let [_ :foo]
-  (let [aum-config (aum/init {:RootComponent RootComponent})]
+  (let [aum-config (aum/init {:RootComponent RootComponent
+                              })]
     (aum/go aum-config))
   )
 
+(js/console.log react)

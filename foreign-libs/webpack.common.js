@@ -7,7 +7,7 @@ module.exports = {
     //and creates this file:
     filename: 'index.bundle.js',
     //in this dir:
-    path:  path.resolve(__dirname, 'foreign-libs')
+    path:  path.resolve(__dirname, '')
   },
   // optimization: {
   //   usedExports: true

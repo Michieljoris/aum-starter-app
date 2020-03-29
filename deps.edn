@@ -272,7 +272,18 @@
  ;;     :extra-paths - vector of additional paths to add to the classpath
  ;;     :classpath-overrides - map of lib to path that overrides the result of resolving deps
 
- :aliases {:revolt {
+ :aliases {
+           :morpheus {:extra-deps {thomasa/morpheus {:git/url "https://github.com/benedekfazekas/morpheus.git"
+                                                     :sha "d3decebc1cb9ef697cd34781f9cf83d44a071e85"}}
+                      :main-opts ["-m" "thomasa.morpheus.main"]}
+           :user/vizns
+           {:extra-deps {io.dominic/vizns {:git/url "https://github.com/SevereOverfl0w/vizns.git"
+                                     :sha "fb2391a4af24246ac4e46f3a573970ba5b7c92de"}}
+            :main-opts ["-m" "io.dominic.vizns.core"]}
+
+           :graph {:extra-deps {org.clojure/tools.deps.graph {:mvn/version "0.2.30"}}
+                   :main-opts ["-m" "clojure.tools.deps.graph"]}
+           :revolt {
                     :extra-deps {
                                  defunkt/revolt {:mvn/version "1.2.0"}
                                  deraen/sass4clj {:mvn/version "0.3.1"}
@@ -295,17 +306,17 @@
                                      ]
                        }
            :git-deps {
-                      :override-deps {
-                                      clojure-utils {:git/url "git@github.com:michieljoris/clojure-utils"
-                                                     :sha "ef287398e23c18ee55dd5611f44a98bd0c0c8027"
-                                                     :mvn/version "0.0.0"
-                                                     }
 
-                                      aum {:git/url "git@github.com:michieljoris/aum-next"
-                                           :sha "0efcde35d29fc0a72876f46a87a80f9ba25967e9"
-                                           :mvn/version "0.0.0"
-                                           }
-                                      }
+                      ;;                 clojure-utils {:git/url "git@github.com:michieljoris/clojure-utils"
+                      ;;                                :sha "ef287398e23c18ee55dd5611f44a98bd0c0c8027"
+                      ;;                                :mvn/version "0.0.0"
+                      ;;                                }
+
+                      ;;                 aum {:git/url "git@github.com:michieljoris/aum-next"
+                      ;;                      :sha "0efcde35d29fc0a72876f46a87a80f9ba25967e9"
+                      ;;                      :mvn/version "0.0.0"
+                      ;;                      }
+                      ;;                 }
 
                       }
 
@@ -345,7 +356,7 @@
                  }
 
            ;; :revolt-plugins {:extra-deps {revolt-plugins {:local/root "/home/michieljoris/src/clojure/playground/revolt-plugins"}}
-           ;;                  ;; :main-opts ["-m" "nrepl2"]
+                                        ;                  ;; :main-opts ["-m" "nrepl2"]
            ;;                  }
            ;;1.10.520 gives error in _meta.js: META is not defined
            :cljs {:extra-deps  {

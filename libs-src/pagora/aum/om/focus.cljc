@@ -39,10 +39,10 @@
   "Given a query, focus it along the specified path.
 
   Examples:
-    (om.next/focus-query [:foo :bar :baz] [:foo])
+    (pagora.aum.om.next/focus-query [:foo :bar :baz] [:foo])
     => [:foo]
 
-    (om.next/focus-query [{:foo [:bar :baz]} :woz] [:foo :bar])
+    (pagora.aum.om.next/focus-query [{:foo [:bar :baz]} :woz] [:foo :bar])
     => [{:foo [:bar]}]"
   [query path]
   (focus-query* query path nil))
@@ -52,7 +52,7 @@
 
    Examples:
 
-     (om.next/focus->path [{:foo [{:bar {:baz []}]}])
+     (pagora.aum.om.next/focus->path [{:foo [{:bar {:baz []}]}])
      => [:foo :bar :baz]"
   ([focus]
    (focus->path focus '* []))

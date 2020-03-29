@@ -14,6 +14,8 @@
               [taoensso.tufte :as tufte :refer-macros (defnp p profiled profile)]
               [goog.object :as gobj]
               [goog.log :as glog]
+              [js.react :as react]
+              [js.react-dom :as react-dom]
               [pagora.aum.om.next.cache :as c]])
    [pagora.aum.om.next.impl.parser :as parser]
 
@@ -122,10 +124,10 @@
        (fn [[name [this :as args] & body]]
          `(~name [this#]
            (let [~this this#]
-             (binding [pagora.aum.om.next/*reconciler* (om.next/get-reconciler this#)
-                       pagora.aum.om.next/*depth*      (inc (om.next/depth this#))
-                       pagora.aum.om.next/*shared*     (om.next/shared this#)
-                       pagora.aum.om.next/*instrument* (om.next/instrument this#)
+             (binding [pagora.aum.om.next/*reconciler* (pagora.aum.om.ext/get-reconciler this#)
+                       pagora.aum.om.next/*depth*      (inc (pagora.aum.om.next/depth this#))
+                       pagora.aum.om.next/*shared*     (pagora.aum.om.next/shared this#)
+                       pagora.aum.om.next/*instrument* (pagora.aum om.next/instrument this#)
                        pagora.aum.om.next/*parent*     this#]
                (let [ret# (do ~@body)
                      props# (:props this#)]
@@ -173,7 +175,7 @@
                                (goog.object/get next-state# "omcljs$state"))
                ret#        (do ~@body)]
            (when (cljs.core/implements? pagora.aum.om.next/Ident this#)
-             (let [ident# (pagora.aum.om.next/ident this# (om.next/props this#))
+             (let [ident# (pagora.aum.om.next/ident this# (pagora.aum.om.next/props this#))
                    next-ident# (pagora.aum.om.next/ident this# ~next-props)]
                (when (not= ident# next-ident#)
                  (let [idxr# (get-in (pagora.aum.om.next/get-reconciler this#) [:config :indexer])]
@@ -222,7 +224,7 @@
          (let [~this this#]
            ;; (timbre/info :#b "+++++++++++++++++++++++++++++++++++++++++++++")
            (binding [pagora.aum.om.next/*reconciler* (pagora.aum.om.next/get-reconciler this#)
-                     pagora.aum.om.next/*depth*      (inc (om.next/depth this#))
+                     pagora.aum.om.next/*depth*      (inc (pagora.aum.om.next/depth this#))
                      pagora.aum.om.next/*shared*     (pagora.aum.om.next/shared this#)
                      pagora.aum.om.next/*instrument* (pagora.aum.om.next/instrument this#)
                      pagora.aum.om.next/*parent*     this#]
@@ -243,7 +245,7 @@
             next-props# (goog.object/get next-props# "omcljs$value")
             next-props# (cond-> next-props#
                           (instance? pagora.aum.om.next/OmProps next-props#) pagora.aum.om.next/unwrap)]
-        (or (not= (om.next/props this#)
+        (or (not= (pagora.aum.om.next/props this#)
                   next-props#)
             (and (.. this# ~'-state)
                  (not= (goog.object/get (. this# ~'-state) "omcljs$state")
@@ -476,13 +478,13 @@
                                {:doc docstring})))
                     []
                     (this-as this#
-                      (.apply js/React.Component this# (js-arguments))
+                      (.apply react/Component this# (js-arguments))
                       (if-not (nil? (.-initLocalState this#))
                         (set! (.-state this#) (.initLocalState this#))
                         (set! (.-state this#) (cljs.core/js-obj)))
                       this#))
            set-react-proto! `(set! (.-prototype ~name)
-                                 (goog.object/clone js/React.Component.prototype))
+                                 (goog.object/clone react/Component.prototype))
            ctor  (if (-> name meta :once)
                    `(when-not (cljs.core/exists? ~name)
                       ~ctor
@@ -853,7 +855,7 @@
             ;; (js/console.log  *shared*)
             ;; (js/console.log  *parent*)
             ;; (js/console.log  *depth*)
-            (js/React.createElement class
+            (react/createElement class
               #js {:key               key
                    :ref               ref
                    :omcljs$reactKey   key
@@ -2708,9 +2710,9 @@
          optimize     (fn [cs] (sort-by depth cs))
          history      100
          root-render  #?(:clj  (fn [c target] c)
-                         :cljs #(js/ReactDOM.render %1 %2))
+                         :cljs #(react-dom/render %1 %2))
          root-unmount #?(:clj   (fn [x])
-                         :cljs #(js/ReactDOM.unmountComponentAtNode %))
+                         :cljs #(react-dom/unmountComponentAtNode %))
          pathopt      false
          migrate      default-migrate
          easy-reads   true}

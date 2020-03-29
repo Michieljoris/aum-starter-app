@@ -1,9 +1,8 @@
-(ns om.dom
+(ns pagora.aum.om.dom
   (:refer-clojure :exclude [map mask meta time select])
-  (:require-macros [om.dom :as dom])
-  (:require [cljsjs.react]
-            [cljsjs.react.dom]
-            [om.util :as util]
+  (:require-macros [pagora.aum.om.dom :as dom])
+  (:require [js.react :as react]
+            [js.react-dom :as react-dom]
             [goog.object :as gobj]))
 
 (dom/gen-react-dom-fns)
@@ -25,9 +24,9 @@
                      (->> #js {:onChange (goog/bind (gobj/get this "onChange") this)}
                        (gobj/extend state props))
                      state))
-                 (.apply js/React.Component this (js-arguments))))]
+                 (.apply react/Component this (js-arguments))))]
     (set! (.-displayName ctor) (str "wrapped-" element))
-    (goog.inherits ctor js/React.Component)
+    (goog.inherits ctor react/Component)
     (specify! (.-prototype ctor)
       Object
       (onChange [this event]
@@ -39,7 +38,7 @@
 
       (componentWillReceiveProps [this new-props]
         (let [state-value (gobj/getValueByKeys this "state" "value")
-              element-value (gobj/get (js/ReactDOM.findDOMNode this) "value")]
+              element-value (gobj/get (react-dom/findDOMNode this) "value")]
           ;; On IE, onChange event might come after actual value of
           ;; an element have changed. We detect this and render
           ;; element as-is, hoping that next onChange will
@@ -57,8 +56,8 @@
             (update-state this new-props (gobj/get new-props "value")))))
 
       (render [this]
-        (js/React.createElement element (.-state this))))
-    (js/React.createFactory ctor)))
+        (react/createElement element (.-state this))))
+    (react/createFactory ctor)))
 
 (def input (wrap-form-element "input"))
 
@@ -71,7 +70,7 @@
 (defn render
   "Equivalent to React.render"
   [component el]
-  (js/ReactDOM.render component el))
+  (react-dom/render component el))
 
 (defn render-to-str
   "Equivalent to React.renderToString"
@@ -81,17 +80,17 @@
 (defn node
   "Returns the dom node associated with a component's React ref."
   ([component]
-   (js/ReactDOM.findDOMNode component))
+   (react-dom/findDOMNode component))
   ([component name]
-   (some-> (.-refs component) (gobj/get name) (js/ReactDOM.findDOMNode))))
+   (some-> (.-refs component) (gobj/get name) (react-dom/findDOMNode))))
 
 (defn create-element
   "Create a DOM element for which there exists no corresponding function.
    Useful to create DOM elements not included in React.DOM. Equivalent
-   to calling `js/React.createElement`"
+   to calling `react/createElement`"
   ([tag]
    (create-element tag nil))
   ([tag opts]
-   (js/React.createElement tag opts))
+   (react/createElement tag opts))
   ([tag opts & children]
-   (js/React.createElement tag opts children)))
+   (react/createElement tag opts children)))

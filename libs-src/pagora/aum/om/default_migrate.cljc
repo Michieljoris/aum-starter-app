@@ -1,1 +1,1 @@
-(ns om.default-migrate)
+(ns pagora.aum.om.default-migrate)

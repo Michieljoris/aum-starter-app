@@ -1,6 +1,6 @@
-(ns om.process-roots
+(ns pagora.aum.om.process-roots
   (:require
-   [om.util :as util]))
+   [pagora.aum.om.util :as util]))
 
 (defn- merge-joins
   "Searches a query for duplicate joins and deep-merges them into a new query."

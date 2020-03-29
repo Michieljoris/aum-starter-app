@@ -1,12 +1,4 @@
 {
-  "name": "Pagora starter app",
-  "version": "1.0.0",
-  "description": "## Install",
-  "main": "index.js",
-  "directories": {
-    "doc": "doc",
-    "test": "test"
-  },
   "devDependencies": {
     "@fortawesome/fontawesome-free": "^5.8.0",
     "alasql": "^0.4.11",
@@ -23,25 +15,13 @@
     "webpack-visualizer-plugin": "^0.1.11",
     "karma-cli": "^1.0.1"
   },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/michieljoris/pagora-app.git"
-  },
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/michieljoris/pagora-app/issues"
-  },
-  "homepage": "https://github.com/michieljoris/pagora-app#readme",
   "dependencies": {
+    "@cljs-oss/module-deps": "^1.1.1",
     "bulma": "0.7.4",
     "cryptojs": "^2.5.3",
     "moment": "^2.24.0",
     "react": "16.8.4",
     "react-datetime": "^2.16.3",
-    "react-dom": "16.8.4",
+    "react-dom": "16.8.4"
   }
 }

@@ -1,6 +1,6 @@
-(ns om.tree-to-db
+(ns pagora.aum.om.tree-to-db
   (:require
-   [om.util :as util])
+   [pagora.aum.om.util :as util])
   )
 
 ;;WIP

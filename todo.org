@@ -8,10 +8,28 @@
 -admin-misc-fixes
 -user-on-off-switch ??
 -calc-active-users-implementation (includes event-store and export-active-accounts)
+* Add emacs shortcuts for restart, reload namespaces etc
+;; Fix docstring highlighting for `defsys`
+(put 'defsys 'clojure-doc-string-elt 2)
 
+;; The below functions allow you to control systemic from Emacs.
+;; Personally, I have found binding them to keys to be very convenient.
+(defun systemic/restart ()
+  "Restarts all systemic systems"
+  (interactive)
+  (cider-interactive-eval "(systemic.core/restart!)"))
+
+(defun systemic/start ()
+  "Starts all systemic systems"
+  (interactive)
+  (cider-interactive-eval "(systemic.core/start!)"))
+
+(defun systemic/stop ()
+  "Stops all systemic systems"
+  (interactive)
+  (cider-interactive-eval "(systemic.core/stop!)"))
 * migrate the tests over from aum-old
 * add db migration lib
-* add the test-runner
 * icons
 * foreign libs (react!!)
 * Get template editor working
@@ -19,3 +37,15 @@
 * Make simple checklist
 * Get mystack going properly for app
 * Clean up, browse and copy useful stuff from all DC notes to my own pagora notes
+* Clean up github
+* Make intro/guide to repos
+* Modules
+** Add security (auth etc) as module
+** Add paging and routing as module
+** Testrunner as module
+** Download etc as module
+** Event store
+** Calc active users
+** Data inspector
+* Data entry environment design document
+mydesign.deed
