@@ -1,5 +1,4 @@
-{:main app.frontend.core
- ;; :build-inputs [:main]
+{:main cljs.user ;; require app.frontend.core in this ns to pull in all dependencies for the app
  :output-to "target/assets/public/app/app.js"
  :output-dir "target/assets/public/app/out"
  :asset-path "app/out",
@@ -7,58 +6,26 @@
  :devcards             true
  :verbose              false
  :compiler-stats       true
- :install-deps true
- ;; :npm-deps {:xregexp "4.2.0"}
- ;; :aot-cache            true
  :source-map-timestamp true
-
  ;; https://github.com/bhauman/lein-figwheel/issues/88
  ;; :closure-defines {"goog.DEBUG" false}
  :recompile-dependents false
-
  :pretty-print         true
-
  :fn-invoke-direct true
-
  ;; :pseudo-names true
-
  :external-config      {:devtools/config {:features-to-install    [:formatters :hints]
                                           :fn-symbol              "F"
-                                          :print-config-overrides true}
-                        }
+                                          :print-config-overrides true}}
  ;; :preloads [devtools.preload]
- ;; :preloads [figwheel.core
- ;;            figwheel.main
- ;;            figwheel.repl.preload
- ;;            devtools.preload
- ;;            figwheel.main.evalback]
- ,
  :aot-cache false,
- ;; :closure-defines {figwheel.repl/connect-url
- ;;                   "ws://localhost:9500/figwheel-connect?fwprocess=b96800&fwbuild=dev"}
- ,
- ;; :repl-requires ([figwheel.repl :refer-macros [conns focus]]
- ;;                 [figwheel.main
- ;;                  :refer-macros
- ;;                  [stop-builds start-builds build-once reset clean status]])
-
- ;; :npm-deps false
-
- ;; :modules {:cljs-base {:output-to "public/admin_new/base.js"}
- ;;           ;; :vendor    {:entries #{re-frame.core}
- ;;           ;;             :output-to "scripts/vendor.js"}
- ;;           :main      {:entries #{app.core}
- ;;                       :output-to "public/admin_new/dev.js"}}
-
  :infer-externs true
- :externs [;; "foreign-libs-externs.ext.js"
+ :externs [;; "foreign-libs.ext.js"
            ;; "cryptojs.ext.js"
-           ;; "moment.ext.js"
+           "moment.ext.js"
            "react.ext.js"
            "react-dom.ext.js"]
  :foreign-libs [
                 ;; {:file "foreign-libs/bugsnag.js" :provides ["js.npm.bugsnag"]}
-                ;; {:file "foreign-libs/dragula.js" :provides ["js.dragula"]}
 
                 ;;unused
                 ;; {:file "node_modules/cryptojs/lib/Crypto.js"
@@ -69,7 +36,9 @@
 
                 ;; Needed for snapshot tests and test-runner
                 {:file "node_modules/alasql/dist/alasql.js"
-                 :provides ["js.alasql"]}
+                 :provides ["js.alasql"]
+                 ;; :global-exports {js.alasql ???}
+                 }
                 ;; {:file "node_modules/lz-string/libs/lz-string.js" :provides ["aum.js.lz-string"]}
                 ;; {:file "aum/js/setImmediate.js" :provides ["aum.js.setimmediate"]}
                 ;; {:file "aum/js/diff_match_patch.js" :provides ["aum.js.diff-match-patch"]}
@@ -82,8 +51,7 @@
                             "js.react-dom"
                             "js.moment"
                             "js.react-datetime"]
-                 :global-exports {
-                                  js.react React
+                 :global-exports {js.react React
                                   js.react-dom ReactDOM
                                   js.moment moment
                                   js.react.datetime ReactDatetime}}]}

@@ -11,11 +11,11 @@
  :pagora.revolt.task/update-html {:src-path "resources/app-template.html"
                                :dest-path "resources/app.html"
 
-                               :dev {:load-user-ns true ;; add script link to app.html that loads the user namespace, also see figwheel-main.edn
+                               :dev {:load-app-dev true ;; add script link to app.html that loads the user namespace, also see figwheel-main.edn
                                      :include-build-info-in-html false
                                      :path "app"
                                      :app-name "Pagora"}
-                               :prod {:load-user-ns false;; add script link to app.html that loads the user namespace, also see figwheel-main.edn
+                               :prod {:load-app-dev false;; add script link to app.html that loads the user namespace, also see figwheel-main.edn
                                       :include-build-info-in-html true
                                       :path "app"
                                       :app-name "pagora"
@@ -50,10 +50,10 @@
 
  :revolt.task/cljs   {:compiler {:output-dir "public/app/out"
                                  :asset-path "/app/out"
-                                 :preloads [devtools.preload]
+                                 ;; :preloads [devtools.preload]
 
                                  :parallel-build       true
-                                 :devcards             true
+                                 ;; :devcards             true
                                  :verbose              false
                                  :compiler-stats       true
                                  ;; :aot-cache            true
@@ -65,7 +65,7 @@
 
                                  ;; https://github.com/bhpagoraan/lein-figwheel/issues/88
                                  ;; :closure-defines {"goog.DEBUG" false}
-                                 :recompile-dependents false
+                                 ;; :recompile-dependents false
 
                                  :pretty-print         true
 
@@ -73,18 +73,8 @@
 
                                  ;; :pseudo-names true
 
-                                 :external-config      {:devtools/config {:features-to-install    [:formatters :hints]
-                                                                          :fn-symbol              "F"
-                                                                          :print-config-overrides true}
-                                                        }
-                                 :main "app.core"
+                                 :main "app.frontend.core"
                                  :output-to "public/app/app.js"
-                                 ;; :modules {:cljs-base {:output-to "public/app/base.js"}
-                                 ;;           ;; :vendor    {:entries #{re-frame.core}
-                                 ;;           ;;             :output-to "scripts/vendor.js"}
-                                 ;;           :main      {:entries #{app.core}
-                                 ;;                       :output-to "public/app/dev.js"}}
-
                                  :infer-externs true
                                  :externs ["foreign-libs-externs.ext.js"
                                            "cryptojs.ext.js"
@@ -102,50 +92,21 @@
                                                 ;;  :provides ["cryptojs.md5"]
                                                 ;;  :requires ["cryptojs.core"]}
 
-                                                ;; Needed for snapshot tests and test-runner
-                                                {:file "node_modules/alasql/dist/alasql.js" :provides ["pagora.js.alasql"]}
-                                                {:file "node_modules/lz-string/libs/lz-string.js" :provides ["pagora.js.lz-string"]}
-                                                ;; {:file "pagora/js/setImmediate.js" :provides ["pagora.js.setimmediate"]}
-                                                {:file "pagora/js/diff_match_patch.js" :provides ["pagora.js.diff-match-patch"]}
-                                                {:file "pagora/js/highlight.js" :provides ["pagora.js.highlight"]}
-                                                {:file "pagora/js/vkbeautify.js" :provides ["pagora.js.vkbeautify"]}
-
                                                 ;;webpacked:
                                                 {:file "foreign-libs/index.bundle.js"
-                                                 :provides ["react" "react-dom"
-                                                            "material-ui"
-                                                            "material-ui-styles"
-                                                            ;; "material-ui-icons"
-                                                            "dragula"
-                                                            "bugsnag"
-                                                            "moment"
-                                                            "react-datetime"
-                                                            "react-smooth-dnd"
-                                                            "react-sortable"
-                                                            "react-beautiful-dnd"
-                                                            "atlas-kit-tree"
-                                                            ]
-                                                 :global-exports {
-                                                                  react React
-                                                                  react-dom ReactDOM
-                                                                  material-ui MaterialUI
-                                                                  material-ui-styles MaterialUIStyles
-                                                                  ;; material-ui-icons MaterialUISvgIcons
-                                                                  dragula Dragula
-                                                                  bugsnag Bugsnag
-                                                                  moment moment
-                                                                  react-datetime ReactDatetime
-                                                                  react-smooth-dnd ReactSmoothDnd
-                                                                  react-sortable ReactSortable
-                                                                  react-beautiful-dnd ReactBeautifulDnd
-                                                                  atlas-kit-tree AtlasKitTree
-                                                                  }}]
-                                 }
+                                                 :provides ["js.react"
+                                                            "js.react-dom"
+                                                            "js.moment"
+                                                            "js.react-datetime"]
+                                                 :global-exports {js.react React
+                                                                  js.react-dom ReactDOM
+                                                                  js.moment moment
+                                                                  js.react.datetime ReactDatetime}}]}
                       ;;Compiler config gets merged with each build
                       :builds [{:id "main"
-                                :source-paths ["src" "src-om"]}]}
+                                :source-paths ["src" "src-frontend"]}]}
 
- :pagora.revolt.task/capsule {:exclude-paths #{"test" "src/cljs"}
+ :pagora.revolt.task/capsule {:exclude-paths #{"test" "src-frontend"}
                              ;; :aliases [:git-deps]
                              :output-jar "dist/app.jar"
                              :capsule-type :fat

@@ -5,6 +5,7 @@
    [integrant.core :as ig]
    [integrant.repl :as ig-repl]
    [integrant.repl.state :as ig-state]
+   [taoensso.timbre :as timbre]
    [pagora.aum.core :as aum]))
 
 (defn print-local-cp []

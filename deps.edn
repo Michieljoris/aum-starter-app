@@ -18,20 +18,26 @@
 
  :paths [
          "src"
-         "libs-src"
          "src-styling"
          "resources" ;;public dir for server and config files
          "src-frontend"
-         "target/assets"
-         ]
 
- ;; External dependencies
+         ;; dev sources
+         "target/assets"
+         "src-dev"
+
+         ;;libs, should be moved to own repos
+         "libs-src"
+         ]
 
  :deps {org.clojure/clojure {:mvn/version "1.10.1"}
 
+
+        ;;dev dependency
+        weasel {:mvn/version "0.7.0"}
+
+
         ;;TODO: move these deps to aum deps.edn
-
-
         ;; org.clojure/clojurescript {:mvn/version"1.10.597"} ;; Use of undeclared Var goog.log/warn
 
         org.clojure/clojurescript {:mvn/version"1.10.520"}
@@ -341,8 +347,6 @@
                                ;;gives errors. Some deps conflict/override?
                                ;; com.bhauman/figwheel-main {:mvn/version "0.2.3"}
                                cider/piggieback {:mvn/version "0.4.2"}
-                               weasel {:mvn/version "0.7.0"
-                                       :exclusions [org.clojure/clojurescript]}
                                fipp {:mvn/version "0.6.17"}
 
                                }
@@ -350,8 +354,7 @@
                  ;;the server to find them target/assets needs to be added to the
                  ;;classpath:
                  :extra-paths ["target/assets"
-                               "src-dev/dev"
-                               "src-dev/test"
+                               ;; "src-dev"
                                ]
                  }
 

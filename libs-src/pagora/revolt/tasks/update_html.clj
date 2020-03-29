@@ -19,7 +19,7 @@
   (let [{:keys [bugsnag-api-key-frontend
                 include-build-info-in-html
                 app-name path
-                load-user-ns]} (get options (or (keyword env) :dev))
+                load-app-dev]} (get options (or (keyword env) :dev))
         bugsnag-ph "<!--bugsnag-->"
         app-js-ph "<!--app-js-ph-->"
         app-dev-js-ph "<!--app-dev-js-ph-->"
@@ -37,7 +37,7 @@
                                                                      "\",sha:\"" sha
                                                                      "\",env:\"" env
                                                                      "\"}</script>"))
-          load-user-ns (str/replace app-dev-js-ph
+          load-app-dev (str/replace app-dev-js-ph
                                     (str "<script type=\"text/javascript\" src=\"/" path "/app-dev.js\"></script>"))
           true (str/replace app-js-ph
                             (str "<script type=\"text/javascript\" src=\"/" path "/app.js\"></script>"))
@@ -60,9 +60,9 @@
 
 ;; (invoke {:env "prod"} {:src-path "resources/admin-template.html"
 ;;                        :dest-path "resources/admin.html"
-;;                        :dev {:load-user-ns true
+;;                        :dev {:load-app-dev true
 ;;                              :include-build-info-in-html false}
-;;                        :prod {:load-user-ns false
+;;                        :prod {:load-app-dev false
 ;;                               :include-build-info-in-html true
 ;;                               :bugsnag-api-key-frontend "123"}
 ;;                        }

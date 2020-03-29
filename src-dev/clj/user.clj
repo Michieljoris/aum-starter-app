@@ -3,6 +3,7 @@
    [pagora.aum.dev.core :as dev]
    [app.database.config :refer [db-config]]
    [pagora.aum.core :as aum]
+   ;; [pagora.aum.dev.cljs-repl :as cljs-repl]
    [integrant.repl :refer [clear go halt init prep reset reset-all]]
 
    [bidi.bidi :as b]
@@ -16,7 +17,7 @@
   (let [aum-config (aum/init {:db-config db-config
                               :app-config-ns 'app.config
                               :frontend-config-keys [:app-path :locales]})]
-    (timbre/info :#pp {:aum-config (:foo (:app-config aum-config))})
+    ;; (timbre/info :#pp {:aum-config (:app-config aum-config)})
 
     (dev/init aum-config)
     (dev/go)

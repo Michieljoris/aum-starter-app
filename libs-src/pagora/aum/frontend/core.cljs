@@ -32,6 +32,7 @@
       ;;                    #(timbre/info "Sent msg to start test-runner"))
       :app (mount-app reconciler RootComponent))))
 
+
 ;; ;; This handler is triggered when websocket is ready to send and receive msgs.
 ;; ;; When this is the case we mount our om app.
 (defmethod channel-msg-handler :ws-first-open
@@ -40,6 +41,7 @@
   ((:chsk-send! websocket/websocket) [:aum/frontend-config nil] 8000
    (fn [resp]
      (let [{:keys [app-config RootComponent]} (update aum-config :app-config merge resp)
+           ;;TODO: we need to get this reconciler in an atom!!!! or alter-var-root or something
            reconciler (start-reconciler
                        {:app-config app-config
                         :app-state {:client/csrf-token (get-in msg [:data :csrf-token])}})]
