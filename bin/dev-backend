@@ -3,8 +3,8 @@
 cmd="CLJ_ENV=dev clj "`
     `"-A:revolt:dev "`
     `"-A:local-deps:nrepl:slf4j "`
-    `"-p watch,pagora.revolt.plugin/nrepl-piggieback,rebel "`
     `"-t info,pagora.revolt.task/write-info,pagora.revolt.task/sass,"`
-    `"pagora.revolt.task/update-html"
+    `"pagora.revolt.task/update-html "`
+    `"-p watch,pagora.revolt.plugin/nrepl-piggieback,rebel"
 echo "$(tput setaf 7)$cmd$(tput sgr0)"
 eval $cmd

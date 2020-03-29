@@ -7,4 +7,7 @@
    ))
 
 (let [aum-config (aum/init {:RootComponent RootComponent})]
-  (aum/go aum-config))
+  ;; (aum/go aum-config)
+  )
+
+

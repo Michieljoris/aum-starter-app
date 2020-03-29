@@ -4,3 +4,19 @@
 https://docs.cider.mx/cider/cljs/figwheel.html
 https://github.com/bhauman/figwheel-main/blob/master/src/figwheel/main/api.clj
 https://github.com/bhauman/figwheel-main/blob/master/docs/docs/emacs.md
+
+* Bootup
+** dev
+*** clj
+When calling bin/dev-backend the last plugin (rebel) is configured in
+resources/revold.edn under the :revolt.plugin/rebel.init-ns to load the clj.user
+ns.
+In clj.user a restart fn is defined that inits aum, inits a integrant system
+with it and then calls (dev/go) on it. This kicks of all the init-key fns in the
+various namespaces (db, server etc).
+*** cljs
+When starting figwheel (by either bin/dev-figwheel or space-m-" in Emacs) the
+complier options in dev.cljs.edn get used to produce the js from cljs. The :main
+options is set to cljs.user. This is the first file loaded in the frontend by
+goog.require and all the dependent files are loaded after that. So cljs.user
+should require app.frontend.core. This is enough to get the app going.

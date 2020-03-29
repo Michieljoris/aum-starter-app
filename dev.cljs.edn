@@ -17,6 +17,7 @@
                                           :fn-symbol              "F"
                                           :print-config-overrides true}}
  ;; :preloads [devtools.preload]
+ :preloads [pagora.aum.dev.core]
  :aot-cache false,
  :infer-externs true
  :externs [;; "foreign-libs.ext.js"
