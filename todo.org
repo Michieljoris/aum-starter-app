@@ -31,7 +31,7 @@
 * migrate the tests over from aum-old
 * add db migration lib
 * icons
-* foreign libs (react!!)
+* DONE foreign libs (react!!)
 * Get template editor working
 ->>> data entry design!!!
 * Make simple checklist
@@ -49,3 +49,14 @@
 ** Data inspector
 * Data entry environment design document
 mydesign.deed
+* write docs
+** make-cmp and om-data
+** backend parser
+** frontend parser
+** database config
+** webpack and foreign-libs
+** bin scripts
+** revolt
+** config for front and backend
+multimethods!
+* Get remotes working!!!
