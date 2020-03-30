@@ -1,13 +1,8 @@
 #+TITLE: todo
 * Portfolio
 ** Make intro/guide to repos
-- Clean up github
 ** Clean up, browse and copy useful stuff from all DC notes to my own pagora notes
-** research current tech
-- web assembly!!!
-- llvm
-- graalvm
-** brush up on algorithms etc
+** Clean up github
 
 * Aum
 ** write docs
@@ -32,6 +27,8 @@ multimethods!
 *** Put libs-src in github repos
 ** Aum modules
 *** add db migration lib
+See clj.joplin for how to run the up and down migrations.
+Should make revolt tasks for them
 *** Add security (auth etc)
 bugsnag, authorization, login, logout etc
 - Load bugsnag api keys from gitignored .env file in update-html-string
@@ -44,12 +41,11 @@ bugsnag, authorization, login, logout etc
 
 ** Aum Migrate over:
 *** icons
-*** Get template editor working
+Get template editor working
 ->>> data entry design!!!
 *** testrunner
 *** Download
 *** event store
-Also see script in modules/events/experimental
 *** data inspector
 *** calc active users
 *** paging and routing

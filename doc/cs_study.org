@@ -1,0 +1,240 @@
+* TODO do certs:
+  :PROPERTIES:
+  :ID:       2830812f-174f-4370-8f1b-78835d8fe1bb
+  :END:
+ * [ ] sicp
+ * [ ] java
+ * [ ] linux
+       Books:
+       + 
+       + unix programming environment
+       + design of unix operating systen
+       
+       
+* TODO coding
+  :PROPERTIES:
+  :ID:       fb587ffb-9fb7-4849-a85f-9c1a990e794b
+  :END:
+  - [ ] finish EOCS
+  - [ ] finish oo.js
+  - [ ] finish bootstrap.js
+
+
+* TODO finish
+  :PROPERTIES:
+  :ID:       683ca5ba-6480-4348-ac41-ce01c4e21154
+  :END:
+  * [ ] put keykit on githb
+  * [ ] maybe ebar on github
+  * [ ] put eocs and oo.js and bootstrap on github
+	
+* TODO articles
+  :PROPERTIES:
+  :ID:       b1138d89-d404-4c5d-a0b2-ef69ce452eac
+  :END:
+  * [ ] js, the pure parts
+  * [ ] js, the emulations: oop
+  * [ ] js, the emulations: modules
+  * [ ] js, the emulations: first class functions
+
+    
+  
+* BookIdeas (by Michiel on Sat 21 Jan 2012 18:02:00 EST) -----
+
+A1thou desirest with True Desire to tread the Path of Wizardly Wisdom, first learn the elementary Postures of Kernighan & Pike's The Unix Programming Environment; then, absorb the mantic puissance of March Rochkind's Advanced Unix Programming and W. Richard Stevens's Advanced Programming In The Unix Environment. 
+
+Immerse thyself, then, in the Pure Light of Maurice J. Bach's The Design Of The Unix Operating System.Neglect not the Berkelian Way; study also The Design and Implementation Of The 4.4BSD Operating System by Kirk McKusick, Keith Bostic et. al. 
+
+For useful hints, tips, and tricks, see Unix Power Tools, Tim O'Reilly,ed. Consider also the dark Wisdom to be gained from contemplation of the dread Portable C And Unix Systems Programming, e'en though it hath flowed from the keyboard of the mad and doomed Malvernite whom the world of unknowing Man misnames "J. E. Lapin". 
+
+These tomes shall instruct thy Left Brain in the Nature of the Unix System; to Feed the other half of thy Head, O Nobly Born, embrace also the Lore of its Nurture. Don Libes's and Sandy Ressler's Life With Unix will set thy Feet unerringly upon that Path; take as thy Travelling Companion the erratic but illuminating compendium called The New Hacker's Dictionary (Eric S. Raymond, ed., with Guy L. Steele Jr.). 
+
+
+Website of Paul Graham 
+
+
+
+
+
+
+
+
+
+
+ 
+
+* CS (by MichielJoris on Mon 27 Feb 2012 08:41:00 EST) -----
+
+[[Wheat blogging engine]]
+[[Android]]
+[[Loading Scripts Without Blocking | High Performance Web Sites]
+[[App list]]
+[[Regex recursion]]
+[[Great hackers]]
+[[Linux commands]]
+[[Vim: Seven habits of effective text editing]]
+[[Image backup]]
+[[SICP Classes for JavaScript]]
+[[Study plan]]
+[[Methodology]]
+[[blog-rants - steveyegge2]]
+[[Ultimate vim config]]
+[[Java IAQ: Infrequently Answered Questions]]
+[[New linux install]]
+[[Study ideas]]
+[[Muscata]]
+[[LooseLeaf: lightweight blog engine for Node]]
+[[DIY node.js server on Amazon EC2 | Cuppster.com]]
+
+Dynamic Script Execution Order - WHATWG Wiki
+
+http://wiki.whatwg.org/wiki/Dynamic_Script_Execution_Order
+This Time, You’ll Learn Node.js Blog Engine | How To - WordPress Videos Tutorials Themes Plugins and SEO
+
+http://wordpresstutor.tv/this-time-youll-learn-node-js-blog-engine
+Alternatives to LiveReload / Ecosystem / FAQs - LiveReload Support
+[[Book ideas]]
+[[Recommended Vim plugins for JavaScript coding? - Stack Overflow]]
+[[Technologies to learn]]
+[[Laptops]]
+Wiki
+
+. A micro-wiki application with distributed version control
+
+Node needs a generic Wiki application that is both small in size and able to maintain versions of documents across multiple instances. This will allow for a decentralized Wikipedia which could also be sharded onto local storage, and to smaller devices like mobile phones. TiddlyWiki is a neat project by Jeremy Ruston which is built on this idea. Some work has been done with node and TiddyWiki, but I couldn't find anything about using node to synchronize multiple TiddlyWiki instances.
+
+
+
+
+** study plan (by MichielJoris on Sat 21 Apr 2012 22:41:00 EST) -----
+
+Get certificates:
+
+    CCNA
+    Java
+    Linux
+
+Study computer science:
+
+    Discrete math
+        Epp, rosen
+    Algorithms
+        Skiena,  clrs
+    Architecture
+        Building computer from first principles, Patterson
+    OS
+        Operating Systems Design and Implementation (minix)
+    Programming languages
+        scip
+        epl  (building interpreter)
+        ctm
+    Web
+        javascript web applications, 
+        software engineering for internet apps
+    Coding
+        assembly step by step
+        the c language
+        land of lisp
+
+
+Practical
+
+    *nix
+        Unix programming environment
+        Art of unix programming
+    revise ipad productive programmer highlights
+    xmonad, git, rsync
+    setup blog with wheat
+    mamre website with joomla
+    nodejitsu
+    building minix
+    building interpreter
+    building from first principles
+    add book used to lecture in google bookmarks
+    get videos of lectures onto tab and laxie
+
+Lectures:
+
+    discrete maths http://www.aduni.org/courses/discrete/index.php?view=cw
+    scip
+    hcw http://www.aduni.org/courses/hcw/index.php?view=cw
+
+
+Write blog articles
+
+    essence of javascript
+    mobile frameworks
+
+
+Code projects
+
+    javascript module system bootstrap.js
+    muscata
+
+
+Contact people
+
+    damien
+    andrew's dad
+    maarten
+
+** study ideas (by MichielJoris on Sat 21 Apr 2012 22:42:00 EST) -----
+
+install wheat on node server, put blog on it.
+research node
+research heroku
+hosting node on amazon ec2
+on dailyjs module packaging http://dailyjs.com/2011/09/22/framework-81/
+http://arcturo.github.com/library/coffeescript/05_applications.html
+http://howtonode.org/object-graphs-3
+vpn???
+http://spinejs.com/docs/started
+http://nodejitsu.com/
+http://dailyjs.com/2010/03/15/hosting-nodejs-apps/
+http://nodester.com/
+textile markdown
+gogrid ec2 rackspace are cloud providers
+Gae heroku are app servers
+ender 
+jsperf
+jstestdrive
+ape.js
+bouncy.js
+list.js
+incident57.com/codekit/ like live reload, using nodejuice!!
+set ssh and sftp etc using openssh-server package
+Check out computer science curricula
+Koans
+PubNub
+
+https://console.aws.amazon.com/s3/home
+
+** ReadingList (by Michiel on Tue 10 Apr 2012 10:31:00 EST) -----
+
+Maths: Epps, dmuac, foundations
+Alg: Skiena, Aho et all
+Arch: Patterson Hennessy
+OS: Minix, Unix design and prog. env. >write LispOs, Linux cert
+Lang:  sicp, lisp macros,  ruby prg lang, c lang, asm, haskell, > Java ce
+Net: JavaScript web apps > write BrowserOs
+Context: Coding interview 
+
+Install arch Linux on sammy.
+Finish eocs
+Code onto githubb
+
+** ToDo (by MichielJoris on Wed 29 Feb 2012 12:24:00 EST) -----
+
+*explore archlinux minix
+*node microblog
+*math exercises ch2
+*reread is ch1
+*implement assembler in lisp, haskell, javascript
+*backup hard drives
+*transfer notes to here
+*code onto github
+finish reading reg expressions, haskell,lisp
+-read emacs ide
+-read newlisp tutorial
+
+

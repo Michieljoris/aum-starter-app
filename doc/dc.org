@@ -1,0 +1,4948 @@
+j Weekly dev update
+** Dev update 2019-01-14
+#+BEGIN_SRC markdown
+## Supergroups
+Past weekend supergroups was deployed to both DC app and admin. The idea behind
+supergroups is that we (DC) can now assign 'supergroup' status to a group. This
+group can then create and administer its 'subgroups'. In effect this creates the
+situation for the supergroup where DC was in when DC had no clients yet, so no
+groups to manage, other than its own group. In practice this deploy changes very
+little till we assign a group to be a supergroup. Groups like Privacy Valley and
+Amsterdam might make good use of this supergroup feature.
+
+A few more 'improvements' came with this deploy. It's now possible to have per
+group translations! So 'verbeteringspuntje' can now be a translation for
+'violation', or overtreding in Dutch. Also a group can have its own logos, both
+in-app and on their pdf.
+
+And a number of bug fixes and changes.
+- Logging using the admin works now without having to refresh the page first.
+- A new user will be 'disabled' by default. There's a line through the name, and
+  the form will be gray.
+- You can go from the admin to the DC app and back by clicking on "Go to .." in
+  the avatar menu right top.
+- You can request a new password for a user from the admin.
+
+# Ember upgrade
+The DC app is built using the Ember framework. The maintainers of this framework
+have a habit of updating it frequently. Which is nice, cause it gets faster and
+more stable. However it also means we as devs have to keep up, and stay in sync.
+The last update was already from 2016, and Ember has moved on mercilessly since.
+We finally got around to updating it, Johnny laid the groundwork and the rest of
+were tasked with updating the tests. It's still somewhat a work in progress, but
+new features are being built on top of the latest upgrade already.
+
+#+END_SRC
+* Omgevingswet dag 27-8-18
+- DSO
+- Digitizing laws
+ To what degree are laws formalized? 
+Is that getting better. 
+- So drafts are only in pdf form
+
+* Lucas quotes
+** We have big plans                                                  
+Just showed the templates to contentmanagement
+And it will be an awesome product
+Just explained to them what the potential value of a product like this would be
+We are now connecting the dots between workproces for permitting and enforcement. So from beginning to end we have the app to follow and register the proces and we have all the content to take the appropriate steps and create the necessary letters.
+For our main customer (26 environmental departments, 17 are a DC customer) on average they will have 10 to 20 people working fulltime on just this. A civil servant costs around 80.000+
+So just for our customers that is about 14.000.000 and we could save them over half of that (way more but they will always be inefficiënt even if they don’t have to be).
+And that 7.000.000 is just what we save on implementing the upcoming change in legislation and not what they sava with working with DC.
+If you look at the 220 cities that will have to do the same you are looking at 176.000.000 it is costing them
+:scream::sunglasses:
+Just to give you an idea of what you guys are working on :smile:
+Of course most of them are not our customers yet but we will aim for as much as possible the next few years.
+
+* telekom servers
+** otc console
+*** paperclip obs credentials
+    I'm getting:
+12:10
+
+```{:storage=>:obs,
+ :obs_credentials=>
+  {:bucket=>"chinchilla-development", :access_key=>"", :secret_access_key=>""}}
+
+```
+
+12:10
+On startup
+12:10
+Jacob Mendoza
+Yes, thats right (edited)
+12:10
+You need to get an access key and secret
+12:11
+that has to be made in OTC
+12:11
+Jacob Mendoza
+12:11
+Jacob Mendoza
+You can get them from here, thats all you need
+12:11
+Its a bit hidden
+12:15
+Does this help Michiel?
+12:15
+Michiel van Oosten
+Ah, I don't have credentials listed there.
+12:16
+Jacob Mendoza
+Sorry, yeah, thats right
+12:16
+You can create them in the bottom left
+12:16
+What Im wondering now is if we cant just share one pair :thinking_face:
+12:16
+In any case, youre just two clicks away I think
+12:17
+Michiel van Oosten
+And they go in dev config in rails I imagine?
+12:18
+Jacob Mendoza
+Right, last step
+12:18
+Michiel van Oosten
+paperclip.yml
+12:18
+Jacob Mendoza
+there is a paperclip.sample.yml
+12:18
+exactly that file to paperclip.yml and values there
+12:18
+I understand you have a paperclip.yml otherwise app wouldnt start I think
+12:18
+Michiel van Oosten
+Which is gitignored
+12:19
+Get it
+*** login url   
+   http://myworkplace.t-systems.com/MyWorkplace/Login.aspx
+*** firewall 
+    Go to the "Virtual Private Cloud" option in OTC console. There you can
+    access the firewalls in the right menu. Once you clicked through the menu's
+    and see the firewall's inbound rules. You can enable the right rule under
+    "more"
+    
+  check rule 12 for example at the inbound firewall table
+10:59
+copy that one, put above your public ip address
+10:59
+and important: ENABLE it
+** production worker
+The logs can be found in ~/logs
+ssh ubuntu@160.44.193.92 -A 
+once you are logged in at the prod worker you can get the db server at
+10:57
+192.168.5.64
+10:57
+port 8635 user root
+
+ubuntu@production-worker:~$ ls
+20170728.sql.gz  bilby-build-staging                 chinchilla-2017-08-02-complete.log  chinchilla-2017-08-23-complete.log  dc-2017-07-29.log   joh     pids
+20170729.sql.gz  chinchilla                          chinchilla-2017-08-15-complete.log  chinchilla-2017-09-20-complete.log  dc_deprecation.log  johnny  report.pdf?extras=true
+bilby            chinchilla-2017-08-01-complete.log  chinchilla-2017-08-21-complete.log  dc-2017-07-28.log                   dc.log              log     test
+
+ubuntu@production-worker:~$ cd chinchilla
+ubuntu@production-worker:~/chinchilla$ ls
+app  config     csv  Dockerfile  Gemfile       Guardfile  log     Rakefile     script  tmp                              vendor
+bin  config.ru  db   ember-cli   Gemfile.lock  lib        public  README.rdoc  test    update-frontend-dependencies.sh
+
+ubuntu@production-worker:~/chinchilla$ cat .env
+export RAILS_ENV="production"
+export EMBER_ENV="production"
+export LOGSTASH_URI="tcp://logstash.dc.otc:5228"
+export ELASTICSEARCH_URL="http://elasticsearch.dc.otc:9200"
+
+export DB_NAME="chinchilla"
+export DB_USER="root"
+export DB_PASSWORD="see keepass"
+export DB_HOST="mysql.dc.otc"
+export DB_PORT="8635"
+
+export REDIS_HOST="redis.dc.otc"
+export REDIS_PASSWORD="see keepass"
+
+export OBS_BUCKET="chinchilla-production"
+export OBS_ACCESS_KEY="see keepass"
+export OBS_SECRET_KEY="see keepass"
+
+ubuntu@production-worker:~/chinchilla$ mysql -h mysql.dc.otc -u root  -p
+
+
+
+** staging worker
+ssh ubuntu@160.44.200.161 -A
+
+There is a directory bilby with the bilby source code
+and a directory bilby-build-staging
+
+You need to build the jar from the sourecode and copy that to bilby-build-staging. Then build the container using the following statement
+
+```docker build -t bilby-st . && docker tag bilby-st 160.44.200.121:443/otc00000000001000005001/bilby-staging:11 && docker push 160.44.200.121:443/otc00000000001000005001/bilby-staging:11```
+
+You need to +1 the integer (the 11 in the command) for each new container
+
+ubuntu@ecs-ed24:~/chinchilla$ cat .env
+export RAILS_ENV="staging"
+export EMBER_ENV="staging"
+export LOGSTASH_URI="tcp://logstash.dc.otc:5228"
+export ELASTICSEARCH_URL="http://elasticsearch.dc.otc:9200"
+
+export DB_NAME="chinchilla_staging"
+export DB_USER="chin_staging"
+export DB_PASSWORD="see keepass"
+export DB_HOST="mysql.dc.otc"
+export DB_PORT="8635"
+
+export REDIS_HOST="redis.dc.otc"
+export REDIS_PASSWORD="see kepass"
+
+export OBS_BUCKET="chinchilla-development"
+export OBS_ACCESS_KEY="OIQN6SAHFIMZDTUQEWT4"
+export OBS_SECRET_KEY="see keepass"
+
+
+
+
+
+* competition
+** iaudit
+** riskman
+   http://www.riskman.net.au/Home
+* alerts spec
+  
+  https://docs.google.com/document/d/1EEEkK401DOS_0h8d7uoMpkTLB0koiFif7Gbcg3nQ-is/edit?ts=59883f99&pli=1#heading=h.10t2av507idk
+* stats
+** bilby  
+ 16-12-2017   
+Michieljoris 613 commits / 187,254 ++ /160,247 --
+jhny 9 commits  2,877 ++  845 --
+jacobmendoza 3 commits  144 ++  6 --
+** Chinchilla  
+16-12-2017
+johny1,821 commits  427,689 ++  326,604 --
+froskos969 commits  24,943 ++  10,715 --
+Michieljoris941 commits  342,072 ++  284,306 -- 
+jacobmendoza360 commits  17,173 ++  12,279 --
+
+21-6-2016
+jhny
+1,646 commits / 420,108 ++ / 290,832 --
+#2Michieljoris
+842 commits / 338,151 ++ / 281,565 --
+#3hezus
+411 commits / 149,922 ++ / 98,076 --
+#4froskos
+911 commits / 23,711 ++ / 10,093 --
+#5nextminds
+62 commits / 11,540 ++ / 7,325 --
+#6davetromp
+42 commits / 898 ++ / 1,023 --
+* DC company
+** Owners
+*** Lucas Oost Lievense (2010)
+*** Eddy Steenmeijer (2010)
+*** Johnny Eradus (2012)
+Worked at Effacts in 2006-2007
+
+A rewrite from the PHP codebase to Ruby on Rails. While doing the rewrite I also
+redesigned the main overview page (2012-)
+
+** Employees
+*** Programmers
+**** Michiel van Oosten (2015)
+**** Johnny Eradus (2012)
+Worked at Effacts in 2006-2007
+
+A rewrite from the PHP codebase to Ruby on Rails. While doing the rewrite I also
+redesigned the main overview page (2012-)
+
+Masters software engineering (2009)
+*** Legal
+**** Lucas Oost Lievense (2010)
+**** Eddy Steenmeijer (2010)
+**** Mandy Boogaart (2011)
+Juridisch contentmanager
+**** Linda van Voorst-Ter Meer (Jan 2014)
+Compliance manager
+Wetteksten en voorschriften omzetten in functionele checklisten voor overheid èn voor bedrijven.
+**** Loraine Makatita (Oct 2014)
+Juridisch content manager
+**** Kristian Maters (Oct 2014)
+     Rolderstraat 1, 9444XC, Grolloo
+Inhoud en klantrelatie 
+Inhoud geven aan nieuwe onderdelen van Digitale
+Checklisten. Klanten ondersteunen bij de praktische uitvoering van de digitale
+revolutie die gaande is binnen auditing, inspectie en toezicht.
+
+
+*** Other
+**** Roy Bogaart (June 2014)
+AV-medewerker en social media-expert
+Instructie filmpjes and facebook
+**** Jacobine van Holland
+Account manager
+
+** Freelance
+*** Victor Gras Valenti (froskos, Sept 2014)
+Did telecommunicatie
+*** Benjamin Udink ten Cate (hezus,2012-mid 2014)
+Did CS
+Worked at Effacts, founder at Lawcat
+Migrated DC from php to ror in 2012
+Did DC landingpage in 2011
+At moop.me now.
+*** Ad-Jan Janmaat (giantatwork, 2009-2012, 2014)
+Did chemistry
+Added d3 in 2014
+Made DC app 2009-2012
+http://www.giantatwork.nl/
+
+** Related companies
+*** Lawcat (2011)
+Lawcat is de wettenbundel voor de moderne jurist. Het gratis platform bevat de
+volledige Nederlandse wet- en regelgeving en biedt alle gebruikers de
+mogelijkheid om kennis toe te voegen en te delen. Doe mee en deel je kennis via
+Lawcat!
+Founders: Banjamin and Johnny
+
+ http://lawc.at/
+
+*** Tekstentoelichting
+
+*** Handhaving 2.0
+Discussieforum voor handhaving omgevingsrecht
+http://www.handhaving20.nl/
+
+*** Effacts (2002)
+Benjamin (2011) and Johnny (2006-7) worked here
+They acquired Legal Manager in 2010
+
+** Address
+Digitale Checklisten VOF 
+Linnaeusparkweg 109-III
+1098CV Oost/Watergraafsmeer
+
+
+
+
+
+
+
+** Accounts:
+*** DC
+
+*** Newrelic
+*** Skylight
+https://www.skylight.io/app/applications/sq3YCoKJYQtc/recent/6h/endpoints
+mail@axion5.net:standard
+*** Tent
+
+*** Dummy password for DC
+$2a$10$614dCDS1EftGYfqXNZQY8.n2T1ndgL9ij2QorbPeZVL0uZtj99iUi
+which is: irma
+
+** Technologies
+*** Ruby
+*** Ror
+*** Emberjs
+*** Travis
+*** d3js
+*** mysql?
+*** rbenv
+*** bundler
+*** ElasticSearch
+http://www.elasticsearch.org/overview/elkdownloads/
+*** Emacs Ruby
+rsense, robe
+
+*** heapanalytics.com
+*** newrelic
+*** bugsnag
+*** skylight
+*** ruby cli
+*** zenhub.io
+*** teaspoon
+*** Rake
+Find out about rake tasks, such as db:migrate dump see 
+https://github.com/digitalechecklisten/chinchilla/wiki/Rake-tasks
+http://www.tutorialspoint.com/ruby-on-rails/rails-and-rake.htm
+*** rvm
+This will get you 1.9 on Ubuntu:
+sudo apt-get install ruby-full
+
+Or:
+http://rvm.io/rvm/install
+gpg --keyserver hkp://keys.gnupg.net --recv-keys D39DC0E3
+\curl -sSL https://get.rvm.io | bash -s stable --ruby
+
+Close out your current shell or terminal session and open a new one (preferred). You may load RVM with the following command:
+
+source ~/.rvm/scripts/rvm
+
+If installation and configuration were successful, RVM should now load whenever
+you open a new shell. This can be tested by executing the following command
+which should output rvm is a function as shown below.
+
+type rvm | head -n 1
+rvm is a function
+
+Display a list of all known rubies. NOTE: RVM can install many more Rubies not listed.
+
+rvm list known
+# MRI Rubies
+[ruby-]1.8.6[-p420]
+[ruby-]1.8.7[-p374]
+[ruby-]1.9.1[-p431]
+[ruby-]1.9.2[-p320]
+[ruby-]1.9.3[-p545]
+[ruby-]2.0.0-p353
+[ruby-]2.0.0[-p451]
+[ruby-]2.1[.1]
+[ruby-]2.1-head
+ruby-head
+...
+Install a version of Ruby (eg 2.1.1):
+
+rvm install 2.1
+Checking requirements for opensuse.
+Requirements installation successful.
+Installing Ruby from source to: /home/mpapis/.rvm/rubies/ruby-2.1.1, this may take a while depending on your cpu(s)...
+...
+Install of ruby-2.1.1 - #complete
+Using /home/mpapis/.rvm/gems/ruby-2.1.1
+Use the newly installed Ruby:
+
+rvm use 2.1
+Using /home/mpapis/.rvm/gems/ruby-2.1.1
+Check this worked correctly:
+
+ruby -v
+ruby 2.1.1p76 (2014-02-24 revision 45161) [x86_64-linux]
+
+which ruby
+/home/mpapis/.rvm/rubies/ruby-2.1.1/bin/ruby
+Optionally, you can set a version of Ruby to use as the default for new shells. Note that this overrides the 'system' ruby:
+
+rvm use 2.1 --default
+*** rbenv
+2.0.0-p481
+Easier than rvm
+https://github.com/sstephenson/rbenv
+rbenv local 2.2.0
+Writes .ruby-version to current dir. 
+Any call to ruby is shimmed and redirected to proper version
+rbenv global 2.2.0
+Writes to ~/.rbenv/version the global version to use.
+rbenv shell 2.2.0
+Sets RBENV_VERSION shell variable, overrides local and global.
+rbenv shell --unset
+Unsets shell variable
+rbenv versions
+List all versions available locally
+rbenv install -l
+Lists all versions available to install
+rbenv version
+To find which version is used and which shim etc.
+rbenv rehash
+Run after installing a new version
+rbenv install 2.2.0
+Installs 2.2.0 version
+rbenv with emacs, add:
+;; Setting rbenv path to the global rbenv setting:
+(setenv "PATH" (concat (getenv "HOME") "/.rbenv/shims:" (getenv "HOME") "/.rbenv/bin:" (getenv "PATH")))
+(setq exec-path (cons (concat (getenv "HOME") "/.rbenv/shims") (cons (concat (getenv "HOME") "/.rbenv/bin") exec-path)))
+and/or install rbenv.el to switch between versions in an emacs session:
+http://blog.senny.ch/blog/2013/02/11/use-the-right-ruby-with-emacs-and-rbenv/
+** Repos
+*** Chincilla
+*** Audit-yarden
+jhny and hezus
+D3.js for dashboard I think
+Contributors giantatwork and WillemRoman
+*** papr-rails 
+jhny and hezus
+*** papr-android (2014) 
+wouter (android and rails) and menno (android, web), both are from moop.me
+*** papr-ios (2014)
+philipplotnikov, mobile ios dev, at uber now and/or moop.me
+*** fork of emberjs
+No commits since mid 2014
+
+* react-native
+  https://juxt.pro/blog/posts/native.html
+
+* chair!!
+  http://www.workbrands.com/nl/herman-miller-herman-miller-mirra-grey-mq133a.html
+
+* printer  
+ hp deskjet 4500 
+hp is installed wirelessly
+Scan by opening up and selecting util
+on cmdline scanimage <filename> also works
+    
+* Tech
+** Mac software
+homebrew, sourcetree, Sequel Pro, Paw restclient, LiveReload, Seil (capslock to ctrl)
+Kaleidoscope : I use that as difftoo
+I used to use k3diff but after a while I started doing merges manually
+well it's not a merge tool tho
+I use the buildin feature of rubymine for that
+mina??
+
+** Tools
+*** database
+mysql-workbench
+phpmyadmin
+emma
+vstudio
+
+*** tora
+sudo apt-get install libqt4-sql-mysql
+*** diff
+meld, kdiff3, bcompare (beyond compare)
+http://alternativeto.net/software/kaleidoscope/?platform=linux
+
+
+*** git
+gitg, gitk, giteye
+http://git-scm.com/blog
+
+** Study
+*** startup lectures
+*** joel spolsky book and essays
+*** hackers and painters
+For startup ideas
+
+*** elm
+http://www.infoq.com/presentations/elm-reactive-programming
+
+
+
+* mysql
+mysql -h 95.211.218.208 -u 'johnny' -p
+
+* GOOD TO KNOW
+** elasticsearch
+*** config/elasticsearch.yml
+http.port: 9200
+#http.cors.allow-origin: "chrome-extension://jopjeaiilkcibeohjdmejhoifenbnmlh"
+http.cors.allow-origin: "*"
+http.cors.enabled: true
+http.cors.allow-headers : X-Requested-With,X-Auth-Token,Content-Type,Content-Length,Authorization
+http.cors.allow-credentials: true
+*** dejavu
+docker run -p 1358:1358 -d appbaseio/dejavu
+open http://localhost:1358/
+Fill in http://localhost:9200
+Select an index to inspect
+** data warehousing
+   Redshift, Snowflake, Azure, Presto, BigQuery
+ https://fivetran.com/blog/warehouse-benchmark  
+ 
+** Split big mysql dump
+   http://kedar.nitty-witty.com/blog/how-to-recipes-for-mysqldumpsplitter
+  ./mysqldumpsplitter --source chin_dev.gz --decompression gzip --compression gzip --extract TABLE  --match_str '(activity_events|admins|alerts|alerts_scheduled|alerts_scheduled_processed|answer_histories|answers|blocklisting_cache_records|categories|categories_questions|checklist_histories|checklist_invitation_histories|checklist_invitations|checklist_invitations_bk|checklist_updater_logs|checklists|checklists_people|checklists_users|companies|csv_files|dashboard_answer_rows|dashboard_answers|dashboard_checklist_rows|dashboard_checklists|dashboard_dossiers|dashboard_filters|dashboard_observation_rows|delayed_jobs|directory_instances_histories|documents|dossier_histories|dossier_invitation_histories|dossier_invitations|dossier_invitations_bk|dossier_types|dossiers|dossiers_locations|dossiers_people|dossiers_users|event_store|event_store_consumers|events|fields|groups|groups_users|invitations|invitations_bk|job_offers|locations|logs|note_histories|notes|organizations|password_expiration_mail_notifications_scheduled|people|person_histories|pictures|public_reports|questions|questions_context_mappings|remark_histories|remarks|schema_migrations|support_questions|task_histories|tasks|templates|templates_templates|templates_users|translations|user_old_passwords|users|value_histories|values|webhook_logs|webhooks)' 
+                
+** import prod database
+   mysqldumpsplitter --source chin_minimal.sql --data exclude --match_str "(dash.*|.*_histories|webhooks|event_store|answers|remarks|documents|values)" --extract ALLTABLES
+   mysqldumpsplitter --source chin_minimal.sql --compression none --data exclude --match_str "(dash.*|.*histories)" --extract ALLTABLES2
+ cat *.sql.gz > all_tables.gz  
+
+  Get from production worker in Johnny folder
+  
+ pv ./db_backup_17_07.sql.gz | gunzip | mysql -u root chinchilla_development 
+ pv ./all_tables.gz | gunzip | mysql -u root chin_dev
+ 
+ Import fails:
+https://stackoverflow.com/questions/45858723/error-1193-hy000-unknown-system-variable-gtid-purged
+  
+ local~/tmp$cat db_backup_17_07.sql| grep GTID
+-- GTID state at the beginning of the backup 
+SET @@GLOBAL.GTID_PURGED='7cd4658c-6592-11e7-a044-fa163ec91ffd:1-117045436';
+
+gunzip db file
+
+Use midnight commander (mc) You may open any file of any size in
+"view mode" (with F3 shortcut), switch to HEX view (F4 shortcut) and activate
+edit mode (F2 shortcut).
+
+Replace SET with '-- ', so 2D 2D 20 I think
+
+gzip db file again
+
+Import then works
+
+** Password strength checker 
+   https://blogs.dropbox.com/tech/2012/04/zxcvbn-realistic-password-strength-estimation/
+** testing backend
+minitest-failed
+single_test
+
+** remote debugging
+Use jsconsole.io
+vorlon.js
+http://stackoverflow.com/questions/37020588/embedded-devices-javascript-debugging/37163704#37163704
+** For sprites:
+For node-canvas:
+sudo apt-get install libcairo2-dev libjpeg8-dev libpango1.0-dev libgif-dev build-essential g++
+https://github.com/Automattic/node-canvas
+** make sure default encoding is utf8 for mysql
+CREATE DATABASE `dich_minimal` CHARACTER SET utf8 COLLATE utf8_general_ci;
+Or add 
+[client] default-character-set=utf8                                                                                                                                                                                         
+[mysql] default-character-set=utf8                                                                                                                                                                                         
+[mysqld] 
+collation-server = utf8_unicode_ci 
+init-connect='SET NAMES utf8'
+character-set-server = utf8 
+
+to my.cnf
+Make sure to restat mysql
+Errors look like:
+Mysql2::Error: Incorrect string value: '\xC4\x87,<br...' for column 'email_text' at row 
+
+** chats
+https://rocket.chat/features
+http://docs.mattermost.com/install/docker-local-machine.html
+** bin/rails:6: warning: already initialized constant APP_PATH
+https://github.com/rails/rails/issues/14115
+** Misterious BUNDLED WITH in gemfile
+https://github.com/bundler/bundler/issues/3697
+Bundler seems to be watching gemfile and removing/adding BUNDLED WITH lines
+This plays havoc wit git and changing branches
+In any case bundler version < 1.9 remove it, updating it should/might help
+gem update bundler
+On 1.12.0.pre.1 now (Feb/2016)
+** dynamic asset fingerprinting
+https://github.com/rickharrison/broccoli-asset-rev/issues/24
+** YES/NO/NVT 1/0/2
+** mandril might be/is disabled in /etc/hosts!!!!!!!!!
+** Line counts
+6-Jan.2016:
+ruby code: 10969
+hbs code :3261
+js code in embercli: 10318
+** alternative email settings
+  config.action_mailer.smtp_settings = {
+    :address => 'smtp.mandrillapp.com',
+    :port => 587,
+    # :domain => '184.173.153.218',
+    :user_name => 'mail@axion5.net',
+    :password => 'U2eJfnNEtFRYCX2zFK1ZHw',
+    :authentication => 'plain',
+    :enable_starttls_auto => true,
+    :return_response => true
+  }
+
+** Issue tracking 
+Whenever bug tracking and feature management gets too complex for github, there
+are too many programmers or app is too complex. So no asana, fogbugz, trello etc.
+
+** Translations and locales
+**** Backend
+     In app/v1/passswords_controller using helper to translate from translations table
+Translation table will have to have two more records for the returned messages
+
+Clearance uses rails I18n support
+**** Front end
+Ember
+https://github.com/andyearnshaw/Intl.js
+Note: Modern browsers already have the Intl APIs built-in, so you can load the Intl.js Polyfill conditionally, by for checking for window.Intl.
+
+Translations are sourced from I18n object which is initialized inline in
+chinchilla.html.erb (sourced from Translation). When logging in and the locale of user is known the
+translations prop of I18n is set to new hash (login_controller.js). When applying
+for session for user it comes back with his locale and translation hash. The
+rails sessions controller also sources its data from Translation. This gets used
+for the intlGet ember helper.
+
+Translation table gets edited in admin
+
+Problem is english version is used as key. So if you change the english
+translation 
+
+Also login page I18n.translations is standard English in chinchilla.html.erbs
+
+
+/home/michieljoris/src/chinchilla/config/routes.rb:
+     get 'app' => 'sessions#new'
+/home/michieljoris/src/chinchilla/app/controllers/sessions_controller.rb
+  def new
+    @translations = Translation.get_messages_json(current_user.present? ? current_user.locale : 'en')
+    render :layout => 'chinchilla' #ember app login substitutes old login pate
+/home/michieljoris/src/chinchilla/app/views/layouts/chinchilla.html.erb
+    translations : { locales:'<%= current_user.present? ? current_user.locale : 'en' %>', messages: <%= @translations.html_safe %> }
+
+Default locale of rails is nl, see /home/michieljoris/src/chinchilla/config/application.rb
+This can be set according to domain, url params, user supplied, http://guides.rubyonrails.org/i18n.html
+
+/home/michieljoris/src/chinchilla/app/helpers/intl_helper.rb
+    def default_locale
+      'nl'
+    end
+
+    def get_locale
+      if current_user.present?
+        locale = current_user.locale
+      else
+        locale = default_locale
+      end
+    end
+
+http://localhost:3000/app/#/login is in Dutch????
+
+** Trailing commas are not allowed in IE8!!!!
+
+** qtypes on tent
+https://tekstentoelichting.nl/effacts/form?method=ListDisplay&id=15
+   
+
+* HOWTO
+//
+** query elasticsearch in prod
+You can query localhost from the build-worker
+9200
+Jacob Mendoza [11:31]
+Yep, giving this a try, checklists index
+Let’s see if I’m doing this right:
+
+```curl -XGET 'http://elasticsearch.dc.otc:9200/checklists_production_20171023074504003/_search' -H 'Content-Type: application/json' -d'{ "query":{"term":{ "_id": "358827" }}}'```
+
+
+```{"took":196,"timed_out":false,"_shards":{"total":5,"successful":5,"skipped":0,"failed":0},"hits":{"total":1,"max_score":1.0,"hits":[{"_index":"checklists_production_20171023074504003","_type":"checklist","_id":"358827","_score":1.0,"_source":{"location":[5.92464,51.7562],"name":"W.Z18.101729.01","status":null,"date":"2018-12-06","updated_at":"2018-12-10T13:04:45.000+01:00","based_on":"ODRN - Agrarische activiteiten","group_id":192,"user_id":1783,"user_ids":[1783,1783,1783],"locations":"Klein Amerika 6 B.T.W. Lamers 6562 KC Groesbeek Klein Amerika 6a B.T.W. Lamers 6562 KC Groesbeek ","users":" William Reijnen william.reijnen@odrn.nl  William Reijnen william.reijnen@odrn.nl  William Reijnen william.reijnen@odrn.nl "}}]}}```
+(edited)
+** testing
+mysqldump -u root -p chinchilla_test | mysql -u root -p chinchilla_test_copy
+rake db:fixtures:load
+when-changed test/controllers/dossiers_controller_search_test.rb -c rake test test/controllers/dossiers_controller_search_test.rb 
+
+when-changed test/controllers/shared_answers_controller_test.rb -c rake test test/controllers/shared_answers_controller_test.rb 
+
+when-changed test/controllers/checklists_controller_test.rb -c rake test test/controllers/checklists_controller_test.rb
+when-changed test/controllers/dossiers_controller_test.rb -c rake test test/controllers/dossiers_controller_test.rb
+Add to config/test.rb
+ActiveSupport::Deprecation.silenced = true
+
+rake test test/controllers/dossiers_controller_search_test.rb
+
+when-changed test/controllers/dossiers_controller_search_test.rb -c rake test test/controllers/dossiers_controller_search_test.rb 
+
+*** http://flavio.castelli.name/2010/05/28/rails_execute_single_test/
+https://github.com/grosser/single_test
+rake test:checklists_c:test_status_changes
+https://github.com/artempartos/minitest-failed
+rake test:f
+
+when-changed test/controllers/checklists_controller_test.rb -c rake test:checklists_c:test_status_changes
+
+Add require 'byebug' to test to be able use it byebug
+
+** run single test in rails 
+   https://stackoverflow.com/questions/1506780/how-to-run-a-single-test-from-a-rails-test-suite
+   ruby -I test test/unit/my_model_test.rb -n test_invalid_with_bad_attributes
+   ruby -I test test/controllers/dossiers_controller_v2_test.rb
+** undelete and index something
+   Open prod worker, 
+source .env && rails c
+   
+id=321938   
+Dossier.find(id).enqueue_to_searchindex
+** turn off workers
+   [27844] * Environment: development
+[27844] * Process workers: 2
+[27844] * Preloading application
+[27844] * Listening on tcp://127.0.0.1:5000
+[27844] Use Ctrl-C to stop
+[27844] - Worker 0 (pid: 27873) booted, phase: 0
+[27844] - Worker 1 (pid: 27887) booted, phase: 0
+
+** view and query DC logs
+Download log from worker 
+In logstash dir:
+bin/logstash -f logstash.conf --config.reload.automatic
+
+See life/biz.org for logstash settings
+Basically set file as input for logstash
+
+Touch the file, add a record, whatever, hopefully logstash will pump whole file
+to elasticsearch
+Use kibana or HQ to view/search logs 
+
+
+~/opt/kibana-5.6.3-linux-x86_64/bin/kibana
+localhost:5601 admin irmairma22
+
+And hq:
+/opt/royrusso-elasticsearch-HQ-eb117d4$http-server -p 999JAG
+** base64 basic authorization header
+echo -n 'jeradus-admin2@gmail.com:I9yPwJoqVpRJERl9WgDA' | base64
+amVyYWR1cy1hZG1pbjJAZ21haWwuY29tOkk5eVB3Sm9xVnBSSkVSbDlXZ0RB
+
+echo -n 'test@axion5.net:irma' | base64
+dGVzdEBheGlvbjUubmV0OmlybWE=
+
+** run delayed jobs
+RAILS_ENV=production bin/delayed_job restart -i rest --queues=invitations,effacts_checklist_template_update  -n 1 --pid-dir=/home/nginxuser/chinchilla_production/shared/pids
+** create new group and dossier type
+INSERT INTO groups (id, `name`, has_dossiers, updated_at, created_at) VALUES (NULL, 'IGZ - Gehandicaptenzorg en Forensische Zorg', 1, NOW(), NOW());
+
+Naam 
+Dossiernummer 
+Zaaknummer 
+Omschrijving 
+Locatie
+Organisatie
++------+-----------------+-------+----------+---------------+---------------------+---------------------+
+| id   | dossier_type_id | order | type     | label         | created_at          | updated_at          |
++------+-----------------+-------+----------+---------------+---------------------+---------------------+
+| 2999 |             583 |     0 | string   | naam          | 2016-07-26 07:33:13 | 2016-07-26 07:33:13 |
+| 3000 |             583 |     1 | string   | dossiernummer | 2016-07-26 07:33:13 | 2016-07-26 07:33:13 |
+| 3001 |             583 |     2 | string   | zaaknummer    | 2016-07-26 07:33:13 | 2016-07-26 07:33:13 |
+| 3002 |             583 |     3 | string   | omschrijving  | 2016-07-26 07:33:13 | 2016-07-26 07:33:13 |
+| 3003 |             583 |     4 | location | locatie       | 2016-07-26 07:33:13 | 2016-07-26 07:33:13 |
+| 3004 |             583 |     5 | location | organisatie   | 2016-07-26 07:33:13 | 2016-07-26 07:33:13 |
++------+-----------------+-------+----------+---------------+---------------------+---------------------+
+
+INSERT INTO dossier_types (id, group_id, `name`, name_format, updated_at, created_at) VALUES (NULL, 265, 'Hoofdzaak', 'naam', NOW(), NOW());
+substitute dossier-type-id with id of just created record
+INSERT INTO fields (id, label, `order`, `type`, dossier_type_id, updated_at, created_at) VALUES (NULL, 'naam', 0, 'string', 588, NOW(), NOW());
+INSERT INTO fields (id, label, `order`, `type`, dossier_type_id, updated_at, created_at) VALUES (NULL, 'dossiernummer', 1, 'string', 588, NOW(), NOW());
+INSERT INTO fields (id, label, `order`, `type`, dossier_type_id, updated_at, created_at) VALUES (NULL, 'zaaknummer', 2, 'string', 588, NOW(), NOW());
+INSERT INTO fields (id, label, `order`, `type`, dossier_type_id, updated_at, created_at) VALUES (NULL, 'omschrijving', 3, 'text', 588, NOW(), NOW());
+INSERT INTO fields (id, label, `order`, `type`, dossier_type_id, updated_at, created_at) VALUES (NULL, 'locatie', 4, 'location', 588, NOW(), NOW());
+INSERT INTO fields (id, label, `order`, `type`, dossier_type_id, updated_at, created_at) VALUES (NULL, 'organisatie', 5, 'location', 588, NOW(), NOW());
+
+But task also creates subdossier type. So need to add the sql statements for
+that as well.
+** Get current route
+https://gist.github.com/eliotsykes/8954cf64fcd0df16f519
+this.get('container').lookup('controller:application').currentPath;
+** run and use elasticsearch ui
+Run on commandline: 
+elasticsearchq 
+and  for chrome dejavu, elasticsearch-head and mirage and gem extensions
+** Setup encryption for all DC data and code
+*** encfs
+https://help.ubuntu.com/community/FolderEncryption
+sudo apt-get install encfs
+sudo add-apt-repository ppa:gencfsm && sudo apt-get update && sudo apt-get install gnome-encfs-manager
+Make dir ~/encfs with following folders:
+db  src  elasticsearch  mysql  org  tmp
+Make dir called ~/.encrypted
+Startup gnome-encfs-manager, configuring to start up on login etc
+Add stash: ~/.encrypted to be mounted at ~/encfs, configure to mount on login,
+use keyring etc..
+Add chinchilla repo to src as dc_master for instance.
+It's useful to have multiple versions running (master, master_release, some
+feature branch etc), add them as dc_release, dc_wip
+Whatever gets put into the encfs folder will be encrypted so next is mysql db
+and elasticsearch.
+*** mysql
+https://downloads.mariadb.org/mariadb/+releases/
+https://downloads.mariadb.org/mariadb/5.5.48/
+https://downloads.mariadb.org/interstitial/mariadb-5.5.48/bintar-linux-glibc_214-x86_64/mariadb-5.5.48-linux-glibc_214-x86_64.tar.gz/from/http%3A//ftp.nluug.nl/db/mariadb/
+Instructions:
+https://mariadb.com/kb/en/mariadb/installing-mariadb-binary-tarballs/
+
+Decompress into ~/opt, then
+ln -s mariadb-5.5.48-linux-x86_64/ mysql
+
+To make rails mysql2 gem happy:
+gem install mysql2 -- --with-mysql-dir=/home/michieljoris/opt/mysql
+https://github.com/brianmario/mysql2
+sudo apt-get install libmysqlclient-dev
+Put .my.cnf in ~/
+--------------------------------------
+[client-server]
+# Uncomment these if you want to use a nonstandard connection to MariaDB
+#socket=/tmp/mysql.sock
+#port=3306
+
+# This will be passed to all MariaDB clients
+[client]
+#password=my_password
+
+# The MariaDB server
+[mysqld]
+# Directory where you want to put your data
+data=/home/michieljoris/encfs/mysql/data
+# Directory for the errmsg.sys file in the language you want to use
+language=/home/michieljoris/encfs/mysql
+# Create a file where the InnoDB/XtraDB engine stores it's data
+loose-innodb_data_file_path = ibdata1:1000M
+loose-innodb_file_per_table
+
+# This is the prefix name to be used for all log, error and replication files
+log-basename=mysqld
+
+# Enable logging by default to help find problems
+general-log
+slow-query-log=1
+slow-query-log-file=/home/michieljoris/encfs/mysql/mysqld-slow.log
+--------------------------------------
+
+cd mysql
+./scripts/mysql_install_db --defaults-file=~/.my.cnf
+
+TO START:
+cd '.' ; ./bin/mysqld_safe --defaults-file=~/.my.cnf &
+
+*** elasticsearch
+https://www.elastic.co/guide/en/elasticsearch/reference/current/setup-dir-layout.html
+cd opt/elasticsearch
+TO START:
+bin/elasticsearch -d
+
+Check:
+
+In elasticsearch dir:
+bin/plugin -install mobz/elasticsearch-head
+http://localhost:9200/_plugin/head/
+
+bin/plugin -install royrusso/elasticsearch-HQ
+http://localhost:9200/_plugin/hq/
+
+bin/plugin install jettro/elasticsearch-gui
+http://localhost:9200/_plugin/gui/#/dashboard
+
+https://github.com/romansanchez/Calaca
+
+Modify ~/opt/elasticsearch/elasticsearch.yml to set paths to encfs/elasticsearch dir:
+# ======================== Elasticsearch Configuration =========================
+#
+# NOTE: Elasticsearch comes with reasonable defaults for most settings.
+#       Before you set out to tweak and tune the configuration, make sure you
+#       understand what are you trying to accomplish and the consequences.
+#
+# The primary way of configuring a node is via this file. This template lists
+# the most important settings you may want to configure for a production cluster.
+#
+# Please see the documentation for further information on configuration options:
+# <http://www.elastic.co/guide/en/elasticsearch/reference/current/setup-configuration.html>
+#
+# ---------------------------------- Cluster -----------------------------------
+#
+# Use a descriptive name for your cluster:
+#
+# cluster.name: my-application
+#
+# ------------------------------------ Node ------------------------------------
+#
+# Use a descriptive name for the node:
+#
+# node.name: node-1
+#
+# Add custom attributes to the node:
+#
+# node.rack: r1
+#
+# ----------------------------------- Paths ------------------------------------
+#
+# Path to directory where to store the data (separate multiple locations by comma):
+#
+path.data: /home/michieljoris/Encfs/elasticsearch/data
+#spath.data: /var/lib/elasticsearch
+#
+# Path to log files:
+#
+path.logs: /home/michieljoris/Encfs/elasticsearch/log
+#path.logs: /var/log/elasticsearch
+#
+# ----------------------------------- Memory -----------------------------------
+#
+# Lock the memory on startup:
+#
+# bootstrap.mlockall: true
+#
+# Make sure that the `ES_HEAP_SIZE` environment variable is set to about half the memory
+# available on the system and that the owner of the process is allowed to use this limit.
+#
+# Elasticsearch performs poorly when the system is swapping the memory.
+#
+# ---------------------------------- Network -----------------------------------
+#
+# Set the bind address to a specific IP (IPv4 or IPv6):
+#
+# network.host: 192.168.0.1
+#
+# Set a custom port for HTTP:
+#
+# http.port: 9200
+#
+# For more information, see the documentation at:
+# <http://www.elastic.co/guide/en/elasticsearch/reference/current/modules-network.html>
+#
+# ---------------------------------- Gateway -----------------------------------
+#
+# Block initial recovery after a full cluster restart until N nodes are started:
+#
+# gateway.recover_after_nodes: 3
+#
+# For more information, see the documentation at:
+# <http://www.elastic.co/guide/en/elasticsearch/reference/current/modules-gateway.html>
+#
+# --------------------------------- Discovery ----------------------------------
+#
+# Elasticsearch nodes will find each other via unicast, by default.
+#
+# Pass an initial list of hosts to perform discovery when new node is started:
+# The default list of hosts is ["127.0.0.1", "[::1]"]
+#
+# discovery.zen.ping.unicast.hosts: ["host1", "host2"]
+#
+# Prevent the "split brain" by configuring the majority of nodes (total number of nodes / 2 + 1):
+#
+# discovery.zen.minimum_master_nodes: 3
+#
+# For more information, see the documentation at:
+# <http://www.elastic.co/guide/en/elasticsearch/reference/current/modules-discovery.html>
+#
+# ---------------------------------- Various -----------------------------------
+#
+# Disable starting multiple nodes on a single system:
+#
+# node.max_local_storage_nodes: 1
+#
+# Require explicit names when deleting indices:
+#
+# action.destructive_requires_name: true
+
+*** db_raw
+Dumps of dc db and scripts to populate mysql db
+*** org
+*** tmp
+To store snippets, deleted code etc.
+*** swap file
+http://askubuntu.com/questions/463661/encrypted-swap-partition-for-14-04
+After some more trying and bootups I figured out that this seems to work for me:
+
+Format your partition to SWAP
+
+sudo swapoff -a
+
+sudo cryptsetup -d /dev/urandom create cryptswap /dev/sdaX
+
+sudo mkswap -f /dev/mapper/cryptswap -v1
+
+add/edit the following line to /etc/crypttab:
+
+cryptswap /dev/sdaX /dev/urandom swap
+
+add/edit the line in /etc/fstab:
+
+/dev/mapper/cryptswap none swap sw 0 0
+
+REPLACE the X in sdaX with YOUR partition-number ! UUIDs did not work for me !
+
+http://ubuntuforums.org/showthread.php?t=2228323
+swapon --summary
+
+If you see something like -
+Code:
+
+/dev/mapper/cryptswap1 .....
+
+..your swap is encrypted. If you see a partition, like -
+Code:
+
+/dev/sda2 ....
+
+** Calling serializer manually
+I'm passing information to the front end using the gon gem, as we are slowly moving towards react.
+
+In my application controller I call the UserSerializer manually if the user visits the /users endpoint
+
+gon.users = current_account.users.map do |user|
+UserSerializer.new(user, {scope: current_user}).attributes
+end
+
+** Upload source map to bugsnag
+Checkout master that's deployed.
+In frontend/ember-cli-build.js:
+   enabled: true, //to produce sourcemaps in production for bugsnag
+bundle install
+rake tmp:clear
+RAILS_ENV=staging_local bin/rake assets:precompile
+
+rails s -e staging_local
+
+or just in ember-cli/frontend:
+ember build -e production
+
+sourcemap is in tmp/ember-cli/apps/frontend/assets
+make sure file is same as at localhost:3000
+But it isn't at the moment... :-(
+
+   # -F appVersion=1.2.3 \
+
+   -F minifiedFile=@/home/michieljoris/all-about-chin/chinchilla/ember-cli/frontend/dist/assets/frontend-725b4cc2615f415af310cc75f09cea73.js\
+
+curl -v https://upload.bugsnag.com/ \
+   -F apiKey=8aea5cd172bf02ce8fe1ebd776bbc9a9\
+   -F minifiedUrl=https://digitalechecklisten.nl/assets/frontend-116988677cef24d8aa07ae74e2e749aa.js\
+   -F sourceMap=@/home/michieljoris/all-about-chin/chinchilla/ember-cli/frontend/dist/assets/frontend.map\
+   -F overwrite=true 
+
+curl -v https://upload.bugsnag.com/ \
+   -F apiKey=8aea5cd172bf02ce8fe1ebd776bbc9a9\
+   -F minifiedUrl=https://digitalechecklisten.nl/assets/vendor-04429ebbe62c9550bd4090aea68daa58.js\
+   -F sourceMap=@/home/michieljoris/all-about-chin/chinchilla/ember-cli/frontend/dist/assets/vendor.map\
+   -F overwrite=true 
+
+http://docs.bugsnag.com/api/js-source-map-upload/#curl-example
+It takes a while for the sourcemaps to kick in apparently
+Uploaded 5/7/16 at 12:37
+
+
+** Run in production mode locally
+Checkout branch staging_local
+bundle install
+rake tmp:clear
+RAILS_ENV=staging_local bin/rake assets:precompile
+rails s -e staging_local
+
+In log dir:
+tail -f ember-frontend.staging_local.log
+and in another terminal again
+tail -f staging_local.log
+** Get latests dev db
+dich db download #downloads latest db 
+dich import chinchilla_development
+** enable cors
+http://stackoverflow.com/questions/29324852/allow-cors-in-ruby-on-rails
+See last entry
+So, with a bit of help from @Akiomi's answer, I was able to figure this out:
+
+In my routes.rb, I added the following code to the top of the file.
+
+  match '(:anything)' => 'application#nothing', via: [:options]
+Next, in my application controller, I added:
+
+def nothing
+    render text: '', content_type: 'text/plain'
+end
+Along with the headers in config/application.rb:
+
+config.action_dispatch.default_headers = {
+    'Access-Control-Allow-Origin' => '*',
+    'Access-Control-Request-Method' => 'GET, PATCH, PUT, POST, OPTIONS, DELETE'
+    'Access-Control-Allow-Headers:' => 'Origin, X-Requested-With, Content-Type, Accept'
+}
+https://gist.github.com/dhoelzgen/cd7126b8652229d32eb4
+http://leopard.in.ua/2012/07/08/using-cors-with-rails/
+https://github.com/cyu/rack-cors
+
+** increase inotify
+https://github.com/guard/listen/wiki/Increasing-the-amount-of-inotify-watchers
+** Preview emails
+http://localhost:3000/rails/mailers/verify_code_mailer
+http://localhost:3000/rails/mailers/new_translations
+
+** Use demo util on dc1
+ssh dc1
+passwords are in keepass under DC
+To access mysql:
+mysql -uroot -pmypwd
+
+To start/stop/online repo:
+demo start chin Need-a-better-system-for-capitalizing-translations-914
+demo online chin Need-a-better-system-for-capitalizing-translations-914
+
+Gettingminfo on state and status:
+demo info
+demo urls
+demo haproxy
+
+Frontend is on port 7500 which gets reverse proxied to servers which are running on ports 8000 and higher
+
+Start haproxy with:
+forever -l ~/node-haproxy.log -a start ~/demo/node_modules/node-haproxy/bin/node-haproxy.js --ipc
+
+sudo ln -s /tmp/mysql.sock /var/run/mysqld/mysqld.sock
+sudo ln -s /var/run/mysqld/mysqld.sock /tmp/mysql.sock
+
+To setup new branch:
+demo init chin branch_name
+Which sets up a database and does rake db:migrate on it
+
+DONE For ember-cli npm install in both ember-cli dirs (frontend and admin) has to be
+done still. Maybe the init script should copy the npm and bower dirs to the new
+branch. Gonna be the same most of the time anyway.
+
+Set up the remote for dc1:
+michieljoris@dc1:repos/chin/bare
+
+Just push the branch to dc1 to deploy to chin-branch_name.axion5.ninja:7500
+
+Long branch don't seem to be dns resolvable. Using alias works.
+Make sure alias is online as well.
+
+Drop all databases with chin_ prefix:
+SELECT CONCAT('DROP DATABASE ',schema_name,' ;') AS stmt
+  FROM information_schema.schemata
+
+ WHERE schema_name LIKE 'chin_%' ESCAPE '\\'
+ ORDER BY schema_name
+
+node-haproxy needs node version 0.12 still!!!!!!
+So start with node set to that version, then upgrade...
+
+*** reset-repo.sh
+local~$cat reset_repo.sh
+#!/bin/bash
+pwd
+REPO=$1
+BRANCH=$2
+DB=$3
+echo "Resetting $DB"
+echo 'Preparing sql dump file'
+sed  "s/chin_minimal/$DB/g" < ~/chin_minimal.sql  >~/db.sql
+echo "Dropping $DB"
+mysql -u root -pmypwd -e "drop database if exists \`$DB\`;"
+echo "Creating $DB"
+mysql -u root -pmypwd -e "create database \`$DB\`;"
+echo 'Importing sql dump'
+mysql -u root -pmypwd $DB < ~/db.sql
+cd ~/repos/$REPO/branches/$BRANCH
+echo 'Now in '`pwd`
+echo 'bundle install'
+bundle install
+echo 'Executing rake db:migrate'
+DATABASE_URL=mysql2://root:mypwd@localhost/$DB rake db:migrate
+exit
+
+echo "installing node and bower dirs"
+(cd ember-cli/frontend
+rm -rf bower_components
+rm -rf node_modules
+npm install
+bower install)
+(cd ember-cli/admin
+rm -rf bower_components
+rm -rf node_modules
+npm install
+bower install)
+
+echo "Done"
+
+
+
+
+
+** Getting store:
+ var store = App.__container__.lookup('store:main');
+http://stackoverflow.com/questions/20052814/ember-data-get-a-model-in-the-console
+** update db, start rails
+dich db download #downloads latest db 
+dich-import chinchilla_development
+
+
+dich db import
+or dich import database-name
+dich reset  #reimport chin_minimal
+dich rails db port env
+dich demo #dich rails chin_minimal 5000 demo
+dich minimal #dich rails chin_minimal 3000
+
+** update checklist
+On staging server:
+
+cd /home/nginxuser/chinchilla_staging/current
+RAILS_ENV=staging bundle exec rails console
+Then:
+# ChecklistTemplateUpdateWorker.perform({ "user_id" => User.where(:email => 'm.vanoosten@digitalechecklisten.nl').first.id, "tent_subject_id" => 138202 }) 
+
+ChecklistTemplateUpdateWorker.perform({ "user_id" => 1, "tent_subject_id" => 138202 })
+
+Since delayedJob:
+ChecklistTemplateUpdateWorker.new(172956, 2).perform
+ChecklistTemplateUpdateWorker.new(167550, 1).perform
+
+
+ChecklistTemplateUpdateWorker.new(84772, 1).perform
+
+Question types:
+ChecklistTemplateUpdateWorker.new(138202, 1).perform
+
+
+Calc qtype:
+ChecklistTemplateUpdateWorker.new(174173, 1).perform
+Proper one:
+ChecklistTemplateUpdateWorker.new(359487, 1).perform
+
+
+New questiontypes:
+http://localhost:3000/admin/update/138202
+http://localhost:5000/admin/update/162485
+
+ChecklistTemplateUpdateWorker.new(138202, 1).perform
+
+
+Ruah templates
+ChecklistTemplateUpdateWorker.new(371666, 1).perform
+ChecklistTemplateUpdateWorker.new(371667, 1).perform
+ChecklistTemplateUpdateWorker.new(371668, 1).perform
+
+ChecklistTemplateUpdateWorker.new(371669, 1).perform
+ChecklistTemplateUpdateWorker.new(371670, 1).perform
+ChecklistTemplateUpdateWorker.new(371671, 1).perform
+
+ChecklistTemplateUpdateWorker.new(371672, 1).perform
+ChecklistTemplateUpdateWorker.new(371673, 1).perform
+ChecklistTemplateUpdateWorker.new(371674, 1).perform
+
+ChecklistTemplateUpdateWorker.new(371675, 1).perform
+ChecklistTemplateUpdateWorker.new(371676, 1).perform
+
+
+Local:
+   admin_controller.rb
+      ChecklistTemplateUpdateWorker.perform({ "user_id" => current_user.id,
+                                              "tent_subject_id" => tent_checklist_subject_id })
+   Checklist_template_update_worker
+   comment out mailer?
+
+UserTemplatesUpdateWorker.new._perform(1)
+
+
+
+** startup rails
+DATABASE_URL=mysql2://root:mypwd@localhost/chin_pristine; rails s -p 4000 -e demo
+
+Using demo:
+set database with:
+export DATABASE_URL=mysql2://root:mypwd@localhost/chin_pristine;
+In demo.json
+set environment with rails s -p PORT -e demo 
+
+If using demo env then first do a RAILS_ENV=demo; rake assets:precompile 
+
+
+
+
+** update dashboard
+bundle exec rake dashboard:update RAILS_ENV=staging
+** speed up rails dev
+http://itreallymatters.net/post/45763483826/speeding-up-page-load-time-in-rails
+https://github.com/wavii/rails-dev-tweaks
+https://github.com/thedarkone/rails-dev-boost
+http://www.artandlogic.com/blog/2012/12/faster-rails-dev/
+** Run guard tests:
+Execute bundle exec guard -p
+http://stackoverflow.com/questions/20076197/guard-does-not-spot-file-changes
+** password
+'encrypted_password' 
+$2a$04$93pkdpsZDRiwuZKzs6XFpO6RvXIAQTrBioA7k6tX6piIv7V1QFxTS
+you can just login with that user
+** Deploy 
+mina deploy to=staging
+
+
+** Log into servers
+m.vanoosten@digitalechecklisten.nl
+** Navigating Emacs
+Enable projectile-mode
+C-x C-p  to find file using projectile
+
+** git
+http://git-scm.com/blog
+
+** Notes on installing DC 
+Don't forget to install libmysqlclient-dev for mysql2
+sudo apt-get install libmysqlclient-dev
+To update rubygems:
+gem update --system
+https://github.com/rubygems/rubygems
+Add the following to config/elasticsearch.yml
+http.cors.allow-origin: "/.*/"
+http.cors.enabled: true
+so that kibana can connect (for local setup)
+
+Set the mysql socket either in /etc/mysql/my.cnf
+Or set it in config/database.yml
+/var/run/mysqld/mysqld.sock
+
+Create mysql db:
+bin/rake db:create db:migrate
+
+In elasticsearch dir:
+bin/elasticsearch
+
+scp nginxuser@staging.digitalechecklisten.nl:/home/nginxuser/backups/20150118.sql.gz ~/
+
+This gives error:
+bundle exec rake dc:reindex_dossiers
+But this doesn't:
+rake dc:reindex_dossiers --trace
+rake dc:reindex_checklists --trace
+
+Add --trace for extra output
+rake dashboard:generate_csv
+
+
+
+rails s
+http://localhost:9200/_plugin/HQ/
+
+In elasticsearch dir:
+bin/plugin -install mobz/elasticsearch-head
+http://localhost:9200/_plugin/head/
+bin/plugin -install royrusso/elasticsearch-HQ
+https://github.com/romansanchez/Calaca
+
+http://localhost:9200/_plugin/gui/index.html#/dashboard
+
+If installed as root:
+local/usr/share/elasticsearch$sudo bin/plugin install royrusso/elasticsearch-HQ
+-> Installing royrusso/elasticsearch-HQ...
+
+Run as deamon
+bin/elasticsearch -d
+
+** redis gui
+npm install -g redis-commander
+http://redisdesktop.com/
+
+** resque
+QUEUE=checklist_template rake resque:work
+
+
+
+** resque
+QUEUE=checklist_template rake resque:work
+
+* monitoring services
+https://gaug.es/dashboard#/gauges/4fa397b1613f5d08d200000c/locations
+mail@axion5.net stpw
+heap analytics
+
+
+* Local servers setup
+Download latest production backup:
+dich db download
+Import into chinchilla_development:
+dich import
+
+Import into another database:
+dich import master/release/branch
+
+Reset minimal databases:
+dich-reset
+dich-reset-master
+dich-reset-release
+dich-reset-branch
+
+| Env     | Port | Minimal port | Start with    | Database |
+| Branch  | 2800 |         2801 | branch-start  | branch   |
+| Release | 2900 |         2901 | release-start | release  |
+| Master  | 3000 |         3001 | master-start  | master   |
+
+| Dev          | 2000 | 2001 | dev-start    | chinchilla_development |
+| Dev rails    | 5000 |      | dev-rails    | chinchilla_development |
+| Dev frontend | 4200 |      | dev-frontend | chinchilla_development |
+| Dev admin    | 4201 |      | dev-admin    | chinchilla_development |
+
+To use minimal databases add any argument to the command
+
+
+* Questions
+** You're allowed to remove questions!!!
+But not categories!!!
+
+** Overzicht
+What makes an overtreding?
+Why is not filling a value not an overtreding?
+PDF says correct overtredingen, but overzicht does not, but violations is
+correct though
+Overzicht has bad formatting for tasks.
+Overzicht remarks and tasks don't refer to the question they belonged
+Logo is not loading, giving missing image graphic
+
+** Put a .ruby-version file in root dir of Chincilla?
+** Find out how app is deployed using phusion-passenger, can we put that in a
+docker container? More easily deployable and also rolling deployment?
+
+** Difference between group and company?
+** What is an 'overtreding'?
+What about the value not filled in or 
+** How to remove categories from a checklist?
+Can you? Are you allowed? Make a new dossier and start over?
+
+
+* Learn
+** view emberjs conf videos
+http://confreaks.tv/events/emberconf2015
+** read ember edge book
+http://bleedingedgepress.com/our-books/developing-an-ember-edge/
+** read ember runloop book
+https://github.com/eoinkelly/ember-runloop-handbook
+** read checklist book
+** read web usuability book 
+   
+
+* Big projects/ideas for DC
+** use dc for docs
+Michiel van Oosten [16:12]
+I was thinking, if we have the tree on the left with the the complete dossier-checklist tree structure, and we give these dossiers tags, and let's say we filter on 'feature'. We get all the dossiers that relate to this. This includes dossiers and checklist relating to deploy, review, beta stages, review stages etc. But if we make a habit of adding a 'documentation' dossier. And we tag it as such. And this doc dossier has just one block, the fields, and only one field called 'docs'.  We can make a special dossier field type that fills the screen, so no label on left.
+If we then filter also on the 'doc' tag, as well as on 'feature'. We get a beautiful content outline on the left of all the features, and when clicking on them the text on the right. And by using nested dossiers the outline on the left becomes a nested documentation structure content outline.
+You could add other tags such as 'technical-doc', 'sales-doc', 'internal-doc', 'customer-facing-doc'. Or different fields in the doc dossiers relating the various types of docs. And some mechanism to hide these fields if you're not interested in them.
+And some kind of export functionality to print a pdf or html dump of all the data you've filtered for, or export a bunch of text files.
+So we need a dossier field type that lets us type formatted text. Markdown perhaps, or a wysiwyg editor.
+If we have a history button that retrieves previous values from history or eventstore tables we have versioned docs of a sort.
+Tbh I think a git repo of simple text files is better, served by jekyll or some other static website builder, you get all of the above including the option to do PR's. But only devs can use this. And of course we're not eating our own dog food then. Anybody in DC is able to create/edit/update/comment on dossiers.
+In time this can be exported to lawcat. For us and/or clients.
+And we'd be able to use this pretty soon. We need the tree on the left. We need tags for dossiers. We need a styled dossier field type.
+And of course this whole thing should've gone into a dossier called 'Ideas' straight away...
+Lucas Oost Lievense [17:35]
+:sunglasses:
+This is why you guys need to work in DC
+We get cool ideas from the people who can actually build them :joy:
+Why would something a static website builder offers not be interesting to have in DC?
+Lucas Oost Lievense [17:45]
+It sounds like you are thinking about contentmanagement? Right? Code being the content in this case, but it’s still content (edited)
+Michiel van Oosten [18:02]
+Yes. Not so much code in this case, but documentation of it. And yes, content management system is the word. Just a few steps are needed to get there. The buckets are the dossiers. The dossier tree the organizational principle. We have generic search already. We have history.  Add tags for secondary organization. Adjust ui slightly to make it work for displaying content (only).
+But we can make a dossier type field that can style code fragments for instance (edited)
+Lucas Oost Lievense [18:04]
+Ok sounds good
+but then we should also look at Lawcat
+that is also a contentmanagement platform
+Michiel van Oosten [18:04]
+Well, read only at the moment right
+other than comments
+Lucas Oost Lievense [18:05]
+true but that is the next step we are going to take
+Michiel van Oosten [18:05]
+I'm thinking now why not use DC app...
+Lucas Oost Lievense [18:06]
+I’m not against
+Michiel van Oosten [18:06]
+If you make a separate group you can rename all the buttons to 'New doc', instead of 'New dossier' etc
+You can design the outline of a document with a dossier type tree.
+Different outlines for different type of documents
+Pick the one you want to use.
+Lucas Oost Lievense [18:10]
+Why does it need to be called a document? (edited)
+That’s just old thinking. It is a dossier containing the information you would have typed in a .doc, printed and added to the little yellow file hanging in the cabinet behind your desk with a little label saying Dev Documentation :stuck_out_tongue:
+Michiel van Oosten [18:12]
+I think cause sometimes that's all you want to create.
+Lucas Oost Lievense [18:14]
+Yes true, but that can still just be a dossiertype. Not saying we should not do it. But keeping all information in one group is very valuable too.
+Michiel van Oosten [18:14]
+A place to record stuctured information
+hierarchical information
+Lucas Oost Lievense [18:15]
+And what i you could create a html template (without sharing)
+That is added as a document in a dossier
+Michiel van Oosten [18:19]
+Not sure if this is what you mean, but you could add some kind of templating language to the html template feature that lets you pull in doc fields from the dossier and its subdossier tree. And use it to export/email the whole doc part of the feature. Formatted with proper styling.
+Michiel van Oosten [18:26]
+But that's the word to use: CMS. Let's start thinking in terms of that a bit more sometimes. And design features with that in the back our minds a bit. I think this is really cool. We can use DC as a repository for all info/data that gets produced. Searchable, taggable, exportable. And then as a little bonus, you can hang checklists on on them, and check for compliance, understanding, process management...
+
+
+** ifttt in clojure that monitors sql database
+  rules editor in bilby/admin 
+*** Before diving into trying to make sense of yaml in clojure, is it an idea to decouple jobs completely from rails?
+
+Since jobs are essentially work triggered by events, can we not just monitor the database, either though mysql triggers or polling, and design rules that execute code if certain 'rules' match?
+
+The problem would shift to design and creation of these 'rules'.  Basically creating a ifttt system.
+
+For instance, on creation of an invitation the rule would be:
+
+If new record in invitation send invitation email to linked contact.
+
+So you need an 'event' such as
+ (on-new-record table) => record
+and an 'action/job' such as
+(send-email (:user-id record) "You got an invitation!!")
+And an if construct that pumps output of event to input of action.
+
+Changing status or comment replies could be handled the same way.
+
+Initially these rules could be written in clojure, later on some kind of ui could be designed to put these clojure expressions together. Or at least the more straightforward kind of rules.
+
+You'd want a 'rules' database.
+
+Some of these rules might be frontend concern only. For instance a rule that says:
+
+if in a checklist of a certain template for a certain user or group this question  gets answered yes, show answers with these ids or from this category, else hide them.
+
+So no attaching rules directly to questions and templates. Templates get shared and different people/groups would like to use different rules perhaps.
+
+I'm just wondering how many features/problems could be covered by properly implementing a rules database plus execution mechanism/engine, and eventually a ui to edit/create these rules. It might be possible to kill more than one bird with this, like ifttt, workflow, alerts.
+
+I've built something before when I was playing with couchdb where work would happen triggered by database events, the decoupling of crud code and event handling code is really nice.
+
+You could get rid of jobs in rails , making it a more of a plain crud api, or at least simplifying it and isolating 'if event then action/job' functionality.
+
+Jacob's adding of location to login even could easily be a rule for instance as well.
+
+(if login-event (set-location-from-ip  login-event-record)
+
+or
+
+(if failed-login-event (send-email (:user failed-login-event-record) "Failed login attempt!"))
+
+This rule could be per group/user/global etc.
+
+Once you've got our events and actions and conditions, possibilities are endless.
+
+You can write these actions/jobs in clojure . Like (set-location-from ip record) and implement some kind of priority queue if execution engine gets overworked.
+
+** deploy using ranger
+** checklist templates in bilby
+** law -> checklist questions
+   Lucas is converting text to csv to columns to questions
+** fast deploy 
+*** ember-cli-deploy
+*** Deploy with docker
+
+** if then else using embedded lisp !!!!!!!
+also for calculated values in answers and workflows such as sending alerts etc
+Reread slack production channel.
+
+** DONE Separate out front and backend 
+Standalone frontend app!!!!
+Reasons for doing so (in dev):
+- No need to restart rails to restart frontend
+- Testing
+- Less of a knot, interweaving. Less complexity.
+
+** source invited user from both people and users tables
+for search on who to invite
+** sync calendar events with google and/or outlook
+Some users are asking for it as per feedback from Kristian.
+
+Quickest and easiest would be exporting DC events into some format that for instance Outlook can understand. Csv for instance.
+
+For example: https://www.calendarwiz.com/knowledgebase/entry/4/
+
+You can add an export button to the calendar page. People would have to import it manually into their outlook, or google calendar.
+
+For automatically syncing DC events to Outlook or Google calendar see:
+
+Microsoft:
+https://msdn.microsoft.com/en-us/office/office365/api/calendar-rest-operations
+For authorization of app and user:
+https://msdn.microsoft.com/en-us/office/office365/api/use-outlook-rest-api
+
+Google:
+https://developers.google.com/google-apps/calendar/
+And authorization:
+https://developers.google.com/google-apps/calendar/auth
+
+** Backend in clojure and datomic
+** sql to datomic script
+** Frontend in react or similar
+Maybe elm? 
+http://elm-lang.org/
+
+** Free trial to get more customers
+** Implement effacts tent app and database and add it to DC
+
+** DONE User profile editing from frontend not admin
+At least show user name in top bar..
+
+** Add mailcheck to email input
+https://github.com/mailcheck/mailcheck
+
+** push functionality
+window.addEventListener("online", establishConnection);
+http://www.one-tab.com/page/CKy5pIiSR8iIDK8tX_v-3w
+** DONE search/filter bar for dossiers/checklists
+**** Instructions
+Search, filter and sort capabilities for the dossier and checklist pages.
+
+You can now apply a filter to your search based on status, location or
+ownership. The results can be sorted on things like last modified, distance,
+name and status. Mix and combine freely text search any filter and any sort.
+
+To see the extra functionality click the little blue triangle on the far
+right end of the search bar. This will drop down an extra bar where you can
+select filters and a sorting method.
+
+To sort on status click the 'Status filter' text. A menu will appear where you
+select can a status. Only statuses actually used in the list of dossiers or
+checklist (of the group) will be shown. So if no other filters or search is
+applied at least one result should show up when applying a status filter.
+
+When a status filter is selected the text 'Status filter' will change in to the
+name of status itself. To cancel the status filter, click on it and select the
+"Clear status filter' in the drop down menu.
+
+On the right is the sort options. This works similarly to the status button.
+Click on it and a dropdown menu appears. Selecting a sort will change the button
+name to the current sort method. Selecting the same sort twice will change the
+directions of the sort. You can also click the arrow to achiev the same effect.
+
+By default all the checklists/dossiers are shown that are accessible by the
+group you belong to. If you want to only see the checklists/dossiers you have
+created click 'Own'.
+
+To filter search results on location click the text 'Location'. A another bar
+will be shown where you can type in a location. This can be anything google maps
+would understand. From a city to a streetname to a business name, or just a full
+address. While you are typing autocomplete options will be shown below the
+location bar. Press enter to enter the top suggestion, or select one by hand.
+The distance to your entered locations is shown on every item in the resulting
+list.
+
+To enter your current location click on the dotted circle. The browser or device
+you're using might ask you for permission to use your current locaiont. If you
+answer yes, a best guess of your current location will be entered for you.
+Results from a location filter will be within a radius of 10 km of the address
+entered. These can still be filtered, searched and sorted. 
+
+Any search, filter and sort applied will be sticky. Selecting a dossier and then
+using the back button to go back to the dossier list will have retained your
+search and filters. 
+
+Closing the filter/sort (blue triangle) bar clears the filters. Your settings
+are retained and opening the filter/sort bar again will reapply the filter/sort.
+
+Notes:
+
+- Checklists location is tied to the location entered for the dossier they belong
+to.
+- The 'modified' sort is by default in reverse. Latest is shown first. Same goes
+for the 'Inspection date' sort for checklists.
+- Of course location search only works for dossiers (and their linked
+  checklists) that have an actual location entered for their 'location' fields. 
+
+-
+Features:
+
+Checklists and dossiers index pages have same ui for filter/sort/search
+Mix and combine freely search, filter, sort and location
+Shows only statuses to filter on actually in use by current group.
+Sort both up and down
+Click circle button in location bar and enter current location as provided by browser/ipad/phone
+Location search get prompted by google autocomplete, should also prompt businesses
+Location search returns results within a radius of 10km by default, but api allows to user to enter radius, and could be added as option to ui
+By default shows all dossiers/checklists owned by group, click 'own' to filter on own.
+More fields to sort on can be added if required
+Modified and inspection sort are inversed by default
+Results paging
+Location sorting is on the 'locatie' field of a dossier, not the organisation or other location fields.
+Checklists are sorted by their dossier's location
+Modifying any belonging to a checklist updates the checklist's and the dossier it belongs to updated_at field
+At the moment you can only filter on presence of a prop, not on absence of it. So on 'completed', but not on 'open', as in without status, but this can be added.
+
+**** Features:
+- Checklists and dossiers index pages have same ui for filter/sort/search
+- Mix and combine freely search, filter, sort and location
+- Shows only statuses to filter on actually in use by current group. 
+- Sort both up and down
+- Click circle button in location bar and enter current location as provided by browser/ipad/phone 
+- Location search get prompted by google autocomplete, should also prompt businesses
+- Location search returns results within a radius of 10km by default, but api allows to user
+  to enter radius, and could be added as option to ui
+- By default shows all dossiers/checklists owned by group, click 'own' to filter
+  on own.
+- More fields to sort on can be added if required
+- Modified and inspection sort are inversed by default
+- Results paging
+- Location sorting is on the 'locatie' field of a dossier, not the organisation or
+  other location fields.
+- Checklists are sorted by their dossier's location 
+- Modifying any belonging to a checklist updates the checklist's and the dossier
+  it belongs to updated_at field
+- At the moment you can only filter on presence of a prop, not on absence of it.
+  So on 'completed', but not on 'open', as in without status, but this can be added.
+
+- Need to do a rake db:migrate; 
+rake dc:reindex_dossiers; 
+rake dc:reindex_checklists
+- Tested in IE9 and Ipad 1
+  
+ Or for just one entity:
+ entity.enqueue_to_searchindex
+I think you replace entity with the checklist or dossier you first find via
+Checklist.find(123)
+ 
+
+TODO: Test on Ipad 3 and iphone
+TODO: Clean up css for smaller screens, media queries etc
+
+updated sweetalert, plus modified it for an input prompt
+-- test on ipad, ie, firefox, iphone, android
+-- spacing for media size, javascript solution? or css?
+But matchMedia doesn't work for IE9, so maybe use css media queries, or always
+show dropdowns instead
+https://developer.mozilla.org/en-US/docs/Web/API/Window/matchMedia
+https://github.com/paulirish/matchMedia.js
+
+
+-- make sure all dossiers have a lat/lng pair
+Maybe when saving 
+https://developers.google.com/maps/documentation/geocoding/#Limits
+limits: 
+Users of the free API:
+2,500 requests per 24 hour period.
+5 requests per second.
+Google Maps API for Work customers:
+100,000 requests per 24 hour period.
+10 requests per second.
+
+
+-- add translations to production, set lang to german to test
+
+-- tests for filter-search-sort api
+What a hassle, test by hand is better and more thorough.
+Can't test textsearch since it involves elasticsearch
+For location lat and lng has to be added to fixtures
+Status needs to be added to some dossiers and checklists fixtures
+
+DONE CLean up all source ready for pull request
+DONE add intlGet everywhere
+DONE make sure on textsearch deleted ones are omited!!!
+DONE Reverse by default some fields
+DONE clear locatin when locationSearchTerm is empty
+DONE add index to lat/lng
+DONE default desc for modified
+
+DONE implement checklist
+DONE api implementation and paging/reloading logic on client side
+DONE hide distance sort when not applicable
+DONE  collection view for statuses and sorts, one horizontal, one dropbox
+
+DONE create mixin or component for checklists and dossiers
+DONE add collect all statuses to dossiers.index, not just active
+DONE scss cross-greyx2, just delete the icons-DF989DS.png
+DONE sort direction icons
+DONE fixed infinite scroll sub pixel bug
+DONE fixed search infinite scroll bug in controllers
+DONE status only filtering on Completed or other, should gather up all statuses
+from Dossier or Checklist and from all DossierTypes and present them?
+DONE sort direction
+DONE prompt address
+ click outside dropdown to close it
+ mouse over hints http://jsfiddle.net/michieljoris/heh12q90/
+or just add title tag
+**** Further possible improvements:
+***** autocomplete user input
+***** not owner/group toggle, but dropdown with list of users in group
+***** filter and sort on dossier type.
+***** store in localstorage on any change, not just when closing the flipout
+
+** document api with swagger
+** make testing setup using node, mysql and superagent
+See test-api project
+So intercept calls and create mock requests and test with that
+** dashboard checklist popups on remarks and violations
+** backbutton and scroll position and bringing over counts to checklisten page,
+  need refresh at the moment
+
+** checklist overzicht reports overtredingen and openstaande overtredingen, overtredingen
+  is wrong number.
+- checklist overzicht, what is 'in orde'?
+** DONE User name next to logout button
+Maybe link to edit his/her profile. 
+
+** DONE close popup menus when clicking outside it. also area not covered by application controller!!!
+** Swagger
+pull request
+
+** DONE Uitbreiding ‘Vraagtypen’ DC
+
+A lot of users of Digitale Checklisten are asking for extra questiontypes next to the ones we have. We need to be smart about what we will offer and what type should maybe only be an option for fields for dossiers instead of questions. We should also consider the dashboard and the way that it ‘analyses’ the information.
+
+So... in this document I will write down the different question-types users ask for and per type work out how it should work. Starting with the questiontype that we really need to make DC more user friendly and get some beter analytics out of the dashboard. The question type ‘list’.
+
+Types of questions
+
+Current questiontypes
+Yes, No, N.a. √
+Yes, No, N.a. + Value - Date √
+Yes, No, N.a. + Value - Text √
+Yes, No, N.a. + Value - Photo √
+
+
+New questiontypes
+5. Yes, No, N.a. + Value - List - single answer
+6. Yes, No, N.a. + Value - List - multiple answers
+7. Yes, No, N.a. + Value - Currency
+8. Yes, No, N.a. + Value - Number
+
+9. Date
+10. Text
+11. List
+12. Currency
+13. Number
+
+14. Boolean
+
+And the ultimate ‘DC rules’-type
+15. If ... then ...
+
+
+What we would like for now:
+
+Yes, No, N.a. + Value - List - single answer
+
+Example of a list in a checklistquestion in Effacts:
+Effacts has an option voor a multiple answerfield. This could be used by ‘administrators/beheerders’ to determine what possible answer the list should contain and show in effacts.
+The problem in Effacts is to make it user friendly. Most type of questions we can add in the list in Effacts were the administrators can simply choose what kind of question it has to be and DC will show that type. IE a Yes, No, N.a., Date or Value.
+With a list they need to be able to add the items that should appear in the list.
+
+The list item choosen in a checklistquestion should be treated as a value and appear in the dashboard in the table Answers on the page Questions.
+
+** DONE serve DC with ember-cli and use rails api!!!
+Is that possible? Should be cool.
+   
+** Secrets out of source code
+http://12factor.net/config
+secrets.yml
+http://ejohn.org/blog/keeping-passwords-in-source-control/
+http://www.gotealeaf.com/blog/managing-environment-configuration-variables-in-rails
+http://guides.rubyonrails.org/upgrading_ruby_on_rails.html#config-secrets-yml
+https://github.com/laserlemon/figaro
+http://railsapps.github.io/rails-environment-variables.html
+** Remove old/unused/cruft
+For instance the old dc rails app views and controllers
+
+** Gekoppelde gebruikers should/could be a search/select
+Gericht aan could be search/select
+Gekoppelde gebruikers should/could be a search/select
+
+** DONE Login screen localhost:3000/admin gets rerouted to old login page by rails
+   
+** write integration server in docker
+node server, api for slack and github
+execute rake tests
+send result to log in database and slack
+ui to query results
+
+
+** my little projects
+
+*** make dc1 demo server run in prod mode
+See note above
+*** How would you build the dashboard again? Issue #965
+*** Node js to push updates to fix #888 and Answer update for deleted answer throws exceptions #838
+
+*** Deploy Lightning
+
+
+* ISSUES
+** ISSUE Deprecations with searchbar open
+   component probably is modifying upstream data, so should use data down,
+   actions up!!
+** ISSUE Search bar for subdossiers and dossier#show checklists
+* MY ISSUES (not on github potentially)
+* ISSUE User's email is validated in terms of format
+non admin users can't update phone/email anyway at the moment
+** ISSUE Don't show inactive checklists and questions (API) #779
+When updating content from t&t (Effacts) to DC inactive checklists and inactive checklistquestions should not appear when the due date is passed. This is a datefield in Effacts which can contain a date on which the checklist or question should become inactive.
+  
+** ISSUE refresh page, make new dossier, delete it, exception in console
+ this.get('dossierType.fields') is undefined in sortedLocations in models-shared/dossier
+** ISSUE importing answer_choices with just one item -> no list in DC
+ there was only on option in the list
+​[18:12] 
+I added an extra option and it worked
+​[18:13] 
+Michiel van Oosten Oh. That should work I would think. I'll look into that. Unless it's a tent thing. Tent doesn't export a list with just one item or something.
+​[18:13] 
+Johnny Eradus reading this, what it could be
+​[18:13] 
+that instead of an array with one object it's returning just that object
+​[18:13] 
+Michiel van Oosten Ah, so the import fails then.
+​[18:14] 
+Expecting an array.
+​[18:14] 
+Johnny Eradus Because it does that in relations as well. Which is quite annoying to say the least
+
+
+
+** ISSUE Email and sms sending logging, feedback, monitoring
+Wat betreft mail notifications: de mail wordt verstuurd door Mandrill. Dat ie daarheen gegaan is kun je wel bevestiging van krijgen in principe. Maar of ie daadwerkelijk verstuurd is dan moet je dat nog's vragen aan Mandrill. Of bij Mandrill inloggen, dan kun je all verstuurde emails zien.
+[12:24] 
+Lucas Oost Lievense Ja maar als Mandril het niet verstuurd ligt het in ieder geval niet aan DC :smile:
+[12:25] 
+Michiel van Oosten Ja, maar wel leuk om te weten toch. Dus als een email adres verkeerd is en bounces weten we dat niet tenzij we dat weer vragen of checken bij Mandrill.
+[12:27] 
+Maar die feedback is toch wel handig om op te zetten tzt. Zelfde geldt voor de verification text messages en emails.(edited)
+[12:27] 
+Lucas Oost Lievense ja zeker
+
+** ISSUE info question type
+https://tekstentoelichting.nl/effacts/form?method=ListDisplay&id=15
+Code 126, id 166
+
+** ISSUE BUG Bij een checklistvraag met een lange keuzelijst moet je naar beneden scrollen om een keuze in te voeren. Als de keuzelijst sluit moet je weer naar boven scrollen. Als inspecteur weet je na het sluiten van de keuzelijst niet waar je in de checklist bent gebleven. Dit is verwarrend.(edited)
+** ISSUE Is er een checklistvraag die je coördinaten vastlegt. Dit is handig bij het registreren van geurmetingen in het veld.
+** ISSUE Search bar on text for questions, and for checklists/dossiers in dossier#show?
+** ISSUE Top blue bar on iphone? Space gobbler.
+** ISSUE Is het mogelijk om een toelichting bij een foto/document te kunnen zetten? (Deze opmerking heb ik overigens ook bij Heerenveen en bij Smallingerland gehoord)
+** ISSUES draw and weather question types
+** ISSUE filtering and qtypes without ja/nee/nv
+
+* ISSUES (file with github)
+** Redesign dossier page
+so make new checklist is on top, for instance by hiding dossier fields a la
+checklist details. With big map for the location instead? A la Johnny screenshot?
+
+ Ik moet nu steeds zoeken, klikken naar beneden scrollen en dan kan ik een checklist aanmaken
+[10:43] 
+Was ook nog niet klaar hè :yum:
+[10:43] 
+Enne 'future' request
+[10:43] 
+Ik denk dat je dit straks vanaf een 'startpagina' wil doen
+[10:50] 
+Johnny Eradus Ja ik denk dat je alle dossier velden niet wilt laten zien. En die weergeven met een druk op de knop
+[10:50] 
+Op die manier komen de belangrijkere dingen sowieso al een stuk naar boven.
+https://digitalechecklisten.slack.com/files/johnny/F0MTS6ZAQ/digitale_checklisten_2016-02-18_11-13-23.png
+Maar iets zien van de andere functies - contactpersonen, documenten - is wel mooi denk ik. Maar helemaal mee eens
+[11:15] 
+En dan afgerond onder een filter oid
+
+** De knoppen heten 'nieuw dossier' en 'nieuw subdossier'. Maar we noemen het 'hoofdzaak' en 'deelzaak'.
+
+
+** Check whether serializers are doing the right thing still!
+In rails 4.2 branch:
+Embed ids/objects as before
+In initializers/active_model.rb default is set to ids, howver v1/answer_serializer
+used to return object nonetheless? It was using v2/answer_serializer!!
+** dossier#show of api/v1 returns now api/v2 document urls! 
+In rails_4.2 branch
+Why didn't this fail before?
+Check in master_release branch the dossiers_controller_test#test_complete_get
+** DOING Change name of dossier, --> search doesn't work anymore on changed name
+Seems indexing is slow, or not always working
+
+* Test ipad console
+
+Use jsconsole.io
+vorlon.js
+* TODO
+** Checkout https://www.silk.co/
+Mooie import tool
+https://www.silk.co/help/get-started/spreadsheet-tutorial
+** Make issues
+Copy paste naar search -> search doesn't kick in
+Change status in overzicht, without opening checklist/dossier
+** DONESet up remote console into ipad!!!!
+
+Using firefox I think, but maybe chrome works too.
+
+Use jsconsole.io
+Firefox developer edition web ide doesn't work.
+** Cleanup address component
+** Test DC app thoroughly on ipad!!!!!!
+** BUG wrap all async not ember callbacks (from ajax, timeout etc) with ember.run
+** Fix login into admin with skip_before authorize [new, admin_embercli] in sessions controller.
+So it shows the ember logi screen, not the rails one.
+** BUG? Verwijder filters doesn't remove location search???
+** FINDOUT Check out double click on ipad needed to select yes/no/nvt?????
+
+   
+* Doing
+** Read production channel.
+** Checkout https://ifttt.com/
+** Is date qtype still working in master_release?
+** DONE Setup bugsnag properly
+
+http://toddsmithsalter.com/effective-error-reporting-with-emberjs-and-bugsnag/
+** In logout-login to same place branch:
+Calendar forward/backward runs into errors and doesn't work at some point
+
+** DOING ISSUE valid timeframe checklists/questions
+*** Issue comment
+I made it so checklists only show up in 'new checklists' when they are are valid based on the two date fields. A date field not filled is the same as a date infinitely in the past or future for all intents and purposes.
+
+I did the same for the questions, but disabled for now.
+
+But what to do with existing checklists and questions that have expired?
+-> Show notice, perhaps with some yellow fixed bar on top for example. Disable
+all questions, perhaps grey out. Add notice to checklists#index
+No need for update button checklist, since all questions in checklist are shown
+at all times, just perhaps disabled. Also date of creation of checklist, date of
+inspection becomes irrelevant. Date of answering question matters only, since
+they can only answer the question when they are enabled based on current
+timedate and question's start/end date. 
+
+Also what to to with questions that are getting valid on a certain date, and might need to be included in existing checklists?
+-> Include, but disable/grey out, plus show when valid from/to dates
+
+Should the valid_till and valid_from fields be shown on the checklist details? And the question's valid_from/till fields on the questions?
+-> Yes, if set.
+
+The server's date needs to be correct though, and the assumption is that the server is in the time zone of the users of the app.
+-> Use server's date? Because perhaps date on device is not set correctly?  
+At the very least make sure/warn user that the time/date needs to be correct on
+his device. If we could find out the location of the device (lat/lng) we could
+then perhaps calculate location timezone, together with server timedate we could
+determine timedate on device independent from timedate set on device.
+
+
+*** But what to do with existing checklists and questions that have expired? 
+In al aangemaakte checklisten? (edited)
+Ik denk dat we een melding moeten geven dat de checklist of een vraag inactief is geworden
+Ja, ik bedoel denk ik dat expired checklists bijv. niet nieuw aangemaakt kunnen worden natuurlijk, maar de bestaande checklists moet dus ook iets mee gebeuren. Een melding dus bijv, zoals je zegt.
+
+*** "Also what to to with questions that are getting valid on a certain date, and might need to be included in existing checklists?"
+Die mogen gewoon meekomen in een lijst, maar werkt DC al zo? Ik dacht van niet
+Dus ook prima als dat gewoon niet meekomt in bestaande checklisten
+Als ik er nu over nadenk, dan zie ik ook geen echte problemen even, maar toentertijd blijkbaar dus wel. Probleem zie ik alleen als een template verandert, met meer/minder vragen, of vragen erbij doet met een ingangstijd of zo, bestaande checklisten opnieuw opbouwen op basis ervan doen we helemaal niet, En hoeven we ook niet te doen.
+*** Maar wat als een vraag verloopt, hoe zit het met het antwoord?
+Het antwoord geldt gewoon voor het moment waarop het is gegeven
+
+*** Should the valid_till and valid_from fields be shown on the checklist details? And the question's valid_from/till fields on the questions?
+Yes.
+
+*** Discussion
+Ik vind die optie die jij schetst ook wel erg interessant - een update button
+Michiel van Oosten Heb je nog steeds het probleem van wanneer je beslist wanneer een vraag 'geldig' wordt. Tijd van aanmaken van de checkist, of wanneer de inspectie gedaan wordt.
+Lucas Oost Lievense Aan de andere kant gaat het nu concreet om vragen waarvan de juridische grondslag (een wetsartikel) vervalt of juist van kracht wordt
+Tijd van aanmaken van de checklist
+Het zou technisch heel mooi zijn wat jij zegt
+En als dat goed te doen is, prima
+Michiel van Oosten Als ze dat een week van te voren doen,dan misser er misschien vragen, of zijn er te veel vragen.
+Op het moment van inspectie.
+Lucas Oost Lievense Dat is altijd te herstellen
+Het is wel een erg belangrijk punt om mee te nemen met de alerts/taken
+Dan wil je namelijk naar de toekomst gaan plannen
+maar volgens mij willen we dan niet de checklist klaarzetten maar de taak om een nieuwe checklist aan te maken
+Dus dan elimineren we eigenlijk het probleem
+Dus...
+Gewoon zoals het nu is en vragen op het tijdstip van aanmaken die actief zijn meenemen
+Michiel van Oosten Ja, dat dus de checklist aangemaakt wordt op de dag van inspectie.
+Lucas Oost Lievense een datum actief/inactief vind ik wel interessant
+Dan laat je eventuele fouten wel zien
+Michiel van Oosten Maar als ze dus een maand later terugkomen, zijn er misschien minder/meer vragen actief.
+Misschien gewoon altijd alle vragen laten zien, maar de inactieve disabled maken.
+Met ingangsdatum/verloop datums erbij (edited)
+Lucas Oost Lievense Ja nogmaals, als het mogelijk is om het zichtbaar te maken in de checklist is dat mooi
+Michiel van Oosten Kunnen ze de frietzaak eigenaar waarschuwen, Als ik volgende week terugkom moet de olie 10 graden heter zijn, maar deze week is het nog goed, volgens de wet.
+Lucas Oost Lievense Maar hoe?
+Ja dat is inderdaad wel zoals het moet, wat jij als voorbeeld geeft
+Let op! Vanaf volgend jaar wordt het ...
+Michiel van Oosten Precies. Kunnen ze de info tekst al lezen, vraag lezen, maar niet ja/nee/nvt invullen.
+Zelfde geldt voor verlopen vragen. "Dat hoeft niet meer" (edited)
+Lucas Oost Lievense Ja dat is wel mooi. Maar dan komen die niet mee in een checklist die je na die datum aanmaakt
+Michiel van Oosten Ja.
+Dat is allemaal nog simpel genoeg.
+Om te maken.
+
+*** Proposal
+- Templates and questions tables
+Add validTo and validFrom fields.
+- Dates and timezones
+Checklists and questions I think are always place, so also timezone bound, so use
+date on device, however:
+At the very least make sure/warn user that the time/date needs to be correct on
+his device. If we could find out the location of the device (lat/lng) we could
+then perhaps calculate location timezone, together with server timedate we could
+determine date on device independent from timedate set on device.
+What we're after is the date of where the device is at. 
+We're trying to prevent off by one day errors in determining validity of checklists/dates.
+
+- Checklists
+Checklist templates only show up in 'new checklists' when they are are valid
+based on the two date fields. A date field not filled in is the same as a date
+infinitely in the past or future for all intents and purposes. This is based on
+date on device, not date on server. So all templates get downloaded still. Or
+device can pass current date on device to server perhaps. 
+
+Existing checklist that have expired are flagged as such in checklists#index
+and dossier#show. Maybe different color, added tag, notice subtext something
+like that. In checklist#show show warning/notice bar on top indicating
+checklist is expired. All questions are disabled and don't allow input, but
+are browserable. Maybe greyed out. Notes, tasks and pictures are still
+editable, but value and value_open are not, since they are legal answers.
+
+ValidFrom and validTo are shown in details.
+
+- Questions
+Questions that are not valid yet or not valid anymore are included and listed in
+checklist, however marked visually as such, and value and value_open are
+disabled, greyed out.
+On all questions that have validFrom and/or validTo filled in show these dates.
+
+At least once a day (setInterval) update 'currentDate'. This is so that
+questions/checklists can change status in case web page stays opened longer
+than a day. 
+
+- Validation at server
+Don't allow updating of questions that are not yet valid or have expired. Nor of
+questions that belong to checklist, so template that has expired.
+However to do this properly we'd need the timezone the checklist is used,
+otherwise checklist/question might be valid on device, but not server, so add
+this as query param to answer#update, so server can make timezone correction
+relative to where server is.
+
+See branch
+https://github.com/digitalechecklisten/chinchilla/compare/dont-show-inactive-checklists-and-questions-779
+for previous start of resolution of issue.
+
+** COMMENT on issue jumpy scrolling, address bar autohide
+As you see, in iphone/ipad and android devices, when you scroll down the page, address bar will be small and when scroll to top address bar size will be return to the actual size, this operation fires window.resize event
+
+First of all, on ipad use Safari, not Chrome. Chrome is clearly buggy.
+
+But also Safari is not smooth as it should be. Problem is firing of resize of event when scrolling when address bar gets automatically hidden/shown. 
+
+Or at least it coincides with firing the window resize event.
+
+On safari it's very usable, it's just the momentum scrolling that gets stopped in it's tracks, right at the moment that the resize event fires, and scroll position gets reset back to where the event happened, a redraw happens at the resize event I think. However window.height hasn't changed, so redraw is not necessary.
+
+Scroll with your finger, and not using momentum scrolling and it's all ok.
+
+To bypass the issue altogether:
+```
+html, body 
+{ 
+       height:100%; 
+       overflow:scroll; 
+       -webkit-overflow-scrolling: touch; 
+} 
+```
+
+But this doesn't autohide the address bar.
+
+More hints to perhaps resolve this issue: 
+http://stackoverflow.com/questions/24944925/background-image-jumps-when-address-bar-hides-ios-android-mobile-chrome
+http://stackoverflow.com/questions/23299960/prevent-fixed-position-background-image-cover-from-resizing-in-mobile-browsers
+
+** COMMENT check barcode questions
+   Working right?
+   So install pic2shop for iphone on ipad, is free. Ipad pro version is 20+ euros.
+   Modify translation..
+
+
+** REVIEW, PR ISSUE Back button not consistent.
+** DONE REVIEW,PR Bij het zoek in dossier moet je 4 tekens invoeren voordat hij gaat zoeken. Bij het dossier RWE is dat lastig. Dit dossier wordt dan ook regelmatig opnieuw en dus extra aangemaakt. (dit is een notoire klachtenveroorzaker).
+location_search_fixes
+
+** DONE REVIEW,PR ISSUE Subdossier have no locatie byline in dossier#index, and checklist#index
+   location_search_fixes
+Not totally happy about removing belongs_to dossier from location model, but
+needed because I'm returning same locations to different dossiers, namely the
+main and its subdossiers to prevent multipe api calls.
+Rails tries its best to return locations with checklists and dossiers, if
+necessary returning locations of owning dossier, or owning owning dossier.
+These are embedded, and both checklist.js and dossier.js have has_many props for locations
+However, locations has belongs_to prop, but that dossier_id prop can't be mapped
+in fronted properly, since it can belong to several dossiers and/or checklists.
+** DONE REVIEW,PR Find untranslated keys in master_release and other branches to be pushed
+on_staging_send_bugsnag_notifications_of_missing_translations
+On staging, send bugsnag message!!
+
+** DONE REVIEW,PR Hide solved/pending violations page in pdf if no offence text is present in any
+PR branch dont_show_violations_on_pdf_if_n...
+
+*** PDF shows ‘Voorschrift:’ under Openstaande overtredingen (Pending violations) and Ongedaangemaakt overtredingen (Solved violations) when there is no article/legislation.
+[12:27] 
+Violations (answer No) for the specified Ja, Nee, N.v.t. questiontypes (Ja, Nee, N.v.t. + datum etc.) do not appear under violations in the pdf
+[12:28] 
+For the first: https://digitalechecklisten.nl/checklists/133013/report.pdf
+[12:33] 
+Lucas Oost Lievense for the second: https://digitalechecklisten.nl/checklists/115651/report.pdf
+[12:38] 
+Michiel van Oosten You only see solved/pending violations that have a letter_text_offence it seems:
+````
+<% @checklist.old_answers_with_violations.each do |answer_history| %>
+  <% if answer_history.answer.question.letter_text_offence.present? %>
+````
+(edited)
+[12:39] 
+Lucas Oost Lievense Ah true
+[12:39] 
+That makes sense :smile:
+[12:40] 
+Michiel van Oosten So if none have a letter_text_offence the violations/pending pages are empty.
+[12:41] 
+Lucas Oost Lievense Then the issue there is that you do get to see the page. It should not show if there are no violations to show. Maybe a text saying ‘No description for the violations available’.
+[12:41] 
+But in this case less important.
+[12:42] 
+The first one we tried to fix by updating the checklist
+[12:42] 
+The questions do not have  a coupled voorschrift in t&t
+[12:43] 
+Michiel van Oosten Well, there are violations, and you can still see when they are registred if you want, just no offence text
+[12:43] 
+ ```      <% if !answer_history.answer.question.regulation.nil? %>
+        <td><span class="field-name"><%= t('Regulation')%>:</span>  <%= answer_history.answer.question.regulation %></td>
+      <% end %>
+```
+
+[12:44] 
+So the regulation is not nil, but still empty it looks like.
+[12:46] 
+Lucas Oost Lievense Does that mean the question did have a coupled regulation in the past?
+[12:57] 
+Michiel van Oosten We should check for blank? here not nil? The regulation is an empty string, not nil. So probably it had a regulation and it's been removed.
+[13:03] 
+Michiel van Oosten Do you still want the solved/pending pages removed if there are no such things or if none have accompanying offence texts?
+[13:04] 
+Or list them anyway, even if there's no offence text?
+[13:18] 
+
+[13:21] 
+github BOT
+[chinchilla] New branch "testing_qunit_mirage" was pushed by Michieljoris
+
+[13:33] 
+Travis CI BOT
+Build #2161 (a3713c0) of digitalechecklisten/chinchilla@testing_qunit_mirage by Michiel van Oosten passed in 10 min 47 sec
+
+[13:41] 
+Lucas Oost Lievense @michieljoris: best would be that there is no page when there is no text to show
+[13:42] 
+
+dont_show_violations_on_pdf_if_n
+** DONE REVIEW,PR Create bugsnag msg if translation is missing!!
+** DONE ISSUE bugsnag source map
+In rails4.1-stagin-local (also has sprocket-uglifier)
+Sprockets::Rails::Helper::AssetNotPrecompiled - Asset was not declared to be precompiled in production.
+Add `Rails.application.config.assets.precompile += %w( libs/ie8-notification.js )` to `config/initializers/assets.rb` and restart your server:
+And I removed handlebars!! from report.pdf.erb...
+But works like shit, no way to get the sourcemaps going via rails.
+
+
+
+http://blog.bugsnag.com/sourcemaps-info
+https://gist.github.com/ToddSmithSalter/23ad9ed91a693b498709
+https://github.com/bugsnag/bugsnag-js#user
+http://toddsmithsalter.com/effective-error-reporting-with-emberjs-and-bugsnag/
+
+https://github.com/AlexanderPavlenko/sprockets_uglifier_with_source_maps/tree/v1.0.0
+But only for rails 4.2!!!
+What's happening is that ember uglifies frontend.js, produces sourcemap file,
+adds link to map at bottom, then it goes through rails asset pipeline again and
+gets compressed again, and of course link to map gets removed, and map file gets
+fingerprinted!!
+
+Ember-cli-rails throws ember produced assets in the rails asset pipeline, we
+don't want that..
+
+test-qunit-mirage-merge-css works find, no duplicate compilation and sourcemaps
+in production
+Now how to prevent everybody to download the sourcemaps?
+http://ivanvanderbyl.com/debugging-sourcemaps/
+http://toddsmithsalter.com/effective-error-reporting-with-emberjs-and-bugsnag/
+
+https://sourcemaps.info/
+
+** DONE Subdossiers don't show in location search
+   Because subdossiers don't have a location ofcourse.
+   I'm showing the parent dossier's location in the frontend
+** DONE Location subtext is not updated after updating location in dossier
+Not till after refresh tab
+** DONE REVIEW,PR enforce international format phone number in admin
+** DONE REVIEW,PR ISSUE add clarifying notes to admin#user for delete, inactive
+** DONE REVIEW, PR Add delete button to translations
+** DONE REVIEW, PR Upgrade rails to 4.2.5.1
+*** Deprecations:
+**** DEPRECATION WARNING: ** Notice: embed is deprecated. **
+User Load (2.4ms)  SELECT `users`.* FROM `users` WHERE `users`.`group_id` = 10
+DEPRECATION WARNING: ** Notice: embed is deprecated. **
+The use of .embed method on a Serializer will be soon removed, as this should have a global scope and not a class scope.
+Please use the global .setup method instead:
+ActiveModel::Serializer.setup do |config|
+  config.embed = :ids
+  config.embed_in_root = false
+end
+ (called from <class:UserSerializer> at /home/michieljoris/src/chinchilla/app/serializers/user_serializer.rb:2)
+
+**** DEPRECATION WARNING: Currently, Active Record suppresses errors raised within `after_rollback`/`after_commit` callbacks and only print them to the logs. In the next version, these errors will no longer be suppressed. Instead, the errors will propagate normally just like in other Active Record callbacks.
+
+You can opt into the new behavior and remove this warning by setting:
+
+  config.active_record.raise_in_transactional_callbacks = true
+
+ (called from <class:Answer> at /home/michieljoris/src/chinchilla/app/models/answer.rb:126)
+
+** DONE REVIEW,PR Forgot password is in English at inlog screen after refresh tab
+   what if you're logged in and you want to visit the login page?
+   what if comming from landing page?
+   review, PR
+
+** DONE REVIEW,PR multiline input but
+   review, PR
+** DONE REVIEW,PR update question filter after changing answer 1085
+   review, PR
+** DONE REVIEW,PR selecting categories ui issues 1084
+   review, PR
+** DONE REVIEW,PR unsaved_subdossier_shows_up_in_dossier_show_1090
+   review and PR
+
+** DONE Current branches I'm working on
+*** DONE node/bower scripts
+push master_release
+*** DONE byebyeResque branches
+    To be pushed: all 3 branches have master_release merged
+**** make sure invited user can verify question 
+DONE add phone column and editor to dossier/checklist invitation
+DONE Make sure to catch verify post failure from rails
+DONE Test checklist invitation
+DONE Add to refactored invitations branch
+Make phone and email editable?
+Catch and send to bugsnag if rails the verify post???
+***** translate
+Invitee's phone number
+Registered phone: {phone}\nRegistered email: {email}\nError: {msg}
+Server failed to send code
+
+*** DONE test_qunit_mirage_merge_css_sourcemaps
+Push when fixed
+***** DONE login of signin isn't loading proper css
+***** DONE transition helper in asnwer.scss is not working anymore!!!
+for lists etc.
+
+***** DONE ds.filter not working anymore!!
+
+*** test_qunit_mirage_merge_css_sourcemaps_mount_ember_app
+Tried to use ember index.html for both rails and ember-cli but paths get all
+screwed up. Rails insists on adding app/ before path, as if baseHref is set.
+Also images doesn't work anymore. But ember-cli-rails is perfectly capable of
+inserting rails erb snippets into index.html
+
+* DONE
+** DONE for {invitee} ({mail}) by {creator} - {created-at, date, long} is not translated
+But in dev it -is- translated
+
+added translation
+
+** DONE fix verify sms translation
+   extract from forgot password branch
+** DONE ISSUE 1084 When adding new category while some are selected, selected categories get blanked out.
+** DONE 1084  A category turns dark blue when hovered over, but doesn't changed color when selected. Not till mouse moves away is it clear category is selected.
+** DONE ISSUE 1085 When changing from yes to no, filter adjusts count, but Q doesn't disappear from no filtered list
+** DONE ISSUE 1156 entering remark>1 line, next remark widget is same size
+issue exists already.
+
+
+** DONE PR Wrap_around_of_text_in_list_choice_is_cut_off_1143
+** DONE make script to swap out npm and bower dirs
+** DONE Translations in sort dropdown are not consistently with capitals?
+** DONE BUG list qtype wrap not visible
+** DONE Ember frontend testing
+*** info and links
+http://ember-cli.com/user-guide/#testing
+
+The default tests in Ember CLI use the QUnit library, though Mocha / Chai testing is possible using ember-cli-mocha.
+https://www.npmjs.com/package/ember-cli-mocha
+http://chaijs.com/
+http://karma-runner.github.io/0.10/index.html
+
+According to this article mocha is preferable: http://www.techtalkdc.com/which-javascript-test-library-should-you-use-qunit-vs-jasmine-vs-mocha/
+
+If you have the app running in standalone mode (ember server) navigate to http://localhost:4200/tests to see your test results in action.
+
+There are quite a few jslint errors in the code still. Almost all are harmless, such as unused vars or global vars. But it produces a lot of errors when doing ember test in a the frontend or admin dir. It's possible to turn linting off for testing.
+
+Some links from when I looked into this earlier:
+
+https://www.npmjs.com/package/ember-cli-test-recorder
+Ember London
+Recording acceptance tests with ember-cli-test-recorder - Nikos Katsikanis
+From the July 2015 Ember London meetup.
+video: https://vimeo.com/133657584
+
+For mocking models and backend client side:
+https://www.npmjs.com/package/ember-cli-mirage
+https://www.npmjs.com/package/ember-data-tiny-factory
+https://www.npmjs.com/package/ember-cli-fake-server
+https://www.npmjs.com/package/ember-data-factory-guy
+
+Helpful:
+https://www.npmjs.com/package/sl-ember-test-helpers
+Ember CLI Addon - Provides and registers test helpers for use in the testing of your application
+https://github.com/201-created/ember-cli-acceptance-test-helpers
+A set of useful test helpers for ember acceptance tests. 
+
+UI or acceptance testing seems more valuable than unit testing for frontend
+since frontend ui errors are what users run into first, it's more obvious a
+fault. And underlying misbehaving frontend is sometimes but not always an
+underlying failing (potential) unit test.
+
+** DONE properly use ember-cli-rails
+https://github.com/thoughtbot/ember-cli-rails
+Double css tags!!! No good!!
+** DONE PR consistently show save button
+
+** DONE PR redirect login branch (back_to_page_after_logout)
+built on Redirect_to_requested_url branch
+Push branch, review, PR
+** DONE testing_qunit_mirage
+** DONE css_source_maps
+
+** DONE PR hack around ember @each bug
+Mention in channel.
+** DONE dashboard csv export extract value and add column for type
+** DONE Setup demo and write instructions
+** DONE Enter name and date before creating new checklist
+*** DONE Watch out: there are 2 places where checklists are created!
+*** DONE Is it appropriate to ask to set name, date, coupledusers for wave empty checklists?
+*** DONE When checklist is empty, and adding choose to path, after creating answers they
+don't get shown till after a refresh. Also in master??
+*** DONE Choose template for openwave
+based_on and checklist_type should be null see  checklist/show/route
+in rails tent_subject_id and based_on should be null see ap1/v1/checklist_controller.rb
+*** DONE Back button goes to list of templates when showing form
+*** DONE Isedited?????
+** DONE Add to I18n.t that it puts in local storage undefined keys
+And remove them when there -is- a key
+And add a function to quickly list the undefined keys.
+But only in dev mode.
+Added to translationcache branch
+** DONE finish save on change
+	if the name proposed by the user is just one or several blankspaces/tabs, that is trimmed in the backend, considered as empty and the validator doesn’t pass
+​
+17:18
+which is ok, but the transition happens and the validation error is not handled
+DONE Also for contacts
+DONE Make sure it works when no users are filled in and validation fails server side
+
+DONE No adding empty contacts
+DONE Make nice people line, without commas
+DONE Remove contacts from search list if they have already been added
+DONE format-person is my oneliner!!! adapt format-person to my solution
+DONE Searching for contacts fires off a whole lot of xhr requests!!
+
+Make sure edit and remove buttons don't wrap. but text wraps.
+How does it play with offline.js?
+
+
+Fixes #964 and #983 
+
+Forked of #1087 since it was already setup halfway for this issue.
+
+There is a flag in config/environment.js to turn off the save on change. You get to see a save button when there is any change. This goes for dossiers and checklists.
+
+In case the old behaviour is desired. With the save on change there is a 3 second debounce. So it doesn't save till there's 3 seconds no change. It also saves even when people navigate away.
+
+Only a refresh will lose edits. I noticed github and slack for instance save your edits to the last letter even with a refresh or close tab. They must save everything you type into localstorage as you type it.
+
+Searching for contact persons is saner. No more xhr request on every change to
+search. Only list contacts that haven't been added yet.
+
+Issues: 
+- on small screens edit and remove icons after contact get pushed to next
+line. Contact, email, ph should wrap
+- offline works, but saves twice when online again. 
+
+** DONE Count line count in om
+in src/main/om folder:
+$find . -name '*.clj*' | xargs wc -l
+47 ./tempid.cljc
+15 ./next/cache.cljs
+26 ./next/server.clj
+227 ./next/impl/parser.cljc
+21 ./next/protocols.cljs
+1773 ./next.cljs
+66 ./dom.cljs
+262 ./next.clj
+5 ./util.cljs
+154 ./dom.clj
+77 ./transit.cljc
+1355 ./core.cljs
+12 ./core.clj
+5 ./impl.cljs
+4045 total
+
+** DONE Fix jshint errors
+1 error
+
+initializers/start.js: line 1, col 8, 'Ember' is defined but never used.
+
+1 error
+
+lib/calendartools.js: line 240, col 7, Possible strict violation.
+lib/calendartools.js: line 241, col 7, Possible strict violation.
+
+2 errors
+
+lib/google_maps/google_map.js: line 109, col 2, Missing semicolon.
+lib/google_maps/google_map.js: line 310, col 23, Expected '===' and instead saw '=='.
+lib/google_maps/google_map.js: line 311, col 11, Missing semicolon.
+lib/google_maps/google_map.js: line 331, col 17, Expected '===' and instead saw '=='.
+lib/google_maps/google_map.js: line 409, col 19, Expected '===' and instead saw '=='.
+lib/google_maps/google_map.js: line 388, col 11, 'Ember' is not defined.
+lib/google_maps/google_map.js: line 238, col 7, 'map' is defined but never used.
+lib/google_maps/google_map.js: line 238, col 45, 'infoWindow' is defined but never used.
+lib/google_maps/google_map.js: line 239, col 5, 'autocomplete' is defined but never used.
+lib/google_maps/google_map.js: line 374, col 13, 'chosenIndex' is defined but never used.
+lib/google_maps/google_map.js: line 373, col 51, 'e' is defined but never used.
+lib/google_maps/google_map.js: line 380, col 43, 'e' is defined but never used.
+lib/google_maps/google_map.js: line 435, col 62, 'skipField' is defined but never used.
+
+13 errors
+
+lib-shared/I18n.js: line 1, col 8, 'Ember' is defined but never used.
+
+1 error
+
+mixins/invited-author-name.js: line 21, col 65, Missing semicolon.
+mixins/invited-author-name.js: line 20, col 22, 'reason' is defined but never used.
+
+2 errors
+
+mixins/value-open-type.js: line 137, col 10, 'formatEmail' is defined but never used.
+mixins/value-open-type.js: line 141, col 10, 'formatCode' is defined but never used.
+mixins/value-open-type.js: line 66, col 29, 'options' is defined but never used.
+mixins/value-open-type.js: line 71, col 27, 'options' is defined but never used.
+mixins/value-open-type.js: line 76, col 31, 'options' is defined but never used.
+mixins/value-open-type.js: line 80, col 28, 'options' is defined but never used.
+mixins/value-open-type.js: line 85, col 27, 'options' is defined but never used.
+mixins/value-open-type.js: line 137, col 30, 'options' is defined but never used.
+mixins/value-open-type.js: line 141, col 29, 'options' is defined but never used.
+mixins/value-open-type.js: line 145, col 28, 'options' is defined but never used.
+mixins/value-open-type.js: line 225, col 31, 'options' is defined but never used.
+mixins/value-open-type.js: line 229, col 28, 'options' is defined but never used.
+
+12 errors
+
+models/category.js: line 4, col 5, 'hasMany' is defined but never used.
+
+1 error
+
+models/checklist-invitation.js: line 5, col 5, 'hasMany' is defined but never used.
+
+1 error
+
+models/chinchilla.js: line 3, col 5, 'attr' is defined but never used.
+models/chinchilla.js: line 4, col 5, 'hasMany' is defined but never used.
+models/chinchilla.js: line 5, col 5, 'belongsTo' is defined but never used.
+
+3 errors
+
+models/company.js: line 5, col 5, 'belongsTo' is defined but never used.
+
+1 error
+
+models/document.js: line 8, col 5, Redefinition of 'Document'.
+models/document.js: line 5, col 5, 'hasMany' is defined but never used.
+
+2 errors
+
+models/dossier-invitation.js: line 137, col 31, Expected '{' and instead saw 'return'.
+models/dossier-invitation.js: line 190, col 9, 'readPermissionsList' is defined but never used.
+
+2 errors
+
+models/event.js: line 7, col 5, Redefinition of 'Event'.
+models/event.js: line 4, col 5, 'hasMany' is defined but never used.
+
+2 errors
+
+models/location.js: line 5, col 5, 'hasMany' is defined but never used.
+
+1 error
+
+models/note.js: line 5, col 5, 'hasMany' is defined but never used.
+
+1 error
+
+models/picture.js: line 4, col 5, 'hasMany' is defined but never used.
+
+1 error
+
+models/public-report.js: line 4, col 5, 'hasMany' is defined but never used.
+
+1 error
+
+models/question.js: line 4, col 5, 'hasMany' is defined but never used.
+
+1 error
+
+models/remark.js: line 5, col 5, 'hasMany' is defined but never used.
+
+1 error
+
+models/support-question.js: line 4, col 5, 'hasMany' is defined but never used.
+models/support-question.js: line 5, col 5, 'belongsTo' is defined but never used.
+
+2 errors
+
+models/task.js: line 4, col 5, 'hasMany' is defined but never used.
+
+1 error
+
+models/template.js: line 4, col 5, 'hasMany' is defined but never used.
+
+1 error
+
+models/tent-question.js: line 4, col 5, 'hasMany' is defined but never used.
+models/tent-question.js: line 5, col 5, 'belongsTo' is defined but never used.
+
+2 errors
+
+models/translation.js: line 4, col 5, 'hasMany' is defined but never used.
+models/translation.js: line 5, col 5, 'belongsTo' is defined but never used.
+
+2 errors
+
+models/value.js: line 5, col 5, 'hasMany' is defined but never used.
+
+1 error
+
+models-shared/field.js: line 4, col 5, 'hasMany' is defined but never used.
+
+1 error
+
+models-shared/group.js: line 5, col 5, 'belongsTo' is defined but never used.
+
+1 error
+
+models-shared/user.js: line 4, col 5, 'hasMany' is defined but never used.
+
+1 error
+
+pods/application/view.js: line 4, col 19, 'ev' is defined but never used.
+
+1 error
+
+pods/checklist/checklist_invitation/new/controller.js: line 25, col 65, Missing semicolon.
+
+1 error
+
+pods/checklist/move/controller.js: line 6, col 16, 'Ember' is not defined.
+
+1 error
+
+pods/checklist/show/controller.js: line 63, col 9, 'saving' is defined but never used.
+
+1 error
+
+pods/components/coupled-users/component.js: line 51, col 27, Expected '!==' and instead saw '!='.
+pods/components/coupled-users/component.js: line 52, col 71, Missing semicolon.
+
+2 errors
+
+pods/components/search-filter-sort-bar/component.js: line 124, col 29, 'owner' is defined but never used.
+
+1 error
+
+pods/dossier/dossiers_choose/controller.js: line 11, col 90, 'array' is defined but never used.
+pods/dossier/dossiers_choose/controller.js: line 11, col 83, 'index' is defined but never used.
+
+2 errors
+
+pods/login/controller.js: line 59, col 17, Confusing use of '!'.
+pods/login/controller.js: line 62, col 15, 'heap' is not defined.
+pods/login/controller.js: line 63, col 15, 'heap' is not defined.
+pods/login/controller.js: line 66, col 15, 'Bugsnag' is not defined.
+
+4 errors
+
+routes-shared/application.js: line 2, col 9, Redefinition of '$'.
+
+1 error
+
+services/offline.js: line 21, col 7, 'Bugsnag' is not defined.
+
+1 error
+
+services/setup.js: line 46, col 23, Confusing use of '!'.
+services/setup.js: line 46, col 52, Confusing use of '!'.
+
+2 errors
+
+===== 40 JSHint Errors
+
+** DONE Review singleDefaultLocale#800
+** DONE Review pdf pimp
+
+why the git rev for wicked_pdf
+why binary_edge for whtmltopdf
+intl_helper merge will create conflicts, but master_release wins here,
+modifications are already 
+** DONE safedumpscript
++1
+** DONE single default locale  
++1  merged
+** DONE version bump review
+push updates
+merged
+
+** DONE reformat dates
+Not merged, apparently it's ok to error out in frontend app!!!!
+
+invalid date: 00-11-2009
+invalid date: 00-01-2009
+invalid date: 00-00-2013
+invalid date: 2015-2022
+invalid date: 2021-2028
+invalid date: 2015-2022
+invalid date: -
+invalid date: -
+invalid date: -
+invalid date: -
+invalid date: 2014-2016
+invalid date: 2016-2023
+invalid date: -
+invalid date: --
+invalid date: -
+invalid date: 45-2-2014
+invalid date: -
+invalid date: -
+invalid date: -
+invalid date: Ja
+#<Answer id: 4075907, value_open: nil, answer_type: 2>
+#<Answer id: 4392004, value_open: nil, answer_type: 2>
+#<Answer id: 4416656, value_open: nil, answer_type: 2>
+#<Answer id: 4418017, value_open: nil, answer_type: 2>
+#<Answer id: 4423747, value_open: nil, answer_type: 2>
+#<Answer id: 4423759, value_open: nil, answer_type: 2>
+#<Answer id: 4427281, value_open: nil, answer_type: 2>
+#<Answer id: 4502576, value_open: nil, answer_type: 2>
+#<Answer id: 4512497, value_open: nil, answer_type: 2>
+#<Answer id: 4534947, value_open: nil, answer_type: 2>
+#<Answer id: 4541250, value_open: nil, answer_type: 2>
+#<Answer id: 4546224, value_open: nil, answer_type: 2>
+#<Answer id: 4546243, value_open: nil, answer_type: 2>
+#<Answer id: 4546250, value_open: nil, answer_type: 2>
+#<Answer id: 4546251, value_open: nil, answer_type: 2>
+#<Answer id: 4559136, value_open: nil, answer_type: 2>
+#<Answer id: 4657415, value_open: nil, answer_type: 2>
+#<Answer id: 4691091, value_open: nil, answer_type: 2>
+#<Answer id: 4691092, value_open: nil, answer_type: 2>
+#<Answer id: 4691095, value_open: nil, answer_type: 2>
+Dates reformatted: 11567
+
+** DONE Date_field branch
+*** Test Date_field* branch on ipad and ie
+*** Test limit date year input (ie+ipad)
+
+*** Clearing date on idevice gives server cannot save error #1062 
+*** On ipad, when modifying date on jukebox date chooser, update button doesn't show #1022 
+Close issue
+
+*** Check/uncheck unedited boolean qtype: debounce works, but still saves #1019 
+
+** DONE Dashboard issues 1009
+PR
+Merged
+** DONE Tests for api/v1 
+Close issue
+https://github.com/digitalechecklisten/chinchilla/issues/1020
+
+** DONE finish ember-upgrades
+Do pull request
+** DONE Review default locale branch 
+Approve pull request
+** DONE checklistOrDossierIndexDefaultFilterCompleted1013
+Push updates
+
+
+** DONE Review other pull requests
+*** DONE styleForgottenPasswordPage#958
+Push updates, approve pull, ask about impersonate, needs visible warning?
+!!!test on ipad and ie!!!!
+*** DONE betterPerformanceAnswersIndexQuery1080
+Approve pull
+*** DONE forgottenPasswordTest#1006=
+Push updates, approve pull
+Testing reset email gets sent, or at least ActionMailer has delivered it
+*** DONE inspectionDateChecklistDate#1089
+Approve pull
+*** DONE checklistOrDossierIndexDefaultFilterCompleted1013
+Fix achieve issue's goal. 
+
+However as soon as you do a (location) search, or click 'eigen' the list gets
+cluttered up again with completed rows.
+
+One solution is for users to sort on status. At least the completed rows are
+grouped together then. When reversing the sort 'afgerond' ends up at the bottom
+of the list. 
+
+If users know about this trick, and completed rows get filtered out with no
+filters applied, this might be all the change that's needed. Otherwise a
+solution as suggested in #955 might be needed.
+
+*** DONE translationCacheKeys1043
+I like the notification of Lucas and auto creating of a new key when a key is queried from the translations
+table, but it's not there. 
+
+Is it possible to do a similar thing with frontend keys? An api call would have
+to be made.
+
+I refactored intlhelper#translate somewhat, interpolate was called twice in some
+cases, less ifs, less vars now.
+
+However the issue has not been addressed. Redis cache key does not get
+invalidated when a translation of the key changes.
+
+** DONE Migration to ember-cli
+    run it still under rails
+
+    split out styles
+
+    options.info asset_loader in geo in dashboard js folder 
+**** offline, what is it good for? And how does it work
+****    csrf??
+    forgot-password checks csrf token...
+**** payload that comes with server index page...
+    index.html commented out bits
+     api would have to changed/added to to deliver translations and setup values
+    for a loggined in tab on refresh. Frontend would have to grab those values
+    on refresh and it sees it's already logged 
+** DONE use keys for translations
+** DONE App.Logger
+push branch and pull request
+** DONE migrate dc app to ember-cli
+** DONE push swagger
+http://swagger.io/
+https://github.com/swagger-api/swagger-spec#additional-libraries
+http://billpatrianakos.me/blog/2013/10/13/list-of-rails-status-code-symbols/
+https://github.com/swagger-api/swagger-spec/blob/master/versions/1.2.md
+** DONE finish list question type
+** DONE fix up calendar
+** DONE api inspector
+** DONE livereload
+Just not working!!!!
+Bloody well keeps complaining about duplicating watches and not responding to
+changes.
+But chrome livereload extension is connecting to guard-livereload server though.
+Need to do bundle exec guard to get it into action.
+** DONE upgrade ember-cli to 1.10 etc
+** DONE add logger with console line count
+push branch better-logger
+** DONE push docker-dc
+** DONE finish ember-cli admin
+
+** DONE calendar
+
+space topbar using col-sm-9 etc
+clicking on task opens up task in answer
+format answer and task in selected event
+violations popup menu is not working 
+
+debugged setting inspectiondate
+filter on type
++2 more and popup window a la google calendar
+
+
+* Snippets
+class Translations < ActiveRecord::Base
+end
+
+class AddKeyToTranslations < ActiveRecord::Migration
+  def up
+    add_column :translations, :key, :string, :after => :id
+    Translation.update_all("`key`=CONCAT(LCASE(LEFT(en,1)),SUBSTRING(en,2))")
+
+    sql =" SELECT translations.id,translations.key FROM translations LEFT OUTER JOIN (SELECT MIN(id) AS id, `key` FROM translations GROUP BY `key`) AS KeepRows ON translations.id = KeepRows.id WHERE KeepRows.id IS NULL"
+    duplicates = Translation.find_by_sql(sql)
+
+    duplicate_ids = duplicates.map {|e| e["id"] }
+    puts "The following keys have one or more duplicates:"
+    duplicates.each {|d| puts d["id"].to_s + " " + d["key"] }
+    puts "Removing duplicates:"
+    Translation.delete_all(:id => duplicate_ids)
+    puts "Done"
+  end
+
+
+  def down
+    remove_column :translations, :key
+  end
+end
+
+
+
+
+development.rb:
+  config.action_mailer.smtp_settings = {
+    :address => 'smtp.mandrillapp.com',
+    :port => 587,
+    # :domain => '184.173.153.218',
+    :user_name => 'mail@axion5.net',
+    :password => 'U2eJfnNEtFRYCX2zFK1ZHw',
+    :authentication => 'plain',
+    :enable_starttls_auto => true,
+    :return_response => true
+  }
+
+
+C-x C-p to projectile-find
+
+
+
+passwords_controller.rb
+module Api::V1
+  class PasswordsController < Clearance::PasswordsController
+
+    def create
+      if params[:password][:email].present? && user = find_user_for_create
+        user.forgot_password!
+        deliver_email(user)
+        render :json => {message: view_context.translate('Within a few minutes you will receive an email with instructions to change your password')}
+      else
+        render :json => "#{view_context.translate('Please specify a valid or existing email address')}", :status => :unauthorized
+      end
+
+      
+    end
+  end
+end
+
+change_password.html.erb
+<p>
+  Je hebt verzocht om je wachtwoord opnieuw in te stellen. Via de volgende link kan je een nieuw wachtwoord kiezen:
+</p>
+
+<% url=edit_user_password_url(@user, :token => @user.confirmation_token.html_safe) %> 
+
+<p>
+  <a href="<%=url%>"> <%= url%></a>
+</p>
+
+<p>
+  Heb je niet gevraagd om je wachtwoord aan te passen dan kan je deze email negeren.
+</p>
+
+
+
+
+
+
+  autoSave: function () {
+    if (this.get('hasBufferedChanges')) {
+      Ember.run.debounce(this, this._autoSave,  this.get('content') , 3000);
+    }
+  }.observes('valueOpen', 'value', 'priorityOverride'),
+  _autoSave:function(content) {
+    if (this.get('hasBufferedChanges')) {
+      this.applyBufferedChanges(content);
+
+      var self = this;
+      // this.get('content').save().catch(function(params){
+      content.save().catch(function(params){
+        // Making sure the user is logged in while answering questions :)
+        if(params['statusText'] == 'Unauthorized') {
+          self.send('logout');
+        }
+      });
+    }
+  },
+
+
+
+  applyBufferedChanges: function (content) {
+    var buffer,  key;
+    buffer = this.buffer;
+    for (key in buffer) {
+      if (!__hasProp.call(buffer, key)) continue;
+      set(content, key, buffer[key]);
+    }
+    if (!this.isDestroyed) {
+      this.buffer = {};
+      this.set("hasBufferedChanges", false);
+    }
+    return this;
+  },
+
+
+
+  <div class="row details">
+    {{#if checklist.violationsCount}}
+      <span class='violations'><i></i>{{checklist.violationsCount}} {{intlGet 'Violations'}}</span>
+    {{else}}
+      <span class='noviolations'><i></i>{{checklist.violationsCount}} {{intlGet 'Violations'}}</span>
+    {{/if}}
+
+
+      .violations {
+
+        color: $red;
+
+        i {
+          @include icon("warning");
+          margin-right: .5em;
+        }
+      }
+
+      .noviolations {
+
+        color: $lightGrey;
+
+        i {
+          /* @include icon("checklist-green"); */
+          /* margin-right: .5em; */
+        }
+      }
+
+
+
+.new-category-bar {
+  min-height: $greyBarHeight - $greyBarMargin * 2;
+  margin: -1em 0 $mediumMargin 0;
+
+  padding: $greyBarMargin $navBarMeasure;
+
+  /* background-color: $darkGrey; */
+  /* color: $white; */
+}
+
+
+  <div class="new-category-bar">
+    <div class="new-category-block-right">
+      <a class="save-button" href="#" {{action 'toggleAddCategory'}}><label>{{intlGet 'Close'}}</label></a>
+
+    </div>
+  </div>
+
+
+  answers: function() {
+    return this.get('model.answers').filterBy('value', 0);
+  }.property('model.answers'),
+
+
+    {{#each answer in answers}}
+      <span>Answers: {{answer.value}}</span>
+    {{/each}}
+
+
+
+        <li>{{#link-to 'checklist.show' checklist (query-params answerId=answer.id)}}
+          {{answer.question}}{{/link-to}}</li>
+
+
+
+
+    <span {{bind-attr class='violationsCountClass'}}>
+      {{#if checklist.violationsCount}}
+        <div class="violations-dropdown">
+            <a class="activator" href="#" {{action "toggleViolationsMenu"}}>
+
+              <i class="warning-icon"></i> {{checklist.violationsCount}} {{intlGet 'Violations'}}
+            </a>
+          {{#if renderViolationsMenu}}
+            <i class="options-top"></i>
+            <ul class="export-list">
+              {{#each answer in answers}}
+                <li>{{#link-to 'checklist.show' checklist (query-params answerId=answer.id)}}
+                  {{answer.question.question}}{{/link-to}}</li>
+              {{/each}}
+            </ul>
+        </div>
+          {{/if}}
+      {{else}}
+          {{checklist.violationsCount}} {{intlGet 'Violations'}}
+      {{/if}}
+    </span>
+
+
+        {{input action="login" on="enter" value=email type="email" placeholder="Email"}}
+        {{input action="login" on="enter" value=password type="password" placeholder="Password"}}
+
+  //api/v1/login errors out when no email/password is passed in, so defining
+  //default values here:
+  email: "",
+  password: "",
+
+
+
+    <span class="completed"><i></i>{{checklist.remarksCount}} {{intlGet 'Remarks'}}</span>
+ 
+
+
+I made it so checklists only show up in 'new checklists' when they are are valid based on the two date fields. A date field not filled is the same as a date infinitely in the past or future for all intents and purposes.
+
+I did the same for the questions. 
+
+But what to do with existing checklists and questions that have expired? 
+
+Also what to to with questions that are getting valid on a certain date, and might need to be included in existing checklists?
+
+Should the valid_till and valid_from fields be shown on the checklist details? And the question's valid_from/till fields on the questions?
+
+The server's date needs to be correct though, and the assumption is that the server is in the time zone of the users of the app.
+
+
+* Misc
+** Response to flippin, fucking whinging and whinning by two idiots, that don't read commnents, make me repeat myself, don't respond, don't go into accurate detail, ignore questions, ask stupid questions, half answer questions, jump to conclusions before thinking a bit more. Assume things before thinking there might be more in play. Idiots. But most importantly refuse to properly understand code before making comments. Don't ever write anything themselves vaguely interesting or complex, have no public repositories, no reputation, no respect in the wider programmer community.
+I understood from Lucas at the time, the issue was having to scroll at all. Especially on an ipad, and when at the bottom of the list. That's why the issue is called what it is right. 
+
+The body gets already automatically bigger.
+
+The dropdowns vary in size quite a bit, plus you don't know the size till after it's rendered, till after the data is loaded from the backend. Don't know how to do that with just css and html.
+
+All the code does is place the dropdown in the viewport if there's room to display it, instead of letting it disappear of the bottom of the page.
+
+The intent was to augment the existing dropdown box for the checklist row, and both violations and remarks use it. The only reason it's a view instead of just some extra code to the checklist row is because I need to catch the didInsertElement event for the dropdown. See earlier comment as well. 
+
+And tbh, I kinda like the the dropbox filipping up and down when scrolling. :-> It was fun to make, looks cool and is still only a minimal change (50 lines or so?). I'd be sad to see it go, but if you guys think it's overkill, or needs to be extracted to  a component, or have an easier or better solution, I'm open for it of course.
+
+
+
+** bugsnag
+
+2 errors from firefox 27 on xp, same 2 errors on ff 41 on w7. One is from
+someone that's trying to log in with chinchilla.js, and a few errors with an
+older frontend.js
+
+Reproduced one error, the toggleSettings one, invitations/index shouldn't have a
+settings button, error is harmless
+
+One was on android. Stack overflow. I don't regularly test on android myself.
+
+3 are in dashboard, single occurence
+
+Nothing handled the action 'getMore'. in ff38, single occurence. Infinity scroll
+works ok in my ff39 and ff43
+
+
+
+
+
+
+In ie10/w7 in console:
+HTML1506: Unexpected token. 
+app, line 54 character 1
+
+icon font awesome
+
+in package.json for admin and frontend
+    "ember-data": "1.13.11",
+
+
+yes/no translation in swal
+
+
+Ok, good idea. That's probably the better approach. Less chance of untranslated
+keys ending up in production.
+
+Ok, I'm with you. We'll do that.
+
+Ok, we'll do that. 
+
+
+
+* DO NOT PUSH MASTER UPSTREAM. IT'S FAR TO MUCH UPDATED!!!!
+
+
+* scratch
+  select u.id, u.email, u.deleted, group_id, count(*) from users as u join templates_users as t on u.id=t.user_id where group_id = 175 and (u.deleted=0 or u.deleted is null) group by u.id order by count(*)
+
+
+  
+  function _formatNumber(number, locale, plainNumber) {
+  number = "" + number;
+  let negative = number[0] === '-';
+  let base = number.split('.')[0];
+
+  base = negative ? base.slice(1) : base;
+  console.log('plainNumber', plainNumber);
+  if (plainNumber) {
+    return base;
+  }
+  else {
+    console.log(number);
+    let thousand = '.', decimal = ',';
+    if (~(commaOrDot.dot.indexOf(locale))) {
+      thousand = ',';
+      decimal = '.';
+    }
+    let decimals = number.split('.')[1];
+    let mod = base.length > 3 ? base.length % 3 : 0;
+    let firstDigits = (mod ? base.substr(0, mod) + thousand : "");
+    let restOfDigits =  base.substr(mod);
+    decimals = decimals.length > 0 ? (decimal + decimals) : "";
+    restOfDigits = restOfDigits.replace(/(\d{3})(?=\d)/g, "$1" + thousand);
+    return (negative ? '-' : '') + firstDigits + restOfDigits +decimals;
+  }
+}
+
+  
+1: b checklist 1
+2: c checklist 2
+3: d checklist 3
+4: a checklist 4
+
+parent_dossier 1 2
+child_dossier 4
+child_dossier2 checklists_child_dossier2
+grandchild_dossier checklists_grandchild_dossier
+
+b4672e38a4f9cb77cabed6969c7722277f93237c
+css sourcemaps before merge
+jshint and schema update
+ bbaac1f76bdf872b07d0f22d1077561295586d8f
+
+sourcemapsdd
+108dc37ce8e15b18b21a4ee7015b380fd4a693e9
+
+
+before css merge
+9027b2256bd7adf0cb959b9b29198243c318b80e
+
+0e93f63b718a19d221045d98b804356142dd2141
+174a8deb47fc6356491a7d037b5686d2e86a3662
+
+
+Translation.select("COUNT(nl) as total, nl").
+  group(:nl).
+  having("COUNT(nl) > 1").
+  order(:nl).
+  map{|p| {p.nl => p.total} }
+-- CREATE DATABASE "chin_minimal" -------------------------
+CREATE DATABASE IF NOT EXISTS `chin_minimal` CHARACTER SET utf8 COLLATE utf8_general_ci;
+USE `chin_minimal`;
+-- ---------------------------------------------------------
+
+
+** timout of effacts https://jeradus-admin%40gmail.com:licT4ash9phoL7i3Om3Ich1Bed6nock1ciLt3ir9aL3cI0Ob2D@tekstentoelichting.nl/effacts/basic/api/2/Subjects/73293.json
+/home/michieljoris/.rbenv/versions/2.1.2/lib/ruby/2.1.0/net/protocol.rb:158:in `rescue in rbuf_fill'
+  /home/michieljoris/.rbenv/versions/2.1.2/lib/ruby/2.1.0/net/protocol.rb:152:in `rbuf_fill'
+  /home/michieljoris/.rbenv/versions/2.1.2/lib/ruby/2.1.0/net/protocol.rb:134:in `readuntil'
+  /home/michieljoris/.rbenv/versions/2.1.2/lib/ruby/2.1.0/net/protocol.rb:144:in `readline'
+  /home/michieljoris/.rbenv/versions/2.1.2/lib/ruby/2.1.0/net/http/response.rb:39:in `read_status_line'
+  /home/michieljoris/.rbenv/versions/2.1.2/lib/ruby/2.1.0/net/http/response.rb:28:in `read_new'
+  /home/michieljoris/.rbenv/versions/2.1.2/lib/ruby/2.1.0/net/http.rb:1408:in `block in transport_request'
+  /home/michieljoris/.rbenv/versions/2.1.2/lib/ruby/2.1.0/net/http.rb:1405:in `transport_request'
+  /home/michieljoris/.rbenv/versions/2.1.2/lib/ruby/2.1.0/net/http.rb:1378:in `request'
+  rest-client (1.6.7) lib/restclient/net_http_ext.rb:51:in `request'
+  skylight (0.10.2) lib/skylight/probes/net_http.rb:34:in `block in request'
+  skylight (0.10.2) lib/skylight/core.rb:91:in `instrument'
+  skylight (0.10.2) lib/skylight/probes/net_http.rb:33:in `request'
+  /home/michieljoris/.rbenv/versions/2.1.2/lib/ruby/2.1.0/net/http.rb:1371:in `block in request'
+  /home/michieljoris/.rbenv/versions/2.1.2/lib/ruby/2.1.0/net/http.rb:853:in `start'
+  /home/michieljoris/.rbenv/versions/2.1.2/lib/ruby/2.1.0/net/http.rb:1369:in `request'
+  rest-client (1.6.7) lib/restclient/net_http_ext.rb:51:in `request'
+  skylight (0.10.2) lib/skylight/probes/net_http.rb:13:in `request'
+  httparty (0.13.1) lib/httparty/request.rb:93:in `perform'
+  httparty (0.13.1) lib/httparty.rb:521:in `perform_request'
+  httparty (0.13.1) lib/httparty.rb:457:in `get'
+  lib/effacts/client.rb:33:in `retrieve'
+  lib/effacts/subject.rb:38:in `retrieve'
+  lib/effacts/subject.rb:29:in `initialize'
+  lib/effacts/client.rb:23:in `subject'
+  app/models/tent_question.rb:16:in `find_by_id'
+
+** To wide a remark
+ ALGEMEEN .................................................................................................................................. 7
+1.1 Algemeen ............................................................................................................................. 7
+1.2 Normen .............................................................................................................................. 7
+1.3 Grens inrichting ................................................................................................................... 7
+1.4 Terreinen en wegen............................................................................................................... 7
+2 AFVALSTOFFEN ....................................................................................................................... 8
+2.1 Afvalscheiding ...................................................................................................................... 8
+2.2 Opslag van afvalstoffen ......................................................................................................... 8
+3 BODEM ................................................................................................................................ 9
+3.1 Algemeen ........................................................................................................................... 9
+3.2 Bedrijfsrioleringen ............................................................................................................... 11
+3.3 Bodembelastingonderzoek .................................................................................................. 11
+3.4 Herstelplicht (bodemsanering) ............................................................................................ 12
+4 ENERGIE ............................................................................................................................. 13
+4.1 Energieverbruik ..................................................................................................................... 13
+5 EXTERNE VEILIGHEID ............................................................................................................ 13
+6 LUCHT ............................................................................................................................... 13
+6.1 Emissies van stoffen uit puntonnen ................................................................................ 13
+6.2 Diffuus stof, algemeen ........................................................................................................... 14
+7 METAALBEWERKING .............................................................................................................. 14
+7.1 Lassen .................................................................................................................. 14
+7.2 Coaten ............................................................................................................... 15
+7.3 Spaanloze, verspanende en theindafwerking van metalen.................................................................... 16
+8 HOUTBEWERKING ................................................................................................................... 17
+8.1 Algemeen ........................................................................................... 17
+8.2 Houtmot ................................................................................................................... 17
+9 GELUID ........................................................................................................... 17
+10 VERRUIMDE REIKWIJDTE .......................................................................................... 18
+
+select * from answers where id IN (4075907,4392004,4416656,4418017,4423747,4423759,4427281,4502576,4512497,4534947,4541250,4546224,4546243,4546250,4546251,4559136,4657415,4691091,4691095,4692581,4692582,4692583,4751681,4751682,4751683,4754963,4754965,4763951,4763952,4833091) 
+select * from users where id in (select user_id from answers where id IN (4075907,4392004,4416656,4418017,4423747,4423759,4427281,4502576,4512497,4534947,4541250,4546224,4546243,4546250,4546251,4559136,4657415,4691091,4691095,4692581,4692582,4692583,4751681,4751682,4751683,4754963,4754965,4763951,4763952,4833091) GROUP BY user_id
+) order by group_id
+
+
+mysql> select id,group_id,name, email from users where id in (select user_id from answers where id IN (4075907,4392004,4416656,4418017,4423747,4423759,4427281,4502576,4512497,4534947,4541250,4546224,4546243,4546250,4546251,4559136,4657415,4691091,4691095,4692581,4692582,4692583,4751681,4751682,4751683,4754963,4754965,4763951,4763952,4833091) GROUP BY user_id
+    -> ) order by group_id;
++------+----------+------------------------------+-------------------------------+
+| id   | group_id | name                         | email                         |
++------+----------+------------------------------+-------------------------------+
+|  996 |        3 | Patrick van Luijk            | pluijk@odijmond.nl            |
+|  177 |        3 | Rogier van Kalken            | rkalken@odijmond.nl           |
+| 1399 |        3 | Winette de Wolf-van den Berg | wwolf@odijmond.nl             |
+| 1866 |        3 | Hans Bakker                  | hbakker@odijmond.nl           |
+|  250 |        3 | Marcel Vergeer               | mvergeer@odijmond.nl          |
+|  216 |        6 | Anouska  Roozing             | a.roozing@oddevallei.nl       |
+| 2655 |       53 | Bennie van de Laar           | blaar@odbn.nl                 |
+|  631 |       53 | Marcia Weeterings            | mweeterings@odbn.nl           |
+|  572 |       61 | Frans Lenaers                | f.lenaers@odrivierenland.nl   |
+| 2638 |      159 | Quint Cuppen                 | quint.cuppen@odra.nl          |
+| 1623 |      165 | Gerrit Hakken                | gerrit.hakken@odachterhoek.nl |
+| 2390 |      200 | Rob Baron                    | r.baron@odru.nl               |
++------+----------+------------------------------+-------------------------------+
+
+
+
+let,const,=>,includes,templates, destructure, params (default, rest, named, spread), rest, maps, promises
+
+*
+
+["Een keuze!!!!!","Keuze twee Keuze twee Keuze twee Keuze twee Keuze twee Keuze twee Keuze twee Keuze twee Keuze twee Keuze twee Keuze twee Keuze twee Keuze twee Keuze twee Keuze twee Keuze twee Keuze twee Keuze twee Keuze twee Keuze twee Keuze twee Keuze twee eind" ,"Keuze drie1" ,"euze drie" ,"uze drie" ,"ze drie" ,"aKeuze drie" ,"bKeuze drie" ,"cKeuze drie" ,"dKeuze drie" ,"eKeuze drie" ,"fKeuze drie" ,"gKeuze drie" ,"hKeuze drie" ,"iKeuze drie" ,"jKeuze drie" ,"kKeuze drie" ,"lKeuze drie" ,"mKeuze drie" ,"nKeuze drie" ,"oKeuze drie" ,"pKeuze drie" ,"qKeuze drie" ,"rKeuze drie" ,"sKeuze drie" ,"tKeuze drie" ,"uKeuze drie" ,"vKeuze drie" ,"wEind"]
+
+** skype effacts slow
+ Lucas Oost Lievense added michiel.mosterd michieljoris.
+[4:49:48 PM] Lucas Oost Lievense: Michiel Mosterd: zou kunnen dat het nu iets langer duurt om een sessie op te bouwen
+[4:50:12 PM] Lucas Oost Lievense: michiel.mosterd: vanuit de API clients
+michiel.mosterd: is afgelopen uur bijvoorbeeld 800 maal nieuwe sessie opgebouwd
+[4:50:32 PM] michieljoris: Ok, hi
+[4:50:37 PM] Lucas Oost Lievense: Michiel DC dat kan jij beter beantwoorden
+[4:50:45 PM] michiel.mosterd: Hoi
+[4:51:04 PM] michiel.mosterd: ik zit o.a. te kijken naar de url: https://tekstentoelichting.nl/effacts/basic/api/2/Subjects/73293.json
+[4:51:27 PM] michiel.mosterd: als ik die in browser doe kost eerste keer idd 9 seconde
+[4:51:29 PM] michieljoris: Nee, simple curl to api takes 9 seconds. Yes, for that subject.
+[4:51:32 PM] michieljoris: I've been curling it.
+[4:51:41 PM] michiel.mosterd: tweede keer is stuk sneller omdat geen sessie wordt opgebouwd
+[4:52:30 PM] michieljoris: Wat bedoel je met sessie?
+[4:53:08 PM] michiel.mosterd: Elke keer dat je aanlogt wordt aan de serverkant een sessie opgebouwd, huidige API is niet stateless
+[4:53:17 PM] michieljoris: Ah.
+[4:53:29 PM] michiel.mosterd: je krijgt een HTTP ONLY cookie met JSESSIONID erin
+[4:53:49 PM] michiel.mosterd: als die opnieuw wordt meegegeven is de loginprocedure al voltooid
+[4:53:50 PM] michieljoris: Rails doet precies het zelfde. Het zend username/pwd elke keer weer.
+[4:54:13 PM] michieljoris: Gebruiken niet de cookie zo ver ik weet.
+[4:54:19 PM] michiel.mosterd: Dat verklaart wel het hoga aantal sessies
+[4:54:37 PM] michiel.mosterd: overigens is de response nog steeds traag: 4 seconde
+[4:54:37 PM] michieljoris: Is dat veranderd?
+[4:55:11 PM] michieljoris: Dat verklaart waarom in de browser het idd maar 3-4 secondes is. Die stuurt de cookie me.
+[4:55:39 PM]  michiel.mosterd added dimurgos.
+[4:55:55 PM] michiel.mosterd: sessie opbouw zou inderdaad wel trager kunnen zijn
+[4:56:29 PM] michiel.mosterd: heb je weet je hoelang deze call nodig had op de oudere versie?
+[4:58:08 PM] michieljoris: Nee, precies weet ik dat niet. Api calls waren alijd een beetje langzaam, maar niet zo langzaam dat ie over de time out ieg.
+[4:58:35 PM] dimurgos: hij gaat met regelmaat over de timeout?
+[4:58:56 PM] michieljoris: Ja, timeout is 4s. Ging ie vandaag regelmatig overheen.
+[4:59:27 PM] dimurgos: bij welke calls trouwens,?
+[4:59:27 PM] michieljoris: En dan errors in DC, en mensen bellen.
+[4:59:29 PM] michiel.mosterd: call met relaties duurt 9 seconde in browser als ik sessie nog moet opbouwen
+rne
+u dus pas in deze versie probleem op kunnen leveren dat hij steeds nieuwe sessie opbouwt
+[5:00:34 PM] dimurgos: /effacts/basic/api/2/Subjects/105837/RelatedSubjects.json of /effacts/basic?method=SubjectDisplayRelations&id=644764&outputtype=xml ?
+[5:00:44 PM] michiel.mosterd: eerste
+[5:01:32 PM] michieljoris: Willekeurige subjects heb ik de indruk. Ik test voortdurend de zelfde, en times out soms wel, soms niet.
+[5:02:12 PM] michieljoris: Ja, als onze server elke keer een nieuwe session opbouwt, dus geen cookie zend verder, en dat is langzamer bij Effact nu, dan verklaart het het probleem.
+[5:02:50 PM] michiel.mosterd: is dat eenvoudig aan te passen / te testen aan jullie zijde?
+[5:05:00 PM] michieljoris: Ja, neem aan dat we dat cookie wel kunnen sturen na de eerste keer. In principe niet zo moeilijk lijkt me. Maar dan nog is 4 seconde response tijd met de sessie al opgebouwd bij Effacts aan de langzame kant eigenlijk.
+[5:05:35 PM] michiel.mosterd: is inderdaad niet erg snel
+[5:06:08 PM] michiel.mosterd: Tony, wat verwacht jij hier?
+[5:06:52 PM] dimurgos: in principe zou een simpele ophalen van relaties <2 seconden moeten kunnen
+[5:07:04 PM] dimurgos: dus verbaas me nogal over dat het 4 seconden duurt
+[5:09:05 PM] dimurgos: hmm
+[5:09:11 PM] dimurgos: ik zit hier in de userlog te kijken
+[5:09:33 PM] dimurgos: en iets als https://tekstentoelichting.nl/effacts/form?method=SubjectDisplayRelations&id=143925&outputtype=xml duurt ~14 ms om op te bouwen
+[5:10:39 PM] dimurgos: maar zelfde ding via https://tekstentoelichting.nl/effacts/form/api/2/Subjects/143925.json kost ~1.5 seconden
+[5:11:40 PM] michiel.mosterd: Zelfde gedrag bij id 73293
+
+7aeb96cfc8aaf4af53fbbc7bff8f99cbf9e5d2f1
+** Polish app comment
+Anything affecting user experience should get done soon imho. Even when it doesn't afffect functionality. You're constantly annoying the user, creating negative associations. a
+
+En in de tussentijd de Ember DC app zo stabiel mogelijk te maken, met zo weinig
+mogelijk 'glitches'. En nieuwe features zo modulair mogelijk. En met frontend
+tests gefixte glitches vastleggen zover mogelijk. Ik denk dat voor het
+eindgebruikers het belangrijk is dat er zo weinig mogelijk 'he wat is dat nou?'
+momenten zijn, terwijl het nog wel gewoon werkt, maar de eindgebruiker leert er
+dan mee omgaan. Ik bedoel denk ik de 'new out of the box' ervaring. Eerste
+indruk bepaalt of iemand de app wel of niet gaat gebruiken.
+
+** transition probs
+-webkit-transition-property: compact(height, padding, margin, false, false, false, false, false, false, false);
+    -moz-transition-property: compact(height, padding, margin, false, false, false, false, false, false, false);
+    -o-transition-property: compact(height, padding, margin, false, false, false, false, false, false, false);
+    transition-property: compact(height, padding, margin, false, false, false, false, false, false, false);
+    -webkit-transition-duration: compact(0.5s, false, false, false, false, false, false, false, false, false);
+    -moz-transition-duration: compact(0.5s, false, false, false, false, false, false, false, false, false);
+    -o-transition-duration: compact(0.5s, false, false, false, false, false, false, false, false, false);
+    transition-duration: compact(0.5s, false, false, false, false, false, false, false, false, false);
+    -webkit-transition-timing-function: compact(ease-in-out, false, false, false, false, false, false, false, false, false);
+    -moz-transition-timing-function: compact(ease-in-out, false, false, false, false, false, false, false, false, false);
+    -o-transition-timing-function: compact(ease-in-out, false, false, false, false, false, false, false, false, false);
+    transition-timing-function: compact(ease-in-out, false, false, false, false, false, false, false, false, false);
+
+-webkit-transition-property: height, padding, margin;
+  -moz-transition-property: height, padding, margin;
+  -o-transition-property: height, padding, margin;
+  transition-property: height, padding, margin;
+  -webkit-transition-duration: 0.5s;
+  -moz-transition-duration: 0.5s;
+  -o-transition-duration: 0.5s;
+  transition-duration: 0.5s;
+  -webkit-transition-timing-function: ease-in-out;
+  -moz-transition-timing-function: ease-in-out;
+  -o-transition-timing-function: ease-in-out;
+  transition-timing-function: ease-in-out;
+
+9QEsDfRG5OkfPZBxcnzz
+
+Started GET "/admin/update/user/1" for 87.214.187.162 at 2016-03-29 10:43:31 +0200
+Processing by AdminController#update_template_user_for_user as HTML
+  Parameters: {"user_id"=>"1"}
+  User Load (1.4ms)  SELECT  `users`.* FROM `users`  WHERE `users`.`remember_token` = '50c9fd57db220481ae40c90c68fec5e5b1aa6d06' LIMIT 1
+  User Load (1.2ms)  SELECT  `users`.* FROM `users`  WHERE `users`.`id` = 1 LIMIT 1
+  Template Load (1.8ms)  SELECT `templates`.* FROM `templates`  WHERE `templates`.`tent_subject_id` IN (97263, 101180, 112855, 119480, 131323, 131326, 131334, 131340, 131341, 131345, 133555, 134878, 135090, 135453, 135550, 135919, 135955, 141509, 146179, 149931, 155692, 155913, 155961, 158660, 159070, 159879, 160693, 161821, 168038)
+  Template Load (1.5ms)  SELECT `templates`.* FROM `templates` INNER JOIN `templates_users` ON `templates`.`id` = `templates_users`.`template_id` WHERE `templates_users`.`user_id` = 1
+   (0.7ms)  BEGIN
+   (0.7ms)  COMMIT
+   (0.7ms)  BEGIN
+  User Exists (1.1ms)  SELECT  1 AS one FROM `users`  WHERE (`users`.`email` = BINARY 'e.steenmeijer@handhaving20.nl' AND `users`.`id` != 1) LIMIT 1
+   (0.7ms)  COMMIT
+  Rendered inline template (0.5ms)
+
+Started GET "/admin/update/user/tent/23611" for 87.214.187.162 at 2016-03-29 10:45:13 +0200
+Processing by AdminController#update_template_user_for_user_by_tent_id as HTML
+  Parameters: {"tent_id"=>"23611"}
+  User Load (1.3ms)  SELECT  `users`.* FROM `users`  WHERE `users`.`remember_token` = '50c9fd57db220481ae40c90c68fec5e5b1aa6d06' LIMIT 1
+  User Load (1.2ms)  SELECT `users`.* FROM `users`  WHERE `users`.`tent_subject_id` = 23611
+  User Load (1.2ms)  SELECT  `users`.* FROM `users`  WHERE `users`.`id` = 1 LIMIT 1
+  Template Load (1.7ms)  SELECT `templates`.* FROM `templates`  WHERE `templates`.`tent_subject_id` IN (97263, 101180, 112855, 119480, 131323, 131326, 131334, 131340, 131341, 131345, 133555, 134878, 135090, 135453, 135550, 135919, 135955, 141509, 146179, 149931, 155692, 155913, 155961, 158660, 159070, 159879, 160693, 161821, 168038)
+  Template Load (1.4ms)  SELECT `templates`.* FROM `templates` INNER JOIN `templates_users` ON `templates`.`id` = `templates_users`.`template_id` WHERE `templates_users`.`user_id` = 1
+   (0.7ms)  BEGIN
+   (0.7ms)  COMMIT
+   (0.7ms)  BEGIN
+  User Exists (0.9ms)  SELECT  1 AS one FROM `users`  WHERE (`users`.`email` = BINARY 'e.steenmeijer@handhaving20.nl' AND `users`.`id` != 1) LIMIT 1
+   (0.7ms)  COMMIT
+  Rendered inline template (0.6ms)
+
+
+ SELECT `templates`.* FROM `templates`  WHERE `templates`.`tent_subject_id` IN (97263, 101180, 112855, 119480, 131323, 131326, 131334, 131340, 131341, 131345, 133555, 134878, 135090, 135453, 135550, 135919, 135955, 141509, 146179, 149931, 155692, 155913, 155961, 158660, 159070, 159879, 160693, 161821, 168038)
+
+ SELECT `templates`.* FROM `templates`  WHERE `templates`.`tent_subject_id` IN (97263, 101180, 112855, 119480, 131323, 131326, 131334, 131340, 131341, 131345, 133555, 134878, 135090, 135453, 135550, 135919, 135955, 141509, 146179, 149931, 155692, 155913, 155961, 158660, 159070, 159879, 160693, 161821, 168038)
+
+
+SELECT `templates`.* FROM `templates`  WHERE `templates`.`tent_subject_id` IN (97263, 101180, 112855, 119480, 131323, 131326, 131334, 131340, 131341, 131345, 133555, 134878, 135090, 135453, 135550, 135919, 135955, 141509, 146179, 149931, 155692, 155913, 155961, 158660, 159070, 159879, 160693, 161821, 168038)
+
+moOk6burG8oAr7oV2cec2Yid2mEt
+mysqldump chinchilla -ueddy --password=catjavojadbovaunagumwzxzokjxw
+checklsit onload
+    this.get('model.dossier').then((dossier) => {
+      this.set('statuses', dossier.get('dossierType.checklistStatuses'));
+    });
+
+detail buttons component
+  modelStatuses: Ember.observer('statuses', function () {
+
+    var statuses = this.get('statuses');
+
+    if (Ember.isEmpty(statuses)) {
+      // Fallback to the default status
+      statuses = [{
+        'status': 'Completed',
+        'verb': 'complete'
+      }];
+    }
+
+    this.set('modelStatuses', this.get('statuses'));
+  }),
+
+
+  def html_list_of_templates(user, templates)
+    if !user.present?
+      "User met id #{params[:user_id]}} niet gevonden"
+    elsif !templates.present?
+      "User #{user.name} (tent subject id: #{user.tent_subject_id}) gevonden, maar er zijn geen templates aan de user gekoppeld"
+    else
+      header ="<p>Checklists die nu met #{user.name} (tent subject id: #{user.tent_subject_id}) zijn gekoppeld:</p>"
+      templates = templates
+        .sort_by{|template| template.name }
+        .map do |template|
+        "#{template.name} (#{template.tent_subject_id}) <br>"
+      end
+      "#{header}#{templates.join('')}"
+    end
+  end
+
+  def update_template_user_for_user
+    
+    if current_user.admin?
+      templates = UserTemplatesUpdateWorker.perform(params[:user_id])
+      user = User.find(params[:user_id])
+      respond_to do |format|
+        format.html { render :inline =>  html_list_of_templates(user, templates)}
+      end
+
+    else
+      raise "Can't clear cache with this user."
+    end
+  end
+
+  def update_template_user_for_user_by_tent_id
+
+    if current_user.admin?
+      inline_html=[]
+      users = User.where(:tent_subject_id => params[:tent_id])
+      users.each do |user|
+        templates = UserTemplatesUpdateWorker.perform(user.id)
+        inline_html << html_list_of_templates(user, templates)
+      end
+      if inline_html.present?
+        inline_html.join('')
+      else
+        inline_html = "No users found with T&T subject id #{params[:tent_id]}" 
+      end
+      respond_to do |format|
+        format.html { render :inline => inline_html }
+      end
+    else
+      raise "Can't clear cache with this user."
+    end
+  end
+
+Heb nog een idee over waarom updating met tent id wel werkt en met user id niet. 
+Als je met tent id update dan gaat rails alle users in de dc database updaten die die tent_id hebben. Lucas, jij hebt naast Lucas Oost Lievense bijv nog 4 alter egos in DC: Bas van Engelen, Geïmporteerd, Extra account Bas en David Bronsveld, allemaal dezelfde tent_subject_id. Maar als je  update met je DC user id dan krijg je alleen de nieuwe checklist lijsten voor jezelf, maar niet voor je alter egos in DC.
+
+RAILS_ENV=staging bundle exec rake dc:read_in_voter_csv
+
+bonaire_michiel: 2696
+
+Torteltuin
+73584
+Gaastmeer 38
+
+meeting
+http://9292.nl/reisadvies/station-amsterdam-zuid/utrecht_moreelsepark-65/aankomst/2016-06-15T1551
+
+Zaaneb's mum
+31647275634
+
+
+* euroclojure
+Saturday A'dam -> Berlin 22 Oct
+8.05 - 15.06  €169
+Sunday, Monday Stay in Berlin
+150-200
+Monday Berlin -> Bratislava 24 Oct
+7.03 - 15.50 €127
+Monday,Tuesday,Wednesday stay in Bratislava 24,25,26
+150-200
+Thursday Bratislava -> Vienna 27 Oct
+€20
+Thursday, Friday stay in Vienna 27,28 Oct
+
+Saturday Vienna -> A'dam 29 Oct
+6.50 - 19.00 €200
+
+                               :style {:padding-left 45}
+hertzog str 43
+06 24148896
+
+* spring cleain
+views/checklists/_report_text.erb
+dashboard workers?
+
+
+
+* deps 
+├── active-model-adapter@2.0.3 
+├─┬ broccoli-asset-rev@2.5.0 
+│ ├── broccoli-asset-rewrite@1.1.0 
+│ ├─┬ broccoli-filter@1.2.4 
+│ │ ├── broccoli-kitchen-sink-helpers@0.3.1 
+│ │ ├── copy-dereference@1.0.0 
+│ │ └── walk-sync@0.3.1 
+│ ├─┬ json-stable-stringify@1.0.1 
+│ │ └── jsonify@0.0.0 
+│ ├─┬ matcher-collection@1.0.4 
+│ │ └─┬ minimatch@3.0.3 
+│ │   └── brace-expansion@1.1.6 
+│ └── rsvp@3.3.3 
+├─┬ broccoli-funnel@0.2.15 
+│ ├── array-equal@1.0.0 
+│ ├── blank-object@1.0.2 
+│ ├─┬ broccoli-plugin@1.3.0 
+│ │ ├─┬ quick-temp@0.1.6 
+│ │ │ ├── mktemp@0.4.0 
+│ │ │ └── rimraf@2.2.8 
+│ │ └─┬ rimraf@2.5.4 
+│ │   └─┬ glob@7.1.1 
+│ │     ├── fs.realpath@1.0.0 
+│ │     ├── inflight@1.0.6 
+│ │     ├── inherits@2.0.3 
+│ │     ├─┬ minimatch@3.0.3 
+│ │     │ └── brace-expansion@1.1.6 
+│ │     ├── once@1.4.0 
+│ │     └── path-is-absolute@1.0.1 
+│ ├─┬ debug@2.6.0 
+│ │ └── ms@0.7.2 
+│ ├── fast-ordered-set@1.0.3 
+│ ├── fs-tree-diff@0.3.1 
+│ ├─┬ minimatch@2.0.10 
+│ │ └─┬ brace-expansion@1.1.6 
+│ │   ├── balanced-match@0.4.2 
+│ │   └── concat-map@0.0.1 
+│ ├─┬ mkdirp@0.5.1 
+│ │ └── minimist@0.0.8 
+│ ├── path-posix@1.0.0 
+│ ├─┬ rimraf@2.5.4 
+│ │ └─┬ glob@7.1.1 
+│ │   ├── fs.realpath@1.0.0 
+│ │   └── minimatch@3.0.3 
+│ ├── symlink-or-copy@1.1.8 
+│ └─┬ walk-sync@0.2.7 
+│   └── ensure-posix-path@1.0.2 
+├─┬ broccoli-merge-trees@1.2.1 
+│ ├─┬ can-symlink@1.0.0 
+│ │ └── tmp@0.0.28 
+│ ├─┬ heimdalljs@0.2.3 
+│ │ └── rsvp@3.2.1 
+│ ├── heimdalljs-logger@0.1.7 
+│ └─┬ rimraf@2.5.4 
+│   └─┬ glob@7.1.1 
+│     └── minimatch@3.0.3 
+├─┬ broccoli-static-compiler@0.2.2 
+│ ├─┬ broccoli-kitchen-sink-helpers@0.2.9 
+│ │ └── glob@5.0.15 
+│ └── broccoli-writer@0.1.1 
+├─┬ ember-autoserve@0.0.4 
+│ ├─┬ nodemon@1.11.0 
+│ │ ├─┬ chokidar@1.6.1 
+│ │ │ ├── async-each@1.0.1 
+│ │ │ ├── glob-parent@2.0.0 
+│ │ │ ├─┬ is-binary-path@1.0.1 
+│ │ │ │ └── binary-extensions@1.8.0 
+│ │ │ ├─┬ is-glob@2.0.1 
+│ │ │ │ └── is-extglob@1.0.0 
+│ │ │ └─┬ readdirp@2.1.0 
+│ │ │   ├── minimatch@3.0.3 
+│ │ │   └── set-immediate-shim@1.0.1 
+│ │ ├── es6-promise@3.3.1 
+│ │ ├── ignore-by-default@1.0.1 
+│ │ ├─┬ lodash.defaults@3.1.2 
+│ │ │ ├─┬ lodash.assign@3.2.0 
+│ │ │ │ └── lodash._baseassign@3.2.0 
+│ │ │ └── lodash.restparam@3.6.1 
+│ │ ├── minimatch@3.0.3 
+│ │ ├─┬ ps-tree@1.1.0 
+│ │ │ └─┬ event-stream@3.3.4 
+│ │ │   ├── duplexer@0.1.1 
+│ │ │   ├── from@0.1.3 
+│ │ │   ├── map-stream@0.1.0 
+│ │ │   ├── pause-stream@0.0.11 
+│ │ │   ├── split@0.3.3 
+│ │ │   └── stream-combiner@0.0.4 
+│ │ ├─┬ touch@1.0.0 
+│ │ │ └── nopt@1.0.10 
+│ │ ├── undefsafe@0.0.3 
+│ │ └─┬ update-notifier@0.5.0 
+│ │   ├── configstore@1.4.0 
+│ │   ├── is-npm@1.0.0 
+│ │   ├─┬ latest-version@1.0.1 
+│ │   │ └─┬ package-json@1.2.0 
+│ │   │   ├─┬ got@3.3.1 
+│ │   │   │ ├─┬ duplexify@3.5.0 
+│ │   │   │ │ ├─┬ end-of-stream@1.0.0 
+│ │   │   │ │ │ └── once@1.3.3 
+│ │   │   │ │ └── stream-shift@1.0.0 
+│ │   │   │ ├── infinity-agent@2.0.3 
+│ │   │   │ ├── is-redirect@1.0.0 
+│ │   │   │ ├── is-stream@1.1.0 
+│ │   │   │ ├── lowercase-keys@1.0.0 
+│ │   │   │ ├── nested-error-stacks@1.0.2 
+│ │   │   │ ├── object-assign@3.0.0 
+│ │   │   │ ├── prepend-http@1.0.4 
+│ │   │   │ ├── read-all-stream@3.1.0 
+│ │   │   │ └── timed-out@2.0.0 
+│ │   │   └─┬ registry-url@3.1.0 
+│ │   │     └─┬ rc@1.1.6 
+│ │   │       ├── deep-extend@0.4.1 
+│ │   │       └── ini@1.3.4 
+│ │   ├─┬ repeating@1.1.3 
+│ │   │ └─┬ is-finite@1.0.2 
+│ │   │   └── number-is-nan@1.0.1 
+│ │   ├── semver-diff@2.1.0 
+│ │   └── string-length@1.0.1 
+│ └─┬ which@1.2.12 
+│   └── isexe@1.1.2 
+├─┬ ember-cli@1.13.15 
+│ ├── amd-name-resolver@0.0.2 
+│ ├── bower@1.8.0 
+│ ├─┬ bower-config@0.6.1 
+│ │ ├── graceful-fs@2.0.3 
+│ │ ├── mout@0.9.1 
+│ │ ├─┬ optimist@0.6.1 
+│ │ │ ├── minimist@0.0.10 
+│ │ │ └── wordwrap@0.0.2 
+│ │ └── osenv@0.0.3 
+│ ├── bower-endpoint-parser@0.2.2 
+│ ├─┬ broccoli@0.16.8 
+│ │ ├── broccoli-kitchen-sink-helpers@0.2.9 
+│ │ ├── broccoli-slow-trees@1.1.0 
+│ │ ├─┬ commander@2.9.0 
+│ │ │ └── graceful-readlink@1.0.1 
+│ │ ├─┬ connect@3.5.0 
+│ │ │ ├─┬ debug@2.2.0 
+│ │ │ │ └── ms@0.7.1 
+│ │ │ └─┬ finalhandler@0.5.0 
+│ │ │   └─┬ debug@2.2.0 
+│ │ │     └── ms@0.7.1 
+│ │ ├─┬ handlebars@3.0.3 
+│ │ │ ├─┬ source-map@0.1.43 
+│ │ │ │ └── amdefine@1.0.1 
+│ │ │ └─┬ uglify-js@2.3.6 
+│ │ │   ├── optimist@0.3.7 
+│ │ │   └── source-map@0.1.43 
+│ │ └── mime@1.3.4 
+│ ├─┬ broccoli-babel-transpiler@5.6.2 
+│ │ ├─┬ babel-core@5.8.38 
+│ │ │ ├── babel-plugin-constant-folding@1.0.1 
+│ │ │ ├── babel-plugin-dead-code-elimination@1.0.2 
+│ │ │ ├── babel-plugin-eval@1.0.1 
+│ │ │ ├── babel-plugin-inline-environment-variables@1.0.1 
+│ │ │ ├── babel-plugin-jscript@1.0.4 
+│ │ │ ├── babel-plugin-member-expression-literals@1.0.1 
+│ │ │ ├── babel-plugin-property-literals@1.0.1 
+│ │ │ ├── babel-plugin-proto-to-assign@1.0.4 
+│ │ │ ├── babel-plugin-react-constant-elements@1.0.3 
+│ │ │ ├── babel-plugin-react-display-name@1.0.3 
+│ │ │ ├── babel-plugin-remove-console@1.0.1 
+│ │ │ ├── babel-plugin-remove-debugger@1.0.1 
+│ │ │ ├── babel-plugin-runtime@1.0.7 
+│ │ │ ├─┬ babel-plugin-undeclared-variables-check@1.0.2 
+│ │ │ │ └── leven@1.0.2 
+│ │ │ ├── babel-plugin-undefined-to-void@1.1.6 
+│ │ │ ├── babylon@5.8.38 
+│ │ │ ├── bluebird@2.11.0 
+│ │ │ ├── convert-source-map@1.3.0 
+│ │ │ ├── core-js@1.2.7 
+│ │ │ ├── detect-indent@3.0.1 
+│ │ │ ├── esutils@2.0.2 
+│ │ │ ├── fs-readdir-recursive@0.1.2 
+│ │ │ ├── globals@6.4.1 
+│ │ │ ├─┬ home-or-tmp@1.0.0 
+│ │ │ │ └── user-home@1.1.1 
+│ │ │ ├── is-integer@1.0.6 
+│ │ │ ├── js-tokens@1.0.1 
+│ │ │ ├── json5@0.4.0 
+│ │ │ ├── output-file-sync@1.1.2 
+│ │ │ ├── path-exists@1.0.0 
+│ │ │ ├── private@0.1.6 
+│ │ │ ├─┬ regenerator@0.8.40 
+│ │ │ │ ├─┬ commoner@0.10.8 
+│ │ │ │ │ ├─┬ detective@4.3.2 
+│ │ │ │ │ │ ├── acorn@3.3.0 
+│ │ │ │ │ │ └── defined@1.0.0 
+│ │ │ │ │ ├── iconv-lite@0.4.15 
+│ │ │ │ │ ├── q@1.4.1 
+│ │ │ │ │ └─┬ recast@0.11.20 
+│ │ │ │ │   └── esprima@3.1.3 
+│ │ │ │ ├─┬ defs@1.1.1 
+│ │ │ │ │ ├─┬ alter@0.2.0 
+│ │ │ │ │ │ └── stable@0.1.5 
+│ │ │ │ │ ├── ast-traverse@0.1.1 
+│ │ │ │ │ ├── breakable@1.0.0 
+│ │ │ │ │ ├── simple-fmt@0.1.0 
+│ │ │ │ │ ├── simple-is@0.2.0 
+│ │ │ │ │ ├── stringmap@0.2.2 
+│ │ │ │ │ ├── stringset@0.2.1 
+│ │ │ │ │ ├── tryor@0.1.2 
+│ │ │ │ │ └─┬ yargs@3.27.0 
+│ │ │ │ │   └── window-size@0.1.4 
+│ │ │ │ ├── esprima-fb@15001.1001.0-dev-harmony-fb 
+│ │ │ │ └─┬ recast@0.10.33 
+│ │ │ │   └── ast-types@0.8.12 
+│ │ │ ├─┬ regexpu@1.3.0 
+│ │ │ │ ├── esprima@2.7.3 
+│ │ │ │ ├── regenerate@1.3.2 
+│ │ │ │ ├── regjsgen@0.2.0 
+│ │ │ │ └─┬ regjsparser@0.1.5 
+│ │ │ │   └── jsesc@0.5.0 
+│ │ │ ├── shebang-regex@1.0.0 
+│ │ │ ├── slash@1.0.0 
+│ │ │ ├── source-map@0.5.6 
+│ │ │ ├─┬ source-map-support@0.2.10 
+│ │ │ │ └── source-map@0.1.32 
+│ │ │ ├── to-fast-properties@1.0.2 
+│ │ │ ├── trim-right@1.0.1 
+│ │ │ └── try-resolve@1.0.1 
+│ │ └── clone@0.2.0 
+│ ├─┬ broccoli-config-loader@1.0.0 
+│ │ └─┬ broccoli-caching-writer@2.3.1 
+│ │   ├── broccoli-kitchen-sink-helpers@0.2.9 
+│ │   ├─┬ broccoli-plugin@1.1.0 
+│ │   │ └─┬ rimraf@2.5.4 
+│ │   │   └─┬ glob@7.1.1 
+│ │   │     └── minimatch@3.0.3 
+│ │   └── walk-sync@0.2.7 
+│ ├─┬ broccoli-config-replace@1.1.2 
+│ │ └── fs-extra@0.24.0 
+│ ├─┬ broccoli-funnel@1.1.0 
+│ │ ├── exists-sync@0.0.4 
+│ │ ├─┬ fs-tree-diff@0.5.6 
+│ │ │ └── object-assign@4.1.1 
+│ │ ├── minimatch@3.0.3 
+│ │ ├─┬ rimraf@2.5.4 
+│ │ │ └─┬ glob@7.1.1 
+│ │ │   └── minimatch@3.0.3 
+│ │ └── walk-sync@0.3.1 
+│ ├── broccoli-kitchen-sink-helpers@0.2.9 
+│ ├── broccoli-sane-watcher@1.1.5 
+│ ├── broccoli-source@1.1.0 
+│ ├─┬ broccoli-sourcemap-concat@2.0.2 
+│ │ ├── broccoli-kitchen-sink-helpers@0.2.9 
+│ │ ├─┬ fast-sourcemap-concat@0.2.7 
+│ │ │ ├─┬ chalk@0.5.1 
+│ │ │ │ ├── ansi-styles@1.1.0 
+│ │ │ │ ├─┬ has-ansi@0.1.0 
+│ │ │ │ │ └── ansi-regex@0.2.1 
+│ │ │ │ ├── strip-ansi@0.3.0 
+│ │ │ │ └── supports-color@0.2.0 
+│ │ │ └── source-map@0.4.4 
+│ │ ├── lodash-node@2.4.1 
+│ │ └─┬ lodash.uniq@3.2.2 
+│ │   ├─┬ lodash._basecallback@3.3.1 
+│ │   │ ├── lodash._baseisequal@3.0.7 
+│ │   │ ├── lodash._bindcallback@3.0.1 
+│ │   │ └── lodash.pairs@3.0.1 
+│ │   ├─┬ lodash._baseuniq@3.0.3 
+│ │   │ ├── lodash._baseindexof@3.1.0 
+│ │   │ ├── lodash._cacheindexof@3.0.2 
+│ │   │ └── lodash._createcache@3.1.2 
+│ │   ├── lodash._getnative@3.9.1 
+│ │   ├── lodash._isiterateecall@3.0.9 
+│ │   └── lodash.isarray@3.0.4 
+│ ├── broccoli-viz@2.0.1 
+│ ├─┬ chalk@1.1.0 
+│ │ ├── ansi-styles@2.2.1 
+│ │ ├─┬ has-ansi@2.0.0 
+│ │ │ └── ansi-regex@2.1.1 
+│ │ ├── strip-ansi@3.0.1 
+│ │ └── supports-color@2.0.0 
+│ ├── clean-base-url@1.0.0 
+│ ├─┬ compression@1.6.2 
+│ │ ├─┬ accepts@1.3.3 
+│ │ │ ├── mime-types@2.1.14 
+│ │ │ └── negotiator@0.6.1 
+│ │ ├── bytes@2.3.0 
+│ │ ├─┬ compressible@2.0.9 
+│ │ │ └── mime-db@1.26.0 
+│ │ ├─┬ debug@2.2.0 
+│ │ │ └── ms@0.7.1 
+│ │ ├── on-headers@1.0.1 
+│ │ └── vary@1.1.0 
+│ ├─┬ configstore@1.2.1 
+│ │ ├── object-assign@3.0.0 
+│ │ ├── os-tmpdir@1.0.2 
+│ │ ├─┬ osenv@0.1.4 
+│ │ │ └── os-homedir@1.0.2 
+│ │ ├── uuid@2.0.3 
+│ │ ├─┬ write-file-atomic@1.3.1 
+│ │ │ ├── imurmurhash@0.1.4 
+│ │ │ └── slide@1.1.6 
+│ │ └── xdg-basedir@2.0.0 
+│ ├── core-object@0.0.2 
+│ ├─┬ cpr@0.4.2 
+│ │ ├── graceful-fs@4.1.11 
+│ │ └─┬ rimraf@2.4.5 
+│ │   └── glob@6.0.4 
+│ ├── diff@1.4.0 
+│ ├── ember-cli-copy-dereference@1.0.0 
+│ ├── ember-cli-get-dependency-depth@1.0.0 
+│ ├── ember-cli-is-package-missing@1.0.0 
+│ ├── ember-cli-normalize-entity-name@1.0.0 
+│ ├── ember-cli-path-utils@1.0.0 
+│ ├─┬ ember-cli-preprocess-registry@1.1.0 
+│ │ ├─┬ broccoli-clean-css@0.2.0 
+│ │ │ ├─┬ broccoli-filter@0.1.14 
+│ │ │ │ ├─┬ broccoli-kitchen-sink-helpers@0.2.9 
+│ │ │ │ │ └─┬ mkdirp@0.5.1 
+│ │ │ │ │   └── minimist@0.0.8 
+│ │ │ │ ├── mkdirp@0.3.5 
+│ │ │ │ └── walk-sync@0.1.3 
+│ │ │ └─┬ clean-css@2.2.23 
+│ │ │   └── commander@2.2.0 
+│ │ ├─┬ broccoli-funnel@1.1.0 
+│ │ │ ├── exists-sync@0.0.4 
+│ │ │ ├── fs-tree-diff@0.5.6 
+│ │ │ ├── minimatch@3.0.3 
+│ │ │ └─┬ rimraf@2.5.4 
+│ │ │   └── glob@7.1.1 
+│ │ └── process-relative-require@1.0.0 
+│ ├── ember-cli-string-utils@1.1.0 
+│ ├── ember-cli-test-info@1.0.0 
+│ ├─┬ ember-router-generator@1.2.3 
+│ │ └─┬ recast@0.11.20 
+│ │   ├── ast-types@0.9.4 
+│ │   └── esprima@3.1.3 
+│ ├── escape-string-regexp@1.0.5 
+│ ├── exists-sync@0.0.3 
+│ ├── exit@0.1.2 
+│ ├─┬ express@4.14.1 
+│ │ ├── array-flatten@1.1.1 
+│ │ ├── content-disposition@0.5.2 
+│ │ ├── content-type@1.0.2 
+│ │ ├── cookie@0.3.1 
+│ │ ├── cookie-signature@1.0.6 
+│ │ ├─┬ debug@2.2.0 
+│ │ │ └── ms@0.7.1 
+│ │ ├── depd@1.1.0 
+│ │ ├── encodeurl@1.0.1 
+│ │ ├── escape-html@1.0.3 
+│ │ ├── etag@1.7.0 
+│ │ ├─┬ finalhandler@0.5.1 
+│ │ │ ├── statuses@1.3.1 
+│ │ │ └── unpipe@1.0.0 
+│ │ ├── fresh@0.3.0 
+│ │ ├── merge-descriptors@1.0.1 
+│ │ ├── methods@1.1.2 
+│ │ ├─┬ on-finished@2.3.0 
+│ │ │ └── ee-first@1.1.1 
+│ │ ├── parseurl@1.3.1 
+│ │ ├── path-to-regexp@0.1.7 
+│ │ ├─┬ proxy-addr@1.1.3 
+│ │ │ ├── forwarded@0.1.0 
+│ │ │ └── ipaddr.js@1.2.0 
+│ │ ├── qs@6.2.0 
+│ │ ├── range-parser@1.2.0 
+│ │ ├─┬ send@0.14.2 
+│ │ │ ├─┬ debug@2.2.0 
+│ │ │ │ └── ms@0.7.1 
+│ │ │ ├── destroy@1.0.4 
+│ │ │ └─┬ http-errors@1.5.1 
+│ │ │   └── setprototypeof@1.0.2 
+│ │ ├── serve-static@1.11.2 
+│ │ ├─┬ type-is@1.6.14 
+│ │ │ └── media-typer@0.3.0 
+│ │ └── utils-merge@1.0.0 
+│ ├─┬ findup@0.1.5 
+│ │ ├── colors@0.6.2 
+│ │ └── commander@2.1.0 
+│ ├─┬ findup-sync@0.2.1 
+│ │ └── glob@4.3.5 
+│ ├─┬ fs-extra@0.22.1 
+│ │ └── jsonfile@2.4.0 
+│ ├── fs-monitor-stack@1.1.1 
+│ ├── git-repo-info@1.4.0 
+│ ├─┬ glob@5.0.13 
+│ │ ├─┬ inflight@1.0.6 
+│ │ │ └── wrappy@1.0.2 
+│ │ ├── inherits@2.0.3 
+│ │ ├── once@1.4.0 
+│ │ └── path-is-absolute@1.0.1 
+│ ├─┬ http-proxy@1.16.2 
+│ │ ├── eventemitter3@1.2.0 
+│ │ └── requires-port@1.0.0 
+│ ├── inflection@1.12.0 
+│ ├─┬ inquirer@0.5.1 
+│ │ ├── async@0.8.0 
+│ │ ├─┬ chalk@0.4.0 
+│ │ │ ├── ansi-styles@1.0.0 
+│ │ │ ├── has-color@0.1.7 
+│ │ │ └── strip-ansi@0.1.1 
+│ │ ├─┬ cli-color@0.3.3 
+│ │ │ ├── d@0.1.1 
+│ │ │ ├─┬ es5-ext@0.10.12 
+│ │ │ │ ├── es6-iterator@2.0.0 
+│ │ │ │ └── es6-symbol@3.1.0 
+│ │ │ ├─┬ memoizee@0.3.10 
+│ │ │ │ ├─┬ es6-weak-map@0.1.4 
+│ │ │ │ │ ├── es6-iterator@0.1.3 
+│ │ │ │ │ └── es6-symbol@2.0.1 
+│ │ │ │ ├── event-emitter@0.3.4 
+│ │ │ │ ├── lru-queue@0.1.0 
+│ │ │ │ └── next-tick@0.2.2 
+│ │ │ └── timers-ext@0.1.0 
+│ │ ├── lodash@2.4.2 
+│ │ └── mute-stream@0.0.4 
+│ ├── is-git-url@0.2.3 
+│ ├── isbinaryfile@2.0.4 
+│ ├─┬ leek@0.0.18 
+│ │ ├── lodash-node@2.4.1 
+│ │ └─┬ request@2.53.0
+│ │   ├─┬ bl@0.9.4
+│ │   │ └─┬ readable-stream@1.0.33
+│ │   │   ├── isarray@0.0.1 
+│ │   │   └── string_decoder@0.10.31 
+│ │   ├─┬ form-data@0.2.0
+│ │   │ └── async@0.9.0 
+│ │   └─┬ hawk@2.3.1
+│ │     └── sntp@1.0.9 
+│ ├── lodash@3.10.1 
+│ ├─┬ markdown-it@4.3.0 
+│ │ ├─┬ argparse@1.0.9 
+│ │ │ └── sprintf-js@1.0.3 
+│ │ ├── entities@1.1.1 
+│ │ ├── linkify-it@1.2.4 
+│ │ ├── mdurl@1.0.1 
+│ │ └── uc.micro@1.0.3 
+│ ├─┬ markdown-it-terminal@0.0.2 
+│ │ ├─┬ cardinal@0.5.0 
+│ │ │ ├── ansicolors@0.2.1 
+│ │ │ └─┬ redeyed@0.5.0 
+│ │ │   └── esprima-fb@12001.1.0-dev-harmony-fb 
+│ │ ├─┬ cli-table@0.3.1 
+│ │ │ └── colors@1.0.3 
+│ │ └── lodash-node@3.10.2 
+│ ├─┬ merge-defaults@0.2.1 
+│ │ └── lodash@2.4.2 
+│ ├─┬ morgan@1.7.0 
+│ │ ├── basic-auth@1.0.4 
+│ │ └─┬ debug@2.2.0 
+│ │   └── ms@0.7.1 
+│ ├── node-modules-path@1.0.1 
+│ ├── node-uuid@1.4.7 
+│ ├─┬ nopt@3.0.6 
+│ │ └── abbrev@1.0.9 
+│ ├─┬ npm@2.14.10 
+│ │ ├── glob@5.0.15 
+│ │ ├── ini@1.3.4 
+│ │ ├─┬ minimatch@3.0.0
+│ │ │ └─┬ brace-expansion@1.1.1
+│ │ │   └── concat-map@0.0.1 
+│ │ ├─┬ mkdirp@0.5.1 
+│ │ │ └── minimist@0.0.8 
+│ │ ├─┬ node-gyp@3.0.3
+│ │ │ ├─┬ glob@4.5.3 
+│ │ │ │ └─┬ minimatch@2.0.10 
+│ │ │ │   └─┬ brace-expansion@1.1.1
+│ │ │ │     └── concat-map@0.0.1 
+│ │ │ └─┬ path-array@1.0.0
+│ │ │   └─┬ array-index@0.1.1
+│ │ │     └─┬ debug@2.2.0 
+│ │ │       └── ms@0.7.1 
+│ │ ├─┬ normalize-package-data@2.3.5 
+│ │ │ └── is-builtin-module@1.0.0 
+│ │ ├─┬ npm-registry-client@7.0.7
+│ │ │ └─┬ concat-stream@1.5.0
+│ │ │   └─┬ readable-stream@2.0.2
+│ │ │     ├── isarray@0.0.1 
+│ │ │     └── string_decoder@0.10.31 
+│ │ ├─┬ readable-stream@1.1.13
+│ │ │ ├── isarray@0.0.1 
+│ │ │ └── string_decoder@0.10.31 
+│ │ ├─┬ request@2.65.0
+│ │ │ ├── aws-sign2@0.6.0 
+│ │ │ ├─┬ bl@1.0.0
+│ │ │ │ └─┬ readable-stream@2.0.3
+│ │ │ │   ├── isarray@0.0.1 
+│ │ │ │   ├── string_decoder@0.10.31 
+│ │ │ │   └── util-deprecate@1.0.2 
+│ │ │ ├── caseless@0.11.0 
+│ │ │ ├─┬ combined-stream@1.0.5 
+│ │ │ │ └── delayed-stream@1.0.0 
+│ │ │ ├── extend@3.0.0 
+│ │ │ ├── forever-agent@0.6.1 
+│ │ │ ├─┬ har-validator@2.0.2
+│ │ │ │ ├─┬ chalk@1.1.1
+│ │ │ │ │ ├── has-ansi@2.0.0 
+│ │ │ │ │ └── supports-color@2.0.0 
+│ │ │ │ ├─┬ commander@2.9.0 
+│ │ │ │ │ └── graceful-readlink@1.0.1 
+│ │ │ │ └─┬ is-my-json-valid@2.12.2
+│ │ │ │   ├── generate-function@2.0.0 
+│ │ │ │   └─┬ generate-object-property@1.2.0 
+│ │ │ │     └── is-property@1.0.2 
+│ │ │ ├─┬ hawk@3.1.0
+│ │ │ │ ├── cryptiles@2.0.5 
+│ │ │ │ ├── hoek@2.16.3 
+│ │ │ │ └── sntp@1.0.9 
+│ │ │ ├── isstream@0.1.2 
+│ │ │ ├── json-stringify-safe@5.0.1 
+│ │ │ ├── qs@5.2.0 
+│ │ │ └── stringstream@0.0.5 
+│ │ ├─┬ sha@2.0.1
+│ │ │ └─┬ readable-stream@2.0.2
+│ │ │   ├── isarray@0.0.1 
+│ │ │   └── string_decoder@0.10.31 
+│ │ ├── slide@1.1.6 
+│ │ ├── tar@2.2.1 
+│ │ └── validate-npm-package-license@3.0.1 
+│ ├── pleasant-progress@1.1.0 
+│ ├─┬ portfinder@0.4.0 
+│ │ └── async@0.9.0 
+│ ├── promise-map-series@0.2.3 
+│ ├─┬ quick-temp@0.1.3 
+│ │ ├── mktemp@0.3.5 
+│ │ ├── rimraf@2.2.8 
+│ │ └── underscore.string@2.3.3 
+│ ├─┬ readline2@0.1.1 
+│ │ └─┬ strip-ansi@2.0.1 
+│ │   └── ansi-regex@1.1.1 
+│ ├── resolve@1.2.0 
+│ ├─┬ sane@1.5.0 
+│ │ ├─┬ anymatch@1.3.0 
+│ │ │ ├── arrify@1.0.1 
+│ │ │ └─┬ micromatch@2.3.11 
+│ │ │   ├─┬ arr-diff@2.0.0 
+│ │ │   │ └── arr-flatten@1.0.1 
+│ │ │   ├── array-unique@0.2.1 
+│ │ │   ├─┬ braces@1.8.5 
+│ │ │   │ ├─┬ expand-range@1.8.2 
+│ │ │   │ │ └─┬ fill-range@2.2.3 
+│ │ │   │ │   ├── is-number@2.1.0 
+│ │ │   │ │   ├── isobject@2.1.0 
+│ │ │   │ │   ├── randomatic@1.1.6 
+│ │ │   │ │   └── repeat-string@1.6.1 
+│ │ │   │ ├── preserve@0.2.0 
+│ │ │   │ └── repeat-element@1.1.2 
+│ │ │   ├─┬ expand-brackets@0.1.5 
+│ │ │   │ └── is-posix-bracket@0.1.1 
+│ │ │   ├── extglob@0.3.2 
+│ │ │   ├── filename-regex@2.0.0 
+│ │ │   ├─┬ kind-of@3.1.0 
+│ │ │   │ └── is-buffer@1.1.4 
+│ │ │   ├── normalize-path@2.0.1 
+│ │ │   ├─┬ object.omit@2.0.1 
+│ │ │   │ ├─┬ for-own@0.1.4 
+│ │ │   │ │ └── for-in@0.1.6 
+│ │ │   │ └── is-extendable@0.1.1 
+│ │ │   ├─┬ parse-glob@3.0.4 
+│ │ │   │ ├── glob-base@0.3.0 
+│ │ │   │ └── is-dotfile@1.0.2 
+│ │ │   └─┬ regex-cache@0.4.3 
+│ │ │     ├── is-equal-shallow@0.1.3 
+│ │ │     └── is-primitive@2.0.0 
+│ │ ├── exec-sh@0.2.0 
+│ │ ├─┬ fb-watchman@1.9.2 
+│ │ │ └─┬ bser@1.0.2 
+│ │ │   └── node-int64@0.4.0 
+│ │ ├── minimatch@3.0.3 
+│ │ ├── minimist@1.2.0 
+│ │ ├─┬ walker@1.0.7 
+│ │ │ └─┬ makeerror@1.0.11 
+│ │ │   └── tmpl@1.0.4 
+│ │ └── watch@0.10.0 
+│ ├── semver@4.3.6 
+│ ├── silent-error@1.0.1 
+│ ├─┬ temp@0.8.3 
+│ │ └── rimraf@2.2.8 
+│ ├─┬ testem@1.14.3 
+│ │ ├─┬ backbone@1.3.3 
+│ │ │ └── underscore@1.8.3 
+│ │ ├── bluebird@3.4.7 
+│ │ ├── charm@1.0.2 
+│ │ ├─┬ consolidate@0.14.5 
+│ │ │ └── bluebird@3.4.7 
+│ │ ├─┬ cross-spawn@5.0.1 
+│ │ │ ├─┬ lru-cache@4.0.2 
+│ │ │ │ ├── pseudomap@1.0.2 
+│ │ │ │ └── yallist@2.0.0 
+│ │ │ └── shebang-command@1.2.0 
+│ │ ├─┬ fireworm@0.7.1 
+│ │ │ ├── async@0.2.10 
+│ │ │ ├─┬ is-type@0.0.1 
+│ │ │ │ └── core-util-is@1.0.2 
+│ │ │ ├── lodash.debounce@3.1.1 
+│ │ │ ├─┬ lodash.flatten@3.0.2 
+│ │ │ │ └── lodash._baseflatten@3.1.4 
+│ │ │ └── minimatch@3.0.3 
+│ │ ├─┬ glob@7.1.1 
+│ │ │ └── minimatch@3.0.3 
+│ │ ├─┬ js-yaml@3.7.0 
+│ │ │ └── esprima@2.7.3 
+│ │ ├── lodash.assignin@4.2.0 
+│ │ ├── lodash.clonedeep@4.5.0 
+│ │ ├── lodash.find@4.6.0 
+│ │ ├── mustache@2.3.0 
+│ │ ├─┬ node-notifier@4.6.1 
+│ │ │ ├─┬ cli-usage@0.1.4 
+│ │ │ │ ├── marked@0.3.6 
+│ │ │ │ └─┬ marked-terminal@1.7.0 
+│ │ │ │   ├─┬ cardinal@1.0.0 
+│ │ │ │   │ └─┬ redeyed@1.0.1 
+│ │ │ │   │   └── esprima@3.0.0 
+│ │ │ │   ├── lodash.assign@4.2.0 
+│ │ │ │   └─┬ node-emoji@1.5.1 
+│ │ │ │     └── string.prototype.codepointat@0.2.0 
+│ │ │ ├── growly@1.3.0 
+│ │ │ ├─┬ lodash.clonedeep@3.0.2 
+│ │ │ │ └── lodash._baseclone@3.3.0 
+│ │ │ └── shellwords@0.1.0 
+│ │ ├─┬ npmlog@4.0.2 
+│ │ │ ├─┬ are-we-there-yet@1.1.2 
+│ │ │ │ └── delegates@1.0.0 
+│ │ │ ├── console-control-strings@1.1.0 
+│ │ │ ├─┬ gauge@2.7.2 
+│ │ │ │ ├── aproba@1.0.4 
+│ │ │ │ ├── has-unicode@2.0.1 
+│ │ │ │ ├── signal-exit@3.0.2 
+│ │ │ │ ├─┬ string-width@1.0.2 
+│ │ │ │ │ ├── code-point-at@1.1.0 
+│ │ │ │ │ └── is-fullwidth-code-point@1.0.0 
+│ │ │ │ ├── supports-color@0.2.0 
+│ │ │ │ └── wide-align@1.1.0 
+│ │ │ └── set-blocking@2.0.0 
+│ │ ├── printf@0.2.5 
+│ │ ├── rimraf@2.5.4 
+│ │ ├─┬ socket.io@1.6.0 
+│ │ │ ├── debug@2.3.3 
+│ │ │ ├─┬ engine.io@1.8.0 
+│ │ │ │ ├── base64id@0.1.0 
+│ │ │ │ ├── debug@2.3.3 
+│ │ │ │ ├─┬ engine.io-parser@1.3.1 
+│ │ │ │ │ ├── after@0.8.1 
+│ │ │ │ │ ├── arraybuffer.slice@0.0.6 
+│ │ │ │ │ ├── base64-arraybuffer@0.1.5 
+│ │ │ │ │ ├── blob@0.0.4 
+│ │ │ │ │ ├─┬ has-binary@0.1.6 
+│ │ │ │ │ │ └── isarray@0.0.1 
+│ │ │ │ │ └── wtf-8@1.0.0 
+│ │ │ │ └─┬ ws@1.1.1 
+│ │ │ │   ├── options@0.0.6 
+│ │ │ │   └── ultron@1.0.2 
+│ │ │ ├─┬ has-binary@0.1.7 
+│ │ │ │ └── isarray@0.0.1 
+│ │ │ ├── object-assign@4.1.0 
+│ │ │ ├─┬ socket.io-adapter@0.5.0 
+│ │ │ │ └── debug@2.3.3 
+│ │ │ ├─┬ socket.io-client@1.6.0 
+│ │ │ │ ├── backo2@1.0.2 
+│ │ │ │ ├── component-bind@1.0.0 
+│ │ │ │ ├── component-emitter@1.2.1 
+│ │ │ │ ├── debug@2.3.3 
+│ │ │ │ ├─┬ engine.io-client@1.8.0 
+│ │ │ │ │ ├── component-emitter@1.2.1 
+│ │ │ │ │ ├── component-inherit@0.0.3 
+│ │ │ │ │ ├── debug@2.3.3 
+│ │ │ │ │ ├── has-cors@1.1.0 
+│ │ │ │ │ ├── parsejson@0.0.3 
+│ │ │ │ │ ├── parseqs@0.0.5 
+│ │ │ │ │ ├── xmlhttprequest-ssl@1.5.3 
+│ │ │ │ │ └── yeast@0.1.2 
+│ │ │ │ ├── indexof@0.0.1 
+│ │ │ │ ├── object-component@0.0.3 
+│ │ │ │ ├─┬ parseuri@0.0.5 
+│ │ │ │ │ └─┬ better-assert@1.0.2 
+│ │ │ │ │   └── callsite@1.0.0 
+│ │ │ │ └── to-array@0.1.4 
+│ │ │ └─┬ socket.io-parser@2.3.1 
+│ │ │   ├── component-emitter@1.1.2 
+│ │ │   ├─┬ debug@2.2.0 
+│ │ │   │ └── ms@0.7.1 
+│ │ │   ├── isarray@0.0.1 
+│ │ │   └── json3@3.3.2 
+│ │ ├── spawn-args@0.2.0 
+│ │ ├── styled_string@0.0.1 
+│ │ ├─┬ tap-parser@5.3.2 
+│ │ │ ├── events-to-array@1.0.2 
+│ │ │ └─┬ readable-stream@2.2.2 
+│ │ │   ├── buffer-shims@1.0.0 
+│ │ │   ├── isarray@1.0.0 
+│ │ │   ├── process-nextick-args@1.0.7 
+│ │ │   ├── string_decoder@0.10.31 
+│ │ │   └── util-deprecate@1.0.2 
+│ │ └── xmldom@0.1.27 
+│ ├── through@2.3.8 
+│ ├─┬ tiny-lr@0.2.0 
+│ │ ├─┬ body-parser@1.14.2 
+│ │ │ ├── bytes@2.2.0 
+│ │ │ ├─┬ debug@2.2.0 
+│ │ │ │ └── ms@0.7.1 
+│ │ │ ├── http-errors@1.3.1 
+│ │ │ ├── iconv-lite@0.4.13 
+│ │ │ ├── qs@5.2.0 
+│ │ │ └─┬ raw-body@2.1.7 
+│ │ │   ├── bytes@2.4.0 
+│ │ │   └── iconv-lite@0.4.13 
+│ │ ├─┬ debug@2.2.0 
+│ │ │ └── ms@0.7.1 
+│ │ ├─┬ faye-websocket@0.10.0 
+│ │ │ └─┬ websocket-driver@0.6.5 
+│ │ │   └── websocket-extensions@0.1.1 
+│ │ ├── livereload-js@2.2.2 
+│ │ └── qs@5.1.0 
+│ ├── walk-sync@0.1.3 
+│ └─┬ yam@0.0.18 
+│   ├─┬ fs-extra@0.16.5 
+│   │ └─┬ graceful-fs@3.0.11 
+│   │   └── natives@1.1.0 
+│   └─┬ lodash.merge@3.3.2 
+│     ├── lodash._arraycopy@3.0.0 
+│     ├── lodash._arrayeach@3.0.0 
+│     ├── lodash._createassigner@3.1.1 
+│     ├── lodash.isarguments@3.1.0 
+│     ├─┬ lodash.isplainobject@3.2.0 
+│     │ └── lodash._basefor@3.0.3 
+│     ├── lodash.istypedarray@3.0.6 
+│     ├── lodash.keys@3.1.2 
+│     ├── lodash.keysin@3.0.8 
+│     └─┬ lodash.toplainobject@3.0.0 
+│       └── lodash._basecopy@3.0.1 
+├── ember-cli-acceptance-test-helpers@0.4.0 
+├─┬ ember-cli-app-version@1.0.1 
+│ └── git-repo-version@0.3.0 
+├─┬ ember-cli-babel@5.2.1 
+│ ├── clone@2.1.0 
+│ └── ember-cli-version-checker@1.2.0 
+├─┬ ember-cli-dependency-checker@1.3.0 
+│ ├─┬ chalk@0.5.1 
+│ │ ├── ansi-styles@1.1.0 
+│ │ ├─┬ has-ansi@0.1.0 
+│ │ │ └── ansi-regex@0.2.1 
+│ │ ├── strip-ansi@0.3.0 
+│ │ └── supports-color@0.2.0 
+│ ├── is-git-url@0.2.0 
+│ └── semver@4.3.6 
+├─┬ ember-cli-deprecation-workflow@0.1.6 
+│ ├─┬ broccoli-funnel@1.1.0 
+│ │ ├── exists-sync@0.0.4 
+│ │ ├── fs-tree-diff@0.5.6 
+│ │ ├── minimatch@3.0.3 
+│ │ └─┬ rimraf@2.5.4 
+│ │   └── glob@7.1.1 
+│ └── ember-debug-handlers-polyfill@1.0.3 
+├── ember-cli-es5-shim@0.2.0 
+├─┬ ember-cli-htmlbars@1.1.1 
+│ ├─┬ broccoli-persistent-filter@1.2.13 
+│ │ ├─┬ async-disk-cache@1.0.9 
+│ │ │ ├─┬ istextorbinary@2.1.0 
+│ │ │ │ ├── binaryextensions@2.0.0 
+│ │ │ │ ├── editions@1.3.3 
+│ │ │ │ └── textextensions@2.0.1 
+│ │ │ └─┬ rimraf@2.5.4 
+│ │ │   └─┬ glob@7.1.1 
+│ │ │     └── minimatch@3.0.3 
+│ │ └─┬ md5-hex@1.3.0 
+│ │   └── md5-o-matic@0.1.1 
+│ ├── hash-for-dep@1.1.2 
+│ └─┬ strip-bom@2.0.0 
+│   └── is-utf8@0.2.1 
+├─┬ ember-cli-htmlbars-inline-precompile@0.3.6 
+│ └── babel-plugin-htmlbars-inline-precompile@0.1.0 
+├── ember-cli-ic-ajax@0.2.4 
+├── ember-cli-inject-live-reload@1.6.1 
+├── ember-cli-inline-content@0.4.1 
+├─┬ ember-cli-mirage@0.1.11 
+│ ├── broccoli-merge-trees@0.2.4 
+│ └── ember-inflector@1.11.0 
+├─┬ ember-cli-page-object@1.4.0 
+│ ├── ceibo@2.0.0 
+│ └─┬ ember-cli-node-assets@0.1.6 
+│   ├─┬ broccoli-funnel@1.1.0 
+│   │ ├── exists-sync@0.0.4 
+│   │ ├── fs-tree-diff@0.5.6 
+│   │ ├── minimatch@3.0.3 
+│   │ └─┬ rimraf@2.5.4 
+│   │   └── glob@7.1.1 
+│   ├── broccoli-unwatched-tree@0.1.1 
+│   └── lodash@4.17.4 
+├─┬ ember-cli-qunit@1.4.2 
+│ ├─┬ broccoli-concat@2.3.8 
+│ │ ├─┬ broccoli-stew@1.4.0 
+│ │ │ ├─┬ broccoli-funnel@1.1.0 
+│ │ │ │ ├── exists-sync@0.0.4 
+│ │ │ │ ├── fs-tree-diff@0.5.6 
+│ │ │ │ └─┬ rimraf@2.5.4 
+│ │ │ │   └── glob@7.1.1 
+│ │ │ ├── fs-extra@0.30.0 
+│ │ │ └── minimatch@3.0.3 
+│ │ ├─┬ fast-sourcemap-concat@1.1.0 
+│ │ │ ├─┬ chalk@0.5.1 
+│ │ │ │ ├── ansi-styles@1.1.0 
+│ │ │ │ ├─┬ has-ansi@0.1.0 
+│ │ │ │ │ └── ansi-regex@0.2.1 
+│ │ │ │ ├── strip-ansi@0.3.0 
+│ │ │ │ └── supports-color@0.2.0 
+│ │ │ ├─┬ memory-streams@0.1.0 
+│ │ │ │ └─┬ readable-stream@1.0.34 
+│ │ │ │   └── isarray@0.0.1 
+│ │ │ └── source-map@0.4.4 
+│ │ ├─┬ fs-extra@0.30.0 
+│ │ │ └── klaw@1.3.1 
+│ │ ├── lodash.merge@4.6.0 
+│ │ ├── lodash.omit@4.5.0 
+│ │ └── lodash.uniq@4.5.0 
+│ ├─┬ broccoli-jshint@1.2.0 
+│ │ ├─┬ chalk@0.4.0 
+│ │ │ ├── ansi-styles@1.0.0 
+│ │ │ └── strip-ansi@0.1.1 
+│ │ ├── findup-sync@0.3.0 
+│ │ ├─┬ jshint@2.9.4 
+│ │ │ ├─┬ cli@1.0.1 
+│ │ │ │ └─┬ glob@7.1.1 
+│ │ │ │   └── minimatch@3.0.3 
+│ │ │ ├─┬ console-browserify@1.1.0 
+│ │ │ │ └── date-now@0.1.4 
+│ │ │ ├─┬ htmlparser2@3.8.3 
+│ │ │ │ ├── domelementtype@1.3.0 
+│ │ │ │ ├── domhandler@2.3.0 
+│ │ │ │ ├─┬ domutils@1.5.1 
+│ │ │ │ │ └─┬ dom-serializer@0.1.0 
+│ │ │ │ │   └── domelementtype@1.1.3 
+│ │ │ │ ├── entities@1.0.0 
+│ │ │ │ └─┬ readable-stream@1.1.14 
+│ │ │ │   └── isarray@0.0.1 
+│ │ │ ├── lodash@3.7.0 
+│ │ │ ├── minimatch@3.0.3 
+│ │ │ ├── shelljs@0.3.0 
+│ │ │ └── strip-json-comments@1.0.4 
+│ │ └─┬ mkdirp@0.4.2 
+│ │   └── minimist@0.0.8 
+│ ├─┬ ember-qunit@0.4.22 
+│ │ └─┬ ember-test-helpers@0.5.34 
+│ │   └── klassy@0.1.3 
+│ └── qunitjs@1.23.1 
+├── ember-cli-rails-addon@0.7.1 
+├─┬ ember-cli-release@0.2.8 
+│ ├── chalk@1.1.3 
+│ ├─┬ git-tools@0.1.4 
+│ │ └── spawnback@1.0.0 
+│ ├── make-array@0.1.2 
+│ ├── merge@1.2.0 
+│ ├─┬ moment-timezone@0.3.1 
+│ │ └── moment@2.17.1 
+│ ├── nopt@3.0.6 
+│ └── semver@4.3.6 
+├─┬ ember-cli-sass@5.6.0 
+│ ├─┬ broccoli-funnel@1.1.0 
+│ │ ├── exists-sync@0.0.4 
+│ │ ├── fs-tree-diff@0.5.6 
+│ │ ├── minimatch@3.0.3 
+│ │ └─┬ rimraf@2.5.4 
+│ │   └── glob@7.1.1 
+│ ├─┬ broccoli-sass-source-maps@1.8.1 
+│ │ ├── broccoli-caching-writer@3.0.3 
+│ │ ├── include-path-searcher@0.1.0 
+│ │ ├── mkdirp@0.3.5 
+│ │ ├─┬ node-sass@3.13.1 
+│ │ │ ├── async-foreach@0.1.3 
+│ │ │ ├── cross-spawn@3.0.1 
+│ │ │ ├─┬ gaze@1.1.2 
+│ │ │ │ └─┬ globule@1.1.0 
+│ │ │ │   ├── glob@7.1.1 
+│ │ │ │   ├── lodash@4.16.6 
+│ │ │ │   └── minimatch@3.0.3 
+│ │ │ ├── get-stdin@4.0.1 
+│ │ │ ├─┬ glob@7.1.1 
+│ │ │ │ └── minimatch@3.0.3 
+│ │ │ ├── in-publish@2.0.0 
+│ │ │ ├── lodash.assign@4.2.0 
+│ │ │ ├─┬ meow@3.7.0 
+│ │ │ │ ├─┬ camelcase-keys@2.1.0 
+│ │ │ │ │ └── camelcase@2.1.1 
+│ │ │ │ ├── decamelize@1.2.0 
+│ │ │ │ ├─┬ loud-rejection@1.6.0 
+│ │ │ │ │ └─┬ currently-unhandled@0.4.1 
+│ │ │ │ │   └── array-find-index@1.0.2 
+│ │ │ │ ├── map-obj@1.0.1 
+│ │ │ │ ├─┬ normalize-package-data@2.3.5 
+│ │ │ │ │ ├── hosted-git-info@2.1.5 
+│ │ │ │ │ ├─┬ is-builtin-module@1.0.0 
+│ │ │ │ │ │ └── builtin-modules@1.1.1 
+│ │ │ │ │ └─┬ validate-npm-package-license@3.0.1 
+│ │ │ │ │   ├─┬ spdx-correct@1.0.2 
+│ │ │ │ │   │ └── spdx-license-ids@1.2.2 
+│ │ │ │ │   └── spdx-expression-parse@1.0.4 
+│ │ │ │ ├─┬ read-pkg-up@1.0.1 
+│ │ │ │ │ ├─┬ find-up@1.1.2 
+│ │ │ │ │ │ └── path-exists@2.1.0 
+│ │ │ │ │ └─┬ read-pkg@1.1.0 
+│ │ │ │ │   ├─┬ load-json-file@1.1.0 
+│ │ │ │ │   │ ├─┬ parse-json@2.2.0 
+│ │ │ │ │   │ │ └─┬ error-ex@1.3.0 
+│ │ │ │ │   │ │   └── is-arrayish@0.2.1 
+│ │ │ │ │   │ └── pify@2.3.0 
+│ │ │ │ │   └── path-type@1.1.0 
+│ │ │ │ ├─┬ redent@1.0.0 
+│ │ │ │ │ ├─┬ indent-string@2.1.0 
+│ │ │ │ │ │ └── repeating@2.0.1 
+│ │ │ │ │ └── strip-indent@1.0.1 
+│ │ │ │ └── trim-newlines@1.0.0 
+│ │ │ ├─┬ node-gyp@3.5.0 
+│ │ │ │ ├── fstream@1.0.10 
+│ │ │ │ ├── glob@7.1.1 
+│ │ │ │ ├── minimatch@3.0.3 
+│ │ │ │ ├── nopt@3.0.6 
+│ │ │ │ └─┬ tar@2.2.1 
+│ │ │ │   └── block-stream@0.0.9 
+│ │ │ └─┬ sass-graph@2.1.2 
+│ │ │   ├─┬ glob@7.1.1 
+│ │ │   │ └── minimatch@3.0.3 
+│ │ │   ├── lodash@4.17.4 
+│ │ │   └─┬ yargs@4.8.1 
+│ │ │     ├─┬ cliui@3.2.0 
+│ │ │     │ └── wrap-ansi@2.1.0 
+│ │ │     ├── get-caller-file@1.0.2 
+│ │ │     ├── lodash.assign@4.2.0 
+│ │ │     ├─┬ os-locale@1.4.0 
+│ │ │     │ └─┬ lcid@1.0.0 
+│ │ │     │   └── invert-kv@1.0.0 
+│ │ │     ├── require-directory@2.1.1 
+│ │ │     ├── require-main-filename@1.0.1 
+│ │ │     ├── which-module@1.0.0 
+│ │ │     ├── window-size@0.2.0 
+│ │ │     ├── y18n@3.2.1 
+│ │ │     └─┬ yargs-parser@2.4.1 
+│ │ │       ├── camelcase@3.0.0 
+│ │ │       └── lodash.assign@4.2.0 
+│ │ └── object-assign@2.1.1 
+│ └─┬ ember-cli-babel@5.1.10 
+│   └── clone@1.0.2 
+├─┬ ember-cli-sri@1.2.1 
+│ └─┬ broccoli-sri-hash@1.2.2 
+│   └── sri-toolbox@0.2.0 
+├─┬ ember-cli-uglify@1.2.0 
+│ └─┬ broccoli-uglify-sourcemap@1.5.1 
+│   ├── lodash.merge@4.6.0 
+│   ├── source-map-url@0.3.0 
+│   ├─┬ uglify-js@2.7.5 
+│   │ ├── uglify-to-browserify@1.0.2 
+│   │ └─┬ yargs@3.10.0 
+│   │   ├── camelcase@1.2.1 
+│   │   ├─┬ cliui@2.1.0 
+│   │   │ ├─┬ center-align@0.1.3 
+│   │   │ │ ├─┬ align-text@0.1.4 
+│   │   │ │ │ └── longest@1.0.1 
+│   │   │ │ └── lazy-cache@1.0.4 
+│   │   │ └── right-align@0.1.3 
+│   │   └── window-size@0.1.0 
+│   └── walk-sync@0.1.3 
+├─┬ ember-data@2.3.0 
+│ ├── babel-plugin-feature-flags@0.2.3 
+│ ├── babel-plugin-filter-imports@0.2.1 
+│ ├─┬ broccoli-file-creator@1.1.1 
+│ │ ├── broccoli-kitchen-sink-helpers@0.2.9 
+│ │ └── rsvp@3.0.21 
+│ └── semver@5.3.0 
+├─┬ ember-devtools@5.1.1 
+│ └── object-assign@3.0.0 
+├── ember-disable-proxy-controllers@1.0.1 
+├── ember-export-application-global@1.1.1 
+├── ember-hook@0.0.4 
+├── ember-legacy-views@0.2.0 
+├─┬ ember-sprite@0.6.0 
+│ ├─┬ broccoli-file-remover@0.3.1 
+│ │ ├── rimraf@2.2.8 
+│ │ └── walk-sync@0.1.3 
+│ └─┬ broccoli-sprite@0.2.0 
+│   ├─┬ broccoli-caching-writer@0.4.2 
+│   │ ├── broccoli-kitchen-sink-helpers@0.2.9 
+│   │ ├─┬ mkdirp@0.4.2 
+│   │ │ └── minimist@0.0.8 
+│   │ ├── rsvp@3.0.21 
+│   │ └── walk-sync@0.1.3 
+│   ├── broccoli-merge-trees@0.1.4 
+│   └─┬ broccoli-static-compiler@0.1.4 
+│     └── mkdirp@0.3.5 
+├── ember-truth-helpers@1.3.0 
+├── ember-wormhole@0.3.5 
+├─┬ node-sprite-generator@0.10.1 
+│ ├── async@1.2.0 
+│ ├── bin-pack@1.0.1 
+│ ├─┬ canvas@1.3.0 
+│ │ └── nan@2.5.1 
+│ ├── glob@5.0.10 
+│ ├─┬ gm@1.21.1 
+│ │ ├── array-parallel@0.1.3 
+│ │ ├── array-series@0.1.5 
+│ │ └─┬ debug@2.2.0 
+│ │   └── ms@0.7.1 
+│ ├─┬ jimp@0.2.19 
+│ │ ├── bignumber.js@2.4.0 
+│ │ ├── bmp-js@0.0.1 
+│ │ ├── exif-parser@0.1.9 
+│ │ ├── file-type@3.9.0 
+│ │ ├── jpeg-js@0.1.2 
+│ │ ├─┬ pixelmatch@4.0.2 
+│ │ │ └── pngjs@3.0.0 
+│ │ ├── pngjs@2.3.1 
+│ │ ├── read-chunk@1.0.1 
+│ │ ├─┬ request@2.79.0 
+│ │ │ ├── aws-sign2@0.6.0 
+│ │ │ ├── aws4@1.5.0 
+│ │ │ ├── caseless@0.11.0 
+│ │ │ ├─┬ combined-stream@1.0.5 
+│ │ │ │ └── delayed-stream@1.0.0 
+│ │ │ ├── extend@3.0.0 
+│ │ │ ├── forever-agent@0.6.1 
+│ │ │ ├─┬ form-data@2.1.2 
+│ │ │ │ └── asynckit@0.4.0 
+│ │ │ ├─┬ har-validator@2.0.6 
+│ │ │ │ ├─┬ is-my-json-valid@2.15.0 
+│ │ │ │ │ ├── generate-function@2.0.0 
+│ │ │ │ │ ├─┬ generate-object-property@1.2.0 
+│ │ │ │ │ │ └── is-property@1.0.2 
+│ │ │ │ │ ├── jsonpointer@4.0.1 
+│ │ │ │ │ └── xtend@4.0.1 
+│ │ │ │ └─┬ pinkie-promise@2.0.1 
+│ │ │ │   └── pinkie@2.0.4 
+│ │ │ ├─┬ hawk@3.1.3 
+│ │ │ │ ├── boom@2.10.1 
+│ │ │ │ ├── cryptiles@2.0.5 
+│ │ │ │ ├── hoek@2.16.3 
+│ │ │ │ └── sntp@1.0.9 
+│ │ │ ├─┬ http-signature@1.1.1 
+│ │ │ │ ├── assert-plus@0.2.0 
+│ │ │ │ ├─┬ jsprim@1.3.1 
+│ │ │ │ │ ├── extsprintf@1.0.2 
+│ │ │ │ │ ├── json-schema@0.2.3 
+│ │ │ │ │ └── verror@1.3.6 
+│ │ │ │ └─┬ sshpk@1.10.2 
+│ │ │ │   ├── asn1@0.2.3 
+│ │ │ │   ├── assert-plus@1.0.0 
+│ │ │ │   ├── bcrypt-pbkdf@1.0.1 
+│ │ │ │   ├─┬ dashdash@1.14.1 
+│ │ │ │   │ └── assert-plus@1.0.0 
+│ │ │ │   ├── ecc-jsbn@0.1.1 
+│ │ │ │   ├─┬ getpass@0.1.6 
+│ │ │ │   │ └── assert-plus@1.0.0 
+│ │ │ │   ├── jodid25519@1.0.2 
+│ │ │ │   ├── jsbn@0.1.0 
+│ │ │ │   └── tweetnacl@0.14.5 
+│ │ │ ├── is-typedarray@1.0.0 
+│ │ │ ├── isstream@0.1.2 
+│ │ │ ├── json-stringify-safe@5.0.1 
+│ │ │ ├── oauth-sign@0.8.2 
+│ │ │ ├── qs@6.3.0 
+│ │ │ ├── stringstream@0.0.5 
+│ │ │ ├─┬ tough-cookie@2.3.2 
+│ │ │ │ └── punycode@1.4.1 
+│ │ │ ├── tunnel-agent@0.4.3 
+│ │ │ └── uuid@3.0.1 
+│ │ ├─┬ stream-to-buffer@0.1.0 
+│ │ │ └── stream-to@0.2.2 
+│ │ ├── tinycolor2@1.4.1 
+│ │ └─┬ url-regex@3.2.0 
+│ │   └── ip-regex@1.0.3 
+│ └── underscore@1.8.2 
+├── ralphs-little-helpers@0.0.5 
+└─┬ rimraf@2.3.1 
+  └── glob@4.5.3 
+
+  
+* standups 
+** standup 7/7/17
+ -bugsnag backend ring errors are picked up
+ - sente exception fixed, tools.namespace call in dev.clj
+ -new relic is working and updating demo account, ring is instrumented, gonna
+ instrument om next read and mutations
+ - want to have some mechanism where new relic agent jar is easily available,
+   maybe a boot copy task, and updateable, and instructions for and test production jar
+ - logstash
+  
+ - fix tests in bilby-libs since making security a bit stricter
+  
+ - dossier types cloning
+ - jacob's security branch review
+** standup 12-10-17 
+ Hopefully fixed funny mu error.
+ Chatted to Lucas, had some suggestions for a more consistent layout. So made some changes.
+ Ready to hook in dragula, dnd lib. 
+ Dragula messes with dom, you gotta give react what the dom actually looks like
+ after dn otherwise things get messed up. Which means reading out the dom. See if
+ I can extract that functionality from dossier types.
+ Experiment with double click question to get question form for it. Normally you
+ drag questions if category form is showing.
+ Experimenting with workflow there.
+ Since we're listing questions under a category, gonna see if I can inline the
+ question component there. Or part of it. Or whether it's better to just open
+ question form for them. Or put them on the left. Will see.
+
+** standup
+ Tried to update, telekom crasht, app stuck on updating
+ Had jar problems, local bigger, but will try other dep list from templates
+ branch
+ Added logstash vars to docker file
+ Parse name format to add tests and backward compatibility, standard joins with
+ -, but now static terxt as well
+ Merged new release with templates branch lots of conflicts but sorted out.
+ But back to templates as long as no issues with dossier types
+
+** 14-11-17 
+Wrote logstash tail script, follow, syntax hl, regex filter, range by number and date
+Should work for rails as well.
+Cleaned up computer somewhat, reorganised
+staging red is finally running version 2
+Still gotta do nameformat thing
+And then templates
+
+** 21-11-17
+Inlined png icons, so they load.
+Safari and chrome give problems, ff was ok?
+Updating to inlined icons, also smaller
+On first login for some reason first send fails
+Fixed a few annoying bugs
+Merged release_master into templates branch
+Get integration tests working, ui snapshot
+Better git deps management 
+Todo list reorgonised for templates branch
+** 5-12-17
+Duplicate entries in template_template table
+Fixed with a group by
+But mysql objects from 5.7, so had to add disable, enable around sql
+Calculating precise remote for nested joins, was fun to do. In cljc
+
+Now getting loads of data in frontend. Namely. 
+category, template, its categories, its joined template, and its categories,
+which are the optional categories for a template.
+
+All with a single query in form component and only getting data it doesn't have
+yet.
+
+So now I'm gonna display all that in ui. It'll give me probably a bit more insight into how to
+put a sensible ui together.as well.
+
+** 13-2-18
+Ticking off boxes for next little release
+Made data inspector
+Have a good idea for load on demand
+** 15-2-18
+- Moving some issues forward, 
+in particular including bilby-libs, I also added  devcards
+and also cloning more than one dossier type at a time, there's some techical
+issues with it that don't make it trivial. 
+- Moving iso cloning also means moving dossiers, dossiers are linked not via
+  dossier types
+- Cleaning up issues for release so service desk can do the new group workflow
+- Making production jar, updating deps, putting it on staging then production 
+  
+
+** 28-2
+bilby ready for deploy
+editor fight
+sidebar for explorer
+finish question form, first functional draft, lawcat not working?
+embedding question as cmp
+write load transaction
+** 1-3-18
+- made emb cmp, embedded t-c-q
+- poc of supergroups for new admin
+- adapted ui so it looks better
+- loads everything, bit slow
+- putting together load fn for specific records, marking props as optional, so
+  in query, but not included in remote ast., mark them all, nothing of join is added
+- trying to think how to load bunch of joined records, 
+how do i mark them as includeable into the ast that goes to remote
+
+
+* travis errif or
+Trying to fix travis error
+
+```  
+Using clearance 1.0.0.rc7
+
+NoMethodError: undefined method `spec' for nil:NilClass
+
+An error occurred while installing clearance_http_auth (0.3.0), and Bundler
+
+cannot continue.
+
+Make sure that `gem install clearance_http_auth -v '0.3.0'` succeeds before
+
+bundling.
+
+The command "eval bundle install --without production --without development --path=${BUNDLE_PATH:-vendor/bundle} " failed. Retrying, 2 of 3.
+
+Fetching source index from https://rubygems.org/
+```
+
+When you ssh into travis debug session and try to do what bundler tells you to
+  you get:
+
+``` 
+  travis@testing-docker-d4c21a91-b688-4fb3-8f36-ba1f9d38cbcc:~/build/digitalechecklisten/chinchilla$ gem install clearance_http_auth -v '0.3.0'
+Fetching: rack-2.0.3.gem (100%)
+ERROR:  Error installing clearance_http_auth:
+        rack requires Ruby version >= 2.2.2.
+travis@testing-docker-d4c21a91-b688-4fb3-8f36-ba1f9d38cbcc:~/build/digitalechecklisten/chinchilla$ ruby -v
+ruby 2.1.5p273 (2014-11-13 revision 48405) [x86_64-linux]
+travis@testing-docker-d4c21a91-b688-4fb3-8f36-ba1f9d38cbcc:~/build/digitalechecklisten/chinchilla$ 
+```
+
+So we update ruby version in travis.yml, or is there something else going on
+all of a sudden? Aren't we getting this from git anyway? What's changed here?
+
+Travis is using bundle version 1.7.6
+
+When updating ruby 2.2.2 it's 1.15.4
+
+Been using 1.14.6 so far
+
+With 2.2.0 it's using 1.8.4
+
+Remco de Jong
+gemeente amsterdam stadsdeel noord
+
+
+* running notes
+** albert a'dam noord 
+  Hi. Dat zijn verschillende checklisten, gebaseerd op verschillende templates, die dus andere vragen hebben.   
+  E
+** eddy checklist ids
+18715
+18716
+109405
+83666
+118017
+153760
+175770
+163718
+163700
+171194
+160636
+179808
+109049
+186608
+
+* supergroups
+Groups get a flag whether they're a supergroup or not.
+A group admin gets the role of supergroup-admin if his group has the supergroup
+flag set. This is used for validation/permissions purposes
+front and back end, and also for ui concerns/behaviour in front end. 
+At the moment a DC user (group 10) gets automatically super-admin role, and
+based on that allowable props to read/update/create, and scope for read are set and
+validations performed. 
+A group admin has different crud props and validations applied to him. Scope is
+for instance [:where [:group_id := u/group-id]]. Where u/group-id is the
+group-id of the current user, the group admin. Frontend asks for the same data,
+however only gets groups, or dossier types, or users belonging to the current
+user's group.
+So everything is in place for supergroup-admins as well. We just need to
+determine whether a group-admin is a supergroup-admin (we look at the supergroup
+flag on the group he's from), and what other groups he's got access to (any
+group created by a supergroup-admin automatically get their group-id set the
+supergroup's id). 
+
+Before we do anything in the parser we add the current user to the environment.
+Here we add for instance the role prop to a user. Here is also where I fetch all
+the subgroup ids of the user's group, and add that to the user's prop if he's a
+group-admin.
+
+Then for supergroup-admin I adjust the scope to [:where [:group-id :in
+:u/subgroup-ids]] for the various tables like dossier types, users, etc.
+
+And that's basically it. If you look at a supergroup's data in the ui you'll see
+a list of subgroups. If you look at a subgroup you see what supergroup it
+belongs to.
+
+If a group-admin of a supergroup logs in they will see what service desk sees,
+and can do what they do, limited to the supergroup and the subgroups.
+
+It becomes then a matter of finetuning permissions and validations. And making
+sure everything is robust enough.
+
+This does not affect DC app at all. It works as it did before. You just give a
+supergroup-admin to administer some more groups instead of having to go through
+DC's service desk.
+
+* release process notes 
+** General  
+*** Annoying to write in feature name for every checklist  
+*** Annoying having to find relevant template
+
+** Feature analysis 
+- Who is a product owner?
+- Can't fill in reviewer
+- The programmer translates the requirements to a document.
+ Which is the feature request checklist . Don't want docs outside DC I'd say.
+- The programmer designs mockups with the appropriate level of detail matching the requirements.
+Web address?
+** Tech analysis checklist
+- Why add CTO?
+- The main programmer writes a technical specification about the new feature's implementation.
+ But can only link to it. Should be text 
+- The main programmer makes a list of the new dependencies introduced by this new feature. 
+ Should be text question 
+- The feature modifies the current database schema.
+Should be ja/nee/nvt plus text value_open
+- The main programmer writes a list of the applications affected.
+Multipe choice doesn't work
+** Dev checklist
+- Main programmer should be contact question
+** Bug report checklist  
+- Often a question doesn't apply, so we should be click the nvt button!
+ Otherwise you gotta go over them every time again when you want to complete a checklist 
+- Multiple choice questions should have a n/a
+- Note which part of DC this concerns drop down doesn't show
+- Url question to fill in github issue url 

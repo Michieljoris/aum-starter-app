@@ -1,0 +1,454 @@
+* Making spec easier/better etc
+**  expound
+
+https://oli.me.uk/2017/10/18/taming-clojure-spec-with-expound/
+
+Luckily, expound happens to be extremely easy to use. Hopefully we can make that
+easier by including it by default in a lot of beginner friendly code too. The
+README does a great job of explaining how to use it.
+
+Replace calls to clojure.spec.alpha/explain with expound.alpha/expound and
+to clojure.spec.alpha/explain-str with expound.alpha/expound-str.
+
+If you don’t use explain directly and you’d like all spec errors to be run
+through expound (including those from Clojure the language), then you can hook
+it in globally like the following snippet. I’d recommend running this within
+your (ns user) before your REPL loads or in the main ns of your application
+before it starts up.
+
+#+BEGIN_SRC clojure
+Clojure
+(ns user
+  (:require [clojure.spec.alpha :as s]
+            [expound.alpha :as expound]))
+#+END_SRC
+
+If you're doing this in the user ns for your repl...
+
+#+BEGIN_SRC clojure
+(alter-var-root #'s/*explain-out* (constantly expound/printer))
+#+END_SRC
+
+Otherwise, you can use the method from the README.
+
+#+BEGIN_SRC clojure
+(set! s/*explain-out* expound/printer)
+#+END_SRC
+
+Now any spec error generated from here on out will be formatted for human consumption by expound, excellent!
+
+** spell-spec
+   https://github.com/bhauman/spell-spec
+
+   clojure.spec.alpha helpers that check for misspelled map keys, with expound integration
+** specviz
+   https://github.com/jebberjeb/specviz
+
+   Generate Graphviz images from clojure.spec
+** ghostwheel
+   https://github.com/gnl/ghostwheel
+
+Hassle-free clojure.spec, automatic generative testing, side effect detection,
+and evaluation tracing for Clojure(-Script)
+** orchestra
+   https://github.com/jeaye/orchestra
+
+   Complete instrumentation for clojure.spec
+
+   By default, clojure.spec will only instrument :args. This leaves out :ret and
+   :fn from automatic validation; Orchestra checks all of them for you.
+   defn-spec
+
+Orchestra also ships with a defn-spec macro for defining both functions and
+their specs together in a way which encourages having more specs
+
+* Require
+Require [cljs.spec.alpha :as s] [clojure.spec.alpha :as s]
+
+* Defining spec
+** s/def
+
+#+BEGIN_SRC clojure
+(s/def ::date inst?)
+#+END_SRC
+
+  :: expands to current namespace
+
+#+BEGIN_SRC clojure
+(s/def foo/date inst?)
+#+END_SRC
+** s/fdef
+
+#+BEGIN_SRC clojure
+
+  (defn ranged-rand
+  "Returns random int in range start <= rand < end"
+  [start end]
+  (+ start (long (rand (- end start)))))
+#+END_SRC
+
+We can then provide a specification for that function:
+
+#+BEGIN_SRC clojure
+
+(s/fdef ranged-rand
+  :args (s/and (s/cat :start int? :end int?)
+               #(< (:start %) (:end %)))
+  :ret int?
+  :fn (s/and #(>= (:ret %) (-> % :args :start))
+             #(< (:ret %) (-> % :args :end))))
+#+END_SRC
+* Building specs
+** s/and s/or
+#+BEGIN_SRC clojure
+(s/def ::big-even (s/and int? even? #(> % 1000)))
+#+END_SRC
+
+#+BEGIN_SRC clojure
+(s/def ::name-or-id (s/or :name string? :id   int?))
+
+(s/valid? ::name-or-id "abc") ;; true
+(s/valid? ::name-or-id 100) ;; true
+(s/valid? ::name-or-id :foo) ;; false
+#+END_SRC
+
+-> named alternatives!!!
+
+#+BEGIN_SRC clojure
+(conform ::name-or-id "abc")
+;;=> [:name "abc"]
+(s/conform ::name-or-id 100)
+;;=> [:id 100]
+#+END_SRC
+
+** s/nilable
+Many predicates that check an instance’s type do not allow nil as a valid value
+(string?, number?, keyword?, etc). To include nil as a valid value, use the
+provided function nilable to make a spec:
+
+#+BEGIN_SRC clojure
+
+(s/valid? string? nil)
+;;=> false
+(s/valid? (s/nilable string?) nil)
+;;=> true
+#+END_SRC
+
+** s/keys
+#+BEGIN_SRC clojure
+
+(s/def ::person (s/keys :req [::first-name ::last-name ::email]
+                        :opt [::phone]))
+#+END_SRC
+** s/keys*
+#+BEGIN_SRC clojure
+
+(s/def ::port number?)
+(s/def ::host string?)
+(s/def ::id keyword?)
+(s/def ::server (s/keys* :req [::id ::host] :opt [::port]))
+(s/conform ::server [::id :s1 ::host "example.com" ::port 5555])
+#+END_SRC
+** s/merge
+#+BEGIN_SRC clojure
+
+(s/def :animal/kind string?)
+(s/def :animal/says string?)
+(s/def :animal/common (s/keys :req [:animal/kind :animal/says]))
+(s/def :dog/tail? boolean?)
+(s/def :dog/breed string?)
+(s/def :animal/dog (s/merge :animal/common
+                            (s/keys :req [:dog/tail? :dog/breed])))
+#+END_SRC
+** s/coll-of
+#+BEGIN_SRC clojure
+
+  (s/conform (s/coll-of keyword?) [:a :b :c])
+  ;;=> [:a :b :c]
+  (s/conform (s/coll-of number?) #{5 10 2})
+;;=> #{2 5 10}
+
+(s/def ::vnum3 (s/coll-of number? :kind vector? :count 3 :distinct true :into #{}))
+(s/conform ::vnum3 [1 2 3])
+;;=> #{1 2 3}
+(s/explain ::vnum3 #{1 2 3})   ;; not a vector
+;; val: #{1 3 2} fails spec: ::vnum3 predicate: clojure.core/vector?
+(s/explain ::vnum3 [1 1 1])    ;; not distinct
+;; val: [1 1 1] fails spec: ::vnum3 predicate: distinct?
+(s/explain ::vnum3 [1 2 :a])   ;; not a number
+;; In: [2] val: :a fails spec: ::vnum3 predicate: number?
+#+END_SRC
+** s/tuple
+#+BEGIN_SRC clojure
+
+(s/def ::point (s/tuple double? double? double?))
+(s/conform ::point [1.5 2.5 -0.5])
+=> [1.5 2.5 -0.5]
+#+END_SRC
+** s/map-of
+#+BEGIN_SRC clojure
+
+(s/def ::scores (s/map-of string? int?))
+(s/conform ::scores {"Sally" 1000, "Joe" 500})
+;=> {"Sally" 1000, "Joe" 500}
+#+END_SRC
+** sequences (regex ops: cat,alt,*,+,?)
+
+Sometimes sequential data is used to encode additional structure (typically new
+syntax, often used in macros). spec provides the standard regular expression
+operators to describe the structure of a sequential data value:
+
+    cat - concatenation of predicates/patterns
+
+    alt - choice among alternative predicates/patterns
+
+    * - 0 or more of a predicate/pattern
+
+    + - 1 or more of a predicate/pattern
+
+    ? - 0 or 1 of a predicate/pattern
+** s/every
+
+* Check spec on a value
+** s/valid (check value, returns true or false)
+#+BEGIN_SRC clojure
+
+(s/def ::big-even (s/and int? even? #(> % 1000)))
+(s/valid? ::big-even :foo) ;; false
+(s/valid? ::big-even 10) ;; false
+(s/valid? ::big-even 100000) ;; true
+#+END_SRC
+** s/explain if not valid (what went wrong?)
+
+explain is another high-level operation in spec that can be used to report (to
+*out*) why a value does not conform to a spec. Let’s see what explain says about
+some non-conforming examples we’ve seen so far.
+
+#+BEGIN_SRC clojure
+
+(s/explain ::suit 42)
+;; val: 42 fails spec: ::suit predicate: #{:spade :heart :diamond :club}
+(s/explain ::big-even 5)
+;; val: 5 fails spec: ::big-even predicate: even?
+(s/explain ::name-or-id :foo)
+;; val: :foo fails spec: ::name-or-id at: [:name] predicate: string?
+;; val: :foo fails spec: ::name-or-id at: [:id] predicate: int?
+#+END_SRC
+
+** s/conform (returns conformed value (what went right?) or s/invalid if it doesn't)
+To see if it well, conforms.
+
+ s/conform returns :clojure.spec.alpha/invalid if not valid, otherwise conformed
+ value (so with names if in spec).
+
+Given a spec and a value, returns :clojure.spec.alpha/invalid
+if value does not match spec, else the (possibly destructured) value.
+
+
+* Using specs for and in fns
+** Spec fns: s/fspec
+
+Higher order functions
+
+Higher order functions are common in Clojure and spec provides fspec to support spec’ing them.
+
+For example, consider the adder function:
+
+#+BEGIN_SRC clojure
+
+(defn adder [x] #(+ x %))
+#+END_SRC
+
+adder returns a function that adds x. We can declare a function spec for adder using fspec for the return value:
+
+#+BEGIN_SRC clojure
+
+(s/fdef adder
+  :args (s/cat :x number?)
+  :ret (s/fspec :args (s/cat :y number?)
+                :ret number?)
+  :fn #(= (-> % :args :x) ((:ret %) 0)))
+ #+END_SRC
+
+The :ret spec uses fspec to declare that the returning function takes and
+returns a number. Even more interesting, the :fn spec can state a general
+property that relates the :args (where we know x) and the result we get from
+invoking the function returned from adder, namely that adding 0 to it should
+return x.
+
+
+** Validate fn input
+#+BEGIN_SRC clojure
+
+  (defn- set-config [prop val]
+  ;; dummy fn
+  (println "set" prop val))
+
+(defn configure [input]
+  (let [parsed (s/conform ::config input)]
+    (if (= parsed ::s/invalid)
+      (throw (ex-info "Invalid input" (s/explain-data ::config input)))
+      (for [{prop :prop [_ val] :val} parsed]
+        (set-config (subs prop 1) val)))))
+
+(configure ["-server" "foo" "-verbose" true "-user" "joe"])
+#+END_SRC
+
+* Exercise and generate. (Or: Examples please)
+** Exercise (generate set of examples of conforming values)
+*** s/exercise (samples and  including conforming info)
+  Exercise
+
+For this we have exercise, which returns pairs of generated and conformed values
+for a spec. exercise by default produces 10 samples (like sample) but you can
+pass both functions a number indicating the number of samples to produce.
+
+#+BEGIN_SRC clojure
+
+(s/exercise (s/cat :k keyword? :ns (s/+ number?)) 5)
+;;=>
+;;([(:y -2.0) {:k :y, :ns [-2.0]}]
+;; [(:_/? -1.0 0.5) {:k :_/?, :ns [-1.0 0.5]}]
+;; [(:-B 0 3.0) {:k :-B, :ns [0 3.0]}]
+;; [(:-!.gD*/W+ -3 3.0 3.75) {:k :-!.gD*/W+, :ns [-3 3.0 3.75]}]
+;; [(:_Y*+._?q-H/-3* 0 1.25 1.5) {:k :_Y*+._?q-H/-3*, :ns [0 1.25 1.5]}])
+
+(s/exercise (s/or :k keyword? :s string? :n number?) 5)
+;;=> ([:H [:k :H]]
+;;    [:ka [:k :ka]]
+;;    [-1 [:n -1]]
+;;    ["" [:s ""]]
+;;    [-3.0 [:n -3.0]])
+#+END_SRC
+
+*** s/exercise-fn (generate sample args and invoke)
+For spec’ed functions we also have exercise-fn, which generates sample args,
+invokes the spec’ed function and returns the args and the return value.
+
+#+BEGIN_SRC clojure
+
+(s/exercise-fn `ranged-rand)
+=>
+([(-2 -1)   -2]
+ [(-3 3)     0]
+ [(0 1)      0]
+ [(-8 -7)   -8]
+ [(3 13)     7]
+ [(-1 0)    -1]
+ [(-69 99) -41]
+ [(-19 -1)  -5]
+ [(-1 1)    -1]
+ [(0 65)     7])
+#+END_SRC
+
+** Generate one or more examples of a spec (just a list of them)
+*** Require
+#+BEGIN_SRC clojure
+ [clojure.spec.gen.alpha :as gen]
+#+END_SRC
+*** s/generate (generate one example value)
+#+BEGIN_SRC clojure
+
+ (gen/generate (s/gen int?))
+ ;;=> -959
+ (gen/generate (s/gen nil?))
+ ;;=> nil
+#+END_SRC
+
+*** gen/sample (generate a bunch of example values)
+#+BEGIN_SRC clojure
+
+ (gen/sample (s/gen string?))
+ ;;=> ("" "" "" "" "8" "W" "" "G74SmCm" "K9sL9" "82vC")
+ (gen/sample (s/gen #{:club :diamond :heart :spade}))
+ ;;=> (:heart :diamond :heart :heart :heart :diamond :spade :spade :spade :club)
+
+ (gen/sample (s/gen (s/cat :k keyword? :ns (s/+ number?))))
+ ;;=> ((:D -2.0)
+ ;;=>  (:q4/c 0.75 -1)
+ ;;=>  (:*!3/? 0)
+ ;;=>  (:+k_?.p*K.*o!d/*V -3)
+ ;;=>  (:i -1 -1 0.5 -0.5 -4)
+ ;;=>  (:?!/! 0.515625 -15 -8 0.5 0 0.75)
+ ;;=>  (:vv_z2.A??!377.+z1*gR.D9+G.l9+.t9/L34p -1.4375 -29 0.75 -1.25)
+ ;;=>  (:-.!pm8bS_+.Z2qB5cd.p.JI0?_2m.S8l.a_Xtu/+OM_34* -2.3125)
+ ;;=>  (:Ci 6.0 -30 -3 1.0)
+ ;;=>  (:s?cw*8.t+G.OS.xh_z2!.cF-b!PAQ_.E98H4_4lSo/?_m0T*7i 4.4375 -3.5 6.0 108 0.33203125 2 8 -0.5175781
+#+END_SRC
+
+* Instrument. (Or: Am I using this right?)
+** stest/instrument fns (check args of specced fns in running prg)
+Instrumentation validates that the :args spec is being invoked on instrumented
+functions and thus provides validation for external uses of a function. Let’s
+turn on instrumentation for our previously spec’ed ranged-rand function:
+
+#+BEGIN_SRC clojure
+
+(stest/instrument `ranged-rand)
+#+END_SRC
+
+Instrument takes a fully-qualified symbol so we use ` here to resolve it in the
+context of the current namespace. If the function is invoked with args that do
+not conform with the :args spec you will see an error like this:
+
+#+BEGIN_SRC clojure
+
+(ranged-rand 8 5)
+CompilerException clojure.lang.ExceptionInfo: Call to #'spec.examples.guide/ranged-rand did not conform to spec:
+val: {:start 8, :end 5} fails at: [:args] predicate: (< (:start %) (:end %))
+:clojure.spec.alpha/args  (8 5)
+:clojure.spec.alpha/failure  :instrument-check-failed
+ #:clojure.spec.alpha{:problems [{:path [:args], :pred (< (:start %) (:end %)), :val {:start 8, :end 5}, :via [], :in []}],
+                      :args (8 5),
+                      :failure :instrument-check-failed}
+#+END_SRC
+
+The error fails in the second args predicate that checks (< start end). Note
+that the :ret and :fn specs are not checked with instrumentation as validating
+the implementation should occur at testing time.
+
+Instrumentation can be turned off using the complementary function unstrument.
+Instrumentation is likely to be useful at both development time and during
+testing to discover errors in calling code. It is not recommended to use
+instrumentation in production due to the overhead involved with checking args
+specs.
+
+
+* Generative testing (Or: is my code correct?)
+** Require
+
+#+BEGIN_SRC clojure
+'[clojure.spec.test.alpha :as stest])
+#+END_SRC
+
+** stest/check (generate sample args,check :ret and :fn)
+We mentioned earlier that clojure.spec.test.alpha provides tools for
+automatically testing functions. When functions have specs, we can use check, to
+automatically generate tests that check the function using the specs.
+
+check will generate arguments based on the :args spec for a function, invoke the
+function, and check that the :ret and :fn specs were satisfied.
+
+#+BEGIN_SRC clojure
+
+(require '[clojure.spec.test.alpha :as stest])
+
+(stest/check `ranged-rand)
+;;=> ({:spec #object[clojure.spec.alpha$fspec_impl$reify__13728 ...],
+;;     :clojure.spec.test.check/ret {:result true, :num-tests 1000, :seed 1466805740290},
+;;     :sym spec.examples.guide/ranged-rand,
+;;     :result true})
+#+END_SRC
+
+check also takes a number of options that can be passed to test.check to influence the test run, as well as the option to override generators for parts of the spec, by either name or path.
+
+** stest/enumerate-namespace
+To test all of the spec’ed functions in a namespace (or multiple namespaces),
+use enumerate-namespace to generate the set of symbols naming vars in the
+namespace:
+
+#+BEGIN_SRC clojure
+(-> (stest/enumerate-namespace 'user) stest/check)
+#+END_SRC
+
+And you can check all of the spec’ed functions by calling stest/check without any arguments.

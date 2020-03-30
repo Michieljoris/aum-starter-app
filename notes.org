@@ -19,10 +19,6 @@ should require app.frontend.core. This is enough to get the app going.
 
 
 * Good to know
-** jdbc, migrations, joplin and stch/sql
-http://clojure-doc.org/articles/ecosystem/java_jdbc/using_ddl.html
-https://github.com/stch-library/sql/blob/master/README.md
-https://github.com/juxt/joplin/blob/master/README.md
 ** figwheel and emacs
 https://docs.cider.mx/cider/cljs/figwheel.html
 https://github.com/bhauman/figwheel-main/blob/master/src/figwheel/main/api.clj
@@ -48,3 +44,443 @@ https://github.com/bhauman/figwheel-main/blob/master/docs/docs/emacs.md
   "Stops all systemic systems"
   (interactive)
   (cider-interactive-eval "(systemic.core/stop!)"))
+
+* vision
+
+Well. I don't really know how to say this properly, but to be honest, at the
+moment I'm a bit unsure how to move forward as a programmer with DC. I still
+believe in the product, I believe in you, Lucas, as the leader and basically the
+person with the bigger business ideas. I want to finish building this template
+editor, with or without Jacob. I want to work with inspiring, super clever
+people I can respect as programmers and that I can learn from, have open minded
+conversations with, without fear of getting shut down, of tempers flaring, that
+are willing to take risks, that dare to think big, that dare to build their own
+tools, that put themselves out there and profile themselves, that share cool
+self built tools and creations for their own sake. I have trouble seeing that
+dynamic at the DC dev team. Which is my problem really, not DC's, and mine to
+solve and act on. In the mean time however, I you would ask me what's most
+useful in terms of getting this template editor finished, then my answer would
+be: autonomy over and responsibility for the bilby project, at least as far as
+the admin app and the framework created to build it goes, which is the bulk of
+the software, and help from Jacob whenever he becomes available. I've built a
+layer over om-next which made building the admin app possible. This got put
+together slowly over the years as needs arose. This is a strong enough project
+and viable enough to be used for future apps. It can be the in house framework.
+It could be open sourced. I can be used to profile DC as a cool place to work
+for programmers. But it has been a one person project so far. It needs more
+documentation, streamlining, cleaning up etc. It needs reuse.
+Anyways, that might not be a goal or priority for DC as you see it. It's just
+how I see myself progress and grow.
+  *
+
+* Programming
+** overview of all projects/ideas
+*** bb-server
+  recaster
+   denodify, recaster,
+   denodify-core,
+   phantom-sitemap
+   url-washer
+   seo-laundry
+   imageopti
+*** html-builder
+*** bb-blog
+
+*** cape
+ ala hoodie, but then with couchdb, see notes in red book
+works with modules below, but also independently
+**** test-cape
+*** adea
+deploy-demo
+ autonomous deployment agent
+**** node-haproxy
+**** serf-rpc
+**** similar projects:
+terminal runnable.com bowery usekit.com  cockroachdb http://usekite.github.io/#
+
+
+*** invoice/accounting
+Using meteor
+Import from trello
+Track time with org
+**** trello-export
+
+*** rostering and timesheets
+   Using my roster as example, but better
+
+*** edge
+   Finish, using meteor
+
+*** personal info app
+    make editor for personal info doc
+*** Buckley site
+*** greenglass
+new bb-server
+new html-builder
+add/finish shop
+fix intermittent image loading problem
+add news and gallery page
+add bb-blog
+
+
+*** __assets
+app that lets authorized users play around with the file system of
+websites, or possibly of the whole hard drive.
+So, uploading and downloading files, rebuild site using html-builder,
+downloading snapshots, uploading snapshots
+
+Maybe even edit js and css and html and the recipe files , as I do it
+locally, but using ace editor.
+
+For more sophisticated system you could use placeholders for static
+assets and fill these buckets in some kind of manager. Maybe store these
+assets in CouchDB. You get to back it up easily through replication,
+and easy retrieval and role based write/read access. And you can share
+the assets with other sites then as well.
+
+Could I tramp to the server? Only to Linode, not jitsu
+
+
+
+
+
+
+
+
+*** Misc modules and apps
+**** vouchdb
+**** quilt
+
+**** logthis
+**** crypto-utils
+**** cachejs
+**** dbeditor
+**** validate_doc_update
+**** directive_objectEditor
+**** bootstrapjs
+
+*** cape
+ ala hoodie, but then with couchdb, see notes in red book
+works with modules below, but also independently
+**** test-cape
+*** bb-server
+  recaster
+   denodify, recaster,
+   denodify-core,
+   phantom-sitemap
+   url-washer
+   seo-laundry
+   imageopti
+*** html-builder
+*** adea
+deploy-demo
+ autonomous deployment agent
+**** node-haproxy
+**** serf-rpc
+**** similar projects:
+terminal runnable.com bowery usekit.com  cockroachdb http://usekite.github.io/#
+
+*** invoice/accounting
+Using meteor
+Import from trello
+Track time with org
+**** trello-export
+
+*** rostering and timesheets
+   Using my roster as example, but better
+
+*** edge
+   Finish, using meteor
+
+*** personal info app
+    make editor for personal info doc
+*** Buckley site
+*** greenglass
+new bb-server
+new html-builder
+add/finish shop
+fix intermittent image loading problem
+add news and gallery page
+add bb-blog
+
+*** bb-blog
+*** __assets
+app that lets authorized users play around with the file system of
+websites, or possibly of the whole hard drive.
+So, uploading and downloading files, rebuild site using html-builder,
+downloading snapshots, uploading snapshots
+
+Maybe even edit js and css and html and the recipe files , as I do it
+locally, but using ace editor.
+
+For more sophisticated system you could use placeholders for static
+assets and fill these buckets in some kind of manager. Maybe store these
+assets in CouchDB. You get to back it up easily through replication,
+and easy retrieval and role based write/read access. And you can share
+the assets with other sites then as well.
+
+Could I tramp to the server? Only to Linode, not jitsu
+
+
+
+
+
+
+
+
+*** Misc modules and apps
+**** vouchdb
+**** quilt
+
+**** logthis
+**** crypto-utils
+**** cachejs
+**** dbeditor
+**** validate_doc_update
+**** directive_objectEditor
+**** bootstrapjs
+
+
+** concepts
+*** defry, describe and delimit
+**** don't ever fucking repeat your self!
+    if yes -> refactor!!
+**** describe what you're doing,
+    clear logical flow, descriptive naming, choice comments, few or no corner case
+    handling or out of place logic, explicitly type or make clear what variables
+    are supposed to contain, use name params instead of list etc
+**** delimit
+break up in modules, pure/independant functions, not bigger than my head per
+function, clear global structure/architecture
+*** modules with functions not objects with methods
+*** librairies not frameworks
+*** quotes
+**** Dijkstra:
+     Industry suffers from the managerial dogma that for the sake of stability
+     and continuity, the company should be independent of the competence of
+     individual employees.
+*** pair programming
+
+Without making any judgement on the benifits or disadvantages of pair
+programming in terms of productivity, I want to make a case that the motivation
+to promote pair programming starts from false premises, and is coming from the
+wrong people.
+
+| <80>                                                                                                                                                                                                                                                                                             | <80>                                                                                                                                                                                                                                                                                                                                                   |
+| Sole programmers                                                                                                                                                                                                                                                                                 | Pair programmers                                                                                                                                                                                                                                                                                                                                       |
+| Sole workers are a black box, uncontrollable, opaque.                                                                                                                                                                                                                                            | Pair are workers transparent, controllable (through the other worker);                                                                                                                                                                                                                                                                                 |
+| Quality control needs to wait for the end result to make an assesment.                                                                                                                                                                                                                           | Quality can be monitored throughout the process.                                                                                                                                                                                                                                                                                                       |
+| Quality can be anything from very low to very high.                                                                                                                                                                                                                                              | Pair programming weeds out low quality workers/work, garantuees minium quality. Averages output, not very bad, not excellent.                                                                                                                                                                                                                          |
+| Makes the individual programmer vital and necessary for the product.                                                                                                                                                                                                                             | Makes programmers replaceble since they are not solely responsible for the output.                                                                                                                                                                                                                                                                     |
+| Needs trust in and reliance on skills of worker by the manager.                                                                                                                                                                                                                                  | Manager knows programmers are monitoring each other.                                                                                                                                                                                                                                                                                                   |
+| Extroverts get restless being quiet. This is understood by managers who are, or need to by by nature of the job extroverts.                                                                                                                                                                      | Forces an introvert to show their inherent weak side and prevents them from leveraging their difference. This alienates then from managers.                                                                                                                                                                                                            |
+| Some people are suited to programming because it is one of the few professions where it is ok or even expected to be alone, and work in silence and in solitary. If programming was a social activity it would deter a certain class of people who otherwise might be very good problem solvers. | Pair programming can be very detrimental to a certain type of people, social interaction, any social interaction can be very draining, exhausting. Not too be avoided necessarily but needing to be managed and limited to some degree, just for personal psychological reasons. In other words not suitable for introverts, especially when enforced. |
+| Work is done thinking, contemplating, designing. Typing the code is almost an afterthought, for this reason does not look productive.                                                                                                                                                            | Pair programmers certainly look very productive, even when they aren't, they can be observed as working, since they are required to sit behind a screen and keyboard, so they're supposed to type and talk. This looks busy. This is satisfying for a manager.                                                                                         |
+| Productivity is dependent on the will of the individual programmer, creativity knows no bounds: the mind is a limitless universe.                                                                                                                                                                | Productivity is encouraged (peer pressure). Creativity by nature discouraged, since you need to always convince the other first of truly original ideas.                                                                                                                                                                                               |
+
+A number of observations and remarks:
+
+- A ordinary but rational manager will always favor pair programming, for the
+  above reasons.
+- Odds are that productivity will be increased, as in functionality
+  implemented, bugs squashed.
+- Some people are not capable of routine, enforced pair programming for
+  psychological reasons. People like that fall sometimes in the profession of
+  programming since it suits them. They think/hope they can leverage their
+  perceived weakness.
+- In traditional business productivity equals money. More cars, means more
+  money as long as the advertising department does its job.
+- Programmers should perhaps have no managers, but should manage
+  themselves. Unlike almost any other profession they have all the tools to
+  their disposal to do this. And if lacking, they can add to the tools, they can
+  them build them themselves. I would guess that almost anything that in
+  ordinary professions needs a specialist can be taken on, can be automated by a
+  programmer. Programming Motherfucker!!!
+- Control must be very important to managers, since they are willing to spend
+  money for the productivity of one for the price of two! Roughly speaking, in
+  an ideal world, where all programmers are equal.
+- But communication, collaboration, brain storming, demonstration, instruction,
+  distribution of work, coordination is inherent to all software writing. You
+  write software to be used. If you want it to continue to be used you write it
+  so at the very least you yourself can read it again later. You hope always
+  that other programmers will at some point see what a solid solution you have
+  found and coded. Nobody can code the world alone. By necessity software is
+  mostly built out on modules built by other people. These modules need to
+  communicate, the people who wrote them need to communicated with. These
+  modules need coordination. A bigger design needs to be decided on. New ideas
+  need to be communicated. Technologies taught. Functionality demonstrated. Work
+  distributed. Etc etc. To say that programming is anti-social activity is
+  ridiculous. But it is fundamentally a creative activity. Innovation is
+  essential for progress in the sector as a whole. Creation requires digging
+  deep. Digging deep is difficult in a social context.
+
+ Interesting blog posts and articles:
+http://www.bennorthrop.com/Essays/2013/pair-programming-my-personal-nightmare.php#comments
+http://qz.com/260846/why-our-startup-has-no-bosses-no-office-and-a-four-day-work-week/
+http://techcrunch.com/2012/03/03/pair-programming-considered-harmful/
+
+
+
+
+
+*** 12factor
+*** seven deadly sins
+1 no comments (week later -> what??) WRITE A BOOK!!!
+2 no specs
+3 runs but is not beautiful
+4 code with added features
+5 very fast, very obscure and incorrect
+6 not beautiful
+7 code written without understanding the problem
+
+*** oop problems
+numerous objects with internal mutable state, very complex
+verboos, data and function bound together.
+
+
+** work
+*** bb-server talk at meetup
+*** javascript freelancers
+http://www.toptal.com/javascript
+https://sourcing.io/
+
+*** holland contacts
+  linkedin and stackexchage Zij zegt dat het handig is je te verbinden
+  met linked-in ,en haar mailadres is : wizzardiggo@gmail.com en je kan
+  haar alles vragen als je iets weten wilt om je te orienteren .Haar
+  naam is : Debby Drinhuyzen Er was ook een vriend van een ander
+  nichtje ,een jonge advokaat ,en via hem kun je ook connecties op doen
+  via linked -in ,via zijn naam : Dirk Zeilstra Er zijn meer
+  Zeilsta's,hij is diegene van Vinkeveen .
+
+
+
+
+*** resume
+**** sites
+    http://creddle.io/
+    http://www.livehire.me/Transparency/Faq
+**** create
+    cover letter draft is in mysrc/job_applications/cover-letter.txt
+    open mysrc/job_applications/cv/resume.js in emacs and ,k to produce md and
+    pdf versions
+
+**** Install json_resume
+
+gem install json_resume
+json_resume --help
+
+sudo apt-get install wkhtmltopdf
+sudo apt-get install texlive-latex-base
+sudo apt-get install texlive-latex-extra
+sudo apt-get install latex-xcolor
+sudo apt-get install pgf
+sudo apt-get install cm-super
+
+Or install manually?
+http://www.tug.org/texlive/quickinstall.html
+
+
+
+I did fork it to
+https://github.com/Michieljoris/json_resume
+
+**** Create resume
+node resume.js
+**** resume sites:
+Linkedin
+Stackoverflow
+Dutchstartupjobs
+***** livehire
+
+*** interview preparation
+    https://github.com/darcyclarke/Front-end-Developer-Interview-Questions#js%EF%BB%BF
+    http://www.nczonline.net/blog/2010/01/05/interviewing-the-front-end-engineer/
+    http://projecteuler.net/
+   skeela
+   xcode
+   interview books
+
+*** job boards
+seek
+glassdoor
+startup etc
+amsterdam startups
+http://www.ictergezocht.nl/ict-vacatures/plaatsen/634_amsterdam/
+http://www.itjobboard.nl/index.php?Mode=AdvertSearch&lang=nl&SearchTerms=javascript&LocationSearchTerms=amsterdam&RadiusUnit=1&Radius=0&
+http://www.livehire.me/Worker/signup#location
+  https://angel.co/amsterdam/jobs
+http://www.toptal.com/javascript
+https://sourcing.io/
+
+**** Amsterdam IT job search sites:
+
+*** startups
+https://www.startupdigest.com/
+
+https://www.leanstartupmachine.com/cities/brisbane
+**** Find cofounders
+http://www.cofounderslab.com/profile/brisbane-ecommerce-programmer-developer-founder-the-question-45254
+http://collabfinder.com/people?interests=Automation
+**** Amsterdam
+     list of startups in Amsterdam
+     http://www.dutchstartupjobs.com/job/
+     https://angel.co/amsterdam/jobs
+     http://www.wired.co.uk/magazine/archive/2013/11/european-startups/amsterdam
+     http://www.iamsterdam.com/amsterdams%20hottest%20tech%20startups
+
+    http://www.wired.co.uk/magazine/archive/2013/11/european-startups/amsterdam
+    http://www.iamsterdam.com/amsterdams%20hottest%20tech%20startups
+    https://angel.co/amsterdam/
+    http://thenextweb.com/insider/2012/09/26/amsterdam-startup-office-photos/
+    http://dutchstartupmap.com/
+
+
+
+**** Brisbane
+   http://blog.thefetch.com/startup-incubators-and-accelerators-in-australia/
+http://www.brisbanemarketing.com.au/Business/Digital-Brisbane/pages/Start-up-Brisbane
+http://tsj.io/startupmap/
+http://pollenizer.com/brisbanes-startup-scene
+http://startupqld.org/
+
+**** resources
+https://github.com/cjbarber/ToolsOfTheTrade
+
+** study
+   job questions/drilling
+   data structures and algos
+   sicp
+   joy of clojure
+   clojure koans
+*** other study
+***** ractive.js
+     It’s a very good question. Ractive doesn’t consider itself an MV* framework
+     (see my answer above), so each instance is responsible for managing its own
+     state, and these can easily become decoupled from other instances or the
+     app as a whole.
+
+There are two approaches being worked on to solve this problem with apps built
+with Ractive. The first is something called ‘adaptors’ – the idea is that a
+Ractive instance can ‘bind’ to a model via an adaptor. So you might have a
+Backbone Model/Collection adaptor, or a Firebase adaptor, or CouchDB, or
+whatever is responsible for providing that single source of truth (SSOT). I’m
+working on a state management library called Statesman
+(https://github.com/Rich-Harris/Statesman) – it’s immature and the docs are out
+of date (!) but it also has an adaptor and is built on similar reactive
+principles to Ractive. Within my own apps, Statesman usually provides the SSOT.
+
+The second is components. These are inspired by Web Components, and similarly to
+Angular directives they allow you to encapsulate markup and functionality in a
+module that can be nested within a larger app. This allows state changes to
+propagate from parent Ractive instance to child instance, and vice
+versa. There’s a discussion about this feature on GitHub –
+https://github.com/Rich-Harris/Ractive/issues/74.
+
+Neither of these features are quite ready for prime time, but watch this space!
+
+***** Can we cook up an easy web app/site development thing using custom
+elements, shadow dom, html imports (web components),(x-tags and
+polymer perhaps as well) postaljs, reactjs etc?
+http://jsperf.com/pubsubjs-vs-jquery-custom-events/66
+arbiter.js

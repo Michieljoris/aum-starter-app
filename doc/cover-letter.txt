@@ -1,0 +1,116 @@
+Hi,
+
+Let me start with the reasons why you might want to stop reading now!
+
+I have no special interest in video editors! At least not currently...
+
+I live up at the Sunshine Coast. Commuting daily would be tricky.
+
+Programming my whole life, but only for a living since 2015.
+
+However. It might still be interesting to have a chat to see if I can be useful to
+clipchamp.
+
+A lot of what's described in the job ads, and in general the culture of the
+company seems appealing to me.
+
+Pushing the browser to its limits to create a video editor and succeeding to
+make it work is just very cool.
+
+Some other things I took note of in the job ads:
+
+- tackling technical challenges (yah!)
+- a respect for programmers (ownership, drive change)
+- tech stack: WebAssembly!
+
+Credentials, such as they are:
+
+Worked for a Dutch company called DigitaleChecklisten (like
+SafetyCulture/Iauditor for Holland) for 5 years. Working
+remotely for them currently.
+
+Tech stack of main app: Rails/Ember/Mysql/Redis/ElasticSearch
+
+I worked on  the main app the first few years (and still do occasionally).
+
+Tech stack of accompanying admin app: clojure(script)/om-next/sente/material-ui
+
+Built the full stack for this app 2017 onwards.
+
+My daily job is writing clojure.
+
+Blowing my own horn a bit:
+
+After building a basic crud app my interest shifted to actually expanding
+om-next into a usable platform to build full stack apps on. I hope to open
+source this in the foreseeable future. Think Fulcro, but different solution.
+
+From the Readme:
+
+    Aum next
+
+    Server om-next parser
+
+        Use om-next queries to do crud on any mysql database, where the read can use one
+        or more joins from and to any table, constrained only by the (db-)configuration
+        of the parser.
+
+    Client om-next reconciler and parser
+
+        Generic client side om-next parser and reconciler. Support for
+        routing/paging/undo-redo.
+
+        Client test-runner
+
+    Standalone client-side om-next test-runner app to be used with the alternative
+    test macros that add and remove tests to the lists of tests. Several ways to
+    display diffs. Rerun test on click. Use snapshots for any test instead of
+    writing the required result into the test. Helpers to click and compare html
+    output for acceptance ui tests. Replay/rewind/step through (ui) tests by using
+    pause macro.
+
+So I started with clojure, ring server and om-next and sente. Building the rest
+was a lot of fun (authentication, test framework, secure and validate db, on
+demand loading, frontend validation, build tools, helper scripts, generic
+backend query parser (think graphql), generic frontend query server etc). Not
+that all this was a special interest of mine, but once set the challenge it had to
+be made.
+
+I think that's probably my strongest suit: a challenge, a scope, some freedom in
+finding a cool solution, and a foreseeable great use for the lib or feature or
+tool and I'm off.
+
+Technologies, languages, libs in essence don't matter that much. They can be
+learnt and mastered. Though I do have a particular liking for lisp(like)
+languages.
+
+However, if focus is on performance, which I'm sure it would be, I imagine
+learning and brushing up on what other clever programmers before us have put
+together (eg algorithms) would be a more than usual part of the job. As a
+selftaught programmer I kinda cherry pick what I can use. I might have to make a
+more thorough study.
+
+My stuff in general seems to be reliable. Once designed, implemented and in
+production there are of course always issues and little bugs that crop up for v2
+of the feature, but (so far) no inherent problems. Once I understand the
+problem, sound logic often can provide a decent solution that will stand up and
+work. Of course, testing is almost indispensable, but more for regressions and
+refactorings. I don't believe in TDD as a general principle, though it can be
+quite useful in some specific situations.
+
+I'm not sure where I could fit in at this stage, if at all. Backend, frontend,
+full stack. What I am looking for is a position where I can learn, do
+interesting work, make a difference and have opportunity to grow professionally.
+I don't see a path forward in my current employment. Business is too small,
+challenges are not interesting enough.
+
+The main attraction would be for me to get involved with and learn about the
+low-level programming, in time. I've dabbled in C and assembly, but that's a
+long time ago. I wouldn't qualify currently at all. But working with ui, react,
+servers, css, js etc I have some experience with.
+
+For CV please see linkedIn and/or stackoverflow.
+
+Kind regards,
+Michiel van Oosten
+0480 400 580

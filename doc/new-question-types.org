@@ -1,0 +1,1126 @@
+https://github.com/digitalechecklisten/chinchilla/issues/953
+* tent question type list
+https://tekstentoelichting.nl/effacts/form?method=ListDisplay&id=15
+* Types of questions
+
+Current questiontypes (tent type_vraag)
+1. Yes, No, N.a. √ (74)
+2. Yes, No, N.a. + Value - Date √ (75)
+3. Yes, No, N.a. + Value - Text √ (76)
+4. Yes, No, N.a. + Value - Photo √ (118, note: doesn't exist?)
+5. Yes, No, N.a. + Value - List - single answer √ (108)
+
+New questiontypes
+6. Yes, No, N.a. + Value - List - multiple answers
+7. Yes, No, N.a. + Value - Currency
+8. Yes, No, N.a. + Value - Number
+
+Same as above but without yes/no/nvt buttons
+9. Date
+10. Text
+11. List
+12. Currency
+13. Number
+
+After discussion with Lucas:
+
+The values of question types with an open value are of a specific type, depending on question type
+Validate input for question type (valuta (€ 350, $10.10, AUD1000), number ) in ember ui
+Also keep locale in mind (10,001.01 and 10.001,01)
+Every answer in a multiple answer list should show up in dashboard as a separate answer So either dashboard splits answers for analysis, or checklist can create hidden answers perhaps, and log two separate answers for the multiple choice list question, but user only sees one, the collated answer.
+Proposal is to use a boolean in tent for the list question type whether multiple answers are possible, and one more field to indicate the type of the open value in case the question is of type 'value' (3, 76).
+
+Questions:
+
+logically the date type question (2, 75) should be a value type question with type date?
+There does not seem to be a question type for photo (118) in tent.
+Also make value input field more noticable as such (box around it for example)
+
+For future consideration:
+
+A value can also be the result of a search of an external database.
+But api's are not stable perhaps, we don't want to keep maintaining these types of questions, one solution is: user/group should be able to attach script to query api, so a wrapper for the api.
+Maybe a questiontype per database or group of databases.
+Examples of external databases: kentekens, certificaties, asbest, bodem saneerders,koelinstallatie monteurs
+For closed databases user has to enter authentication perhaps, or route call to server who has authentication perhaps
+
+Test all question types on tent:
+https://jekstentoelichting.nl/effacts/form?method=SubjectDisplay&id=138202
+
+* update into DC:
+admin/update/138202
+Old list:
+http://localhost:3000/admin/update/123212
+* Don't forget to enable resque again!!!
+* tent urls
+https://tekstentoelichting.nl/effacts/basic/api/2/Subjects/123212.json
+
+* list only, multiple answers question type missing? 
+* input box style
+border: 1px lightgray dotted;
+width: 90%;
+margin-top:0.8em
+* multi select
+http://www.jarrodctaylor.com/posts/Ember-multiselect-component/
+https://github.com/SquireLabs/ember-multiselect
+http://addepar.github.io/#/ember-widgets/select
+http://emberjs.com/api/classes/Ember.Select.html#property_multiple
+* adapt pdf reports when value_open is list!!!
+* maybe store multi answer as haml
+and serialize to json?
+* send multi-answer in proper format to effacts in eanswer.rb
+* enforce value type on server!
+* locale dependant number and currency parsing
+http://www.xe.com/iso4217.php
+http://www.currency-iso.org/dam/downloads/table_a1.xml
+https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Number/toLocaleString
+http://rxaviers.github.io/javascript-globalization/
+https://github.com/jquery/globalize#currency-module
+https://github.com/wikimedia/jquery.i18n
+http://code.google.com/p/jquery-numberformatter/
+http://stackoverflow.com/questions/559112/how-to-convert-a-currency-string-to-a-double-with-jquery-or-javascript
+* should value input box be separately saveable?
+So add a save and delete button?
+Maybe when starting to type show the save/update button, if the value is already filled
+show a 'pen' edit button and 'x' delete button. Show confirmation box on deleting.
+It also makes more sense then to show validating errors while typing, and autosave is less abused. At
+the moment when you type a sentence and if you pause for more than 3 seconds
+while typing the answer is saved.
+
+* TODO
+** DONE validate currency
+** DONE make clean branch
+** DONE save currency and number non localized but show value
+** DONE multiselect without dropdown
+** DONE currency: USD10000000.22344
+** DONE list: ["bla", "foo"]
+** DONE number 12345.78899000
+** DONE better multi select
+http://www.jarrodctaylor.com/posts/Ember-multiselect-component/
+https://github.com/SquireLabs/ember-multiselect
+http://addepar.github.io/#/ember-widgets/select
+http://emberjs.com/api/classes/Ember.Select.html#property_multiple
+    
+** DONE maybe make single answer list same as multianswer?
+** DONE enforce value type on server!
+** DONE do a trim before validating so extra spaces don't show update button
+** DONE empty input doesn't validate -> wrong!
+** DONE saving date is not happening
+** DONE adapt pdf output for multi answer
+   add format open_value method to  models/answer.rb
+
+** DONE restore database.yml and rake seed
+** DONE parameterize the update task and use an environment variable for the dev db
+** DONE make number input even more tolerant, so allow 10.00.000,12
+** DONE format date in dashboard according to locale?
+** DONE save/update button label not working
+** DONE finish validation for answer#update of open values
+** DONE validate date type as a ISO 8601 string or at least "YYYY-MM-DD"
+** DONE add tests for value_open
+** DONE test single quotes in value prop!!!
+** DONE migrate answer and histories to all json value_open
+http://api.rubyonrails.org/classes/ActiveRecord/Batches.html
+
+| table     | total rows | highest id | null      | empty strin | string  | text (3) | date (2) | list (5) |
+| answers   | 3,786,230  | 3,733,615  | 3,455,980 | 286,653     | 43,597  | 35,081   |     8499 |       16 |
+| histories | 7,619,276  | 7,524,675  | 7,107,626 | 308,037     | 203,613 |          |          |          |
+| dashboard | 12,465     | 12,327,027 | 1,445,655 | 0           | 43,240  |          |          |          |
+Answers:
+{3=>35081, 2=>8499, 1=>1, 5=>16}
+Histories:
+{3=>162410, 1=>1, 2=>41177, 5=>25}
+DasboardAnswerRow
+{2=>8292, 3=>34927, 1=>1, 5=>20}
+
+AnswerHistory
+Null: 7107626
+Empty string: 308037
+Not empty: 203613
+
+DashboardAnswerRow
+Null: 1445655
+Empty string: 0
+Not empty: 43240
+
+** DONE set dashboard answer row.value_open to serialize json?
+** DONE test dashboard update
+** DONE translations, put intlGet in etc
+including pdf translations (make issue for it)
+** DONE add help txt for inputting numbers/currencies? Maybe ad helpline under input box
+margin-top: -16px;
+display: none;
+color: red;
+font-size: 15px;
+padding-left: 30px;
+padding-top: 0px;
+padding-bottom: 1px;
+<div>error text under question div
+** DONE checkout eventable in regards to json formatting of value_open
+** DONE check public reports for value_open as well
+** DONE change json into minimal json -> NO GOOD!!!
+leave out type prop, but then for dashboard create json and include type into
+json, as it is now
+- validation.rb reenable
+
+** DONE test import of checklist in v2 branch
+** DONE add tests for new question types
+** DONE make checkbox and ja/nee type question
+** DONE fix pdf
+** DONE fix icons
+   grey shade and radio button
+** DONE remove BufferedProxy
+** DONE validation for yes/no 
+value can only be yes/no/nvt, or yes/no, or cannot be set at all for value_only types
+** DONE make trello with question types
+** DONE make currency even more forgiving
+so $123,1 or $123, same for numbers
+** DONE Inject valueOpenTypemap in user login
+** DONE IMPORTANT: push fix_login_after_refresh_bug
+** DONE forgot password email in english
+
+** DONE pull request for fix_login
+** DONE push forgot_password
+Clearance forgot password template is translated, however the forgot password
+process is usually done while user is not logged in, so neither server nor
+client knows the user's locale and will both default to Dutch. 
+
+Maybe have a button to set locale? Or language? As soon user is known locale and
+language is set properly though, so in the email and follow edit password screen.
+** DONE push sweetalert deze/dit branch 
+deze document of foto? -> dit document of deze foto?
+German translation of 'Are you sure you want to change the {object} status into "{status}"?' is missing?
+added question marks
+changed wanna into want to, is a bit more polite..
+only dossier was affected by this bug, but I also replaced the other
+formatMessage calls with whole sentence translations where perhaps future languages
+might show up same problem. 
+
+** DONE ui issues
+But a few notes on the design
+
+[18:32] Johnny Eradus: You're using a dotted-border with rounded corners
+
+[18:33] Johnny Eradus: I think it's better to just keep the sharp corners and a line rather then a dotted one (edited)
+
+[18:33] Johnny Eradus: I also don't like the error you're showing, i'd prefer it simpler
+
+[18:34] Johnny Eradus: don't highlight the entire input field
+
+[18:34] Johnny Eradus: but just show a red text above the cancel button (beneath the border of the field)
+
+[18:35] Johnny Eradus: and use a real red color not rosé :stuck_out_tongue:
+
+[18:40] Johnny Eradus: The edit button is also a little weird
+
+[18:40] Johnny Eradus: clicking the item will also result in opening the edit phase
+
+[18:41] Johnny Eradus: Also focus the input field when it's clicked, that makes the transition a lot smoother
+
+** DONE merge master
+** DONE show swal immediately to verify, then confirm sending a code
+** DONE make branch with nonblocking spinner and csrf token added to dropzone
+** DONE fix offline and saving again when online
+** DONE consolidate verifyTypeQuestions and valueOpenTypeMap
+** DONE trim url input!!!
+** DONE use rubocop on all my new ruby code
+** DONE format date in pdf
+** DONE save url with!!! http://
+** DONE fix pdf
+** DONE move helpers into answer helper
+** DONE check dashboard
+** DONE api/v1/answerserializer
+Override in api/v2!!!
+
+** DONE fix all swals
+** DONE use twilio instead of textmagic
+** DONE verify toggle bug
+** DONE Test pulling checklist from tent
+** DONE Are new question types implemented on tent?
+** DONE BUT TEST IT put null in answerchoices in question
+   serialize with JsonCoder
+
+** DONE flash of update button after clicking on save
+** DONE Comma or dot and currencies can go into question_types_info!!!??!!
+No, not worth it.
+
+** DONE first correction of boolean does a save
+** DONE Test verify with all question types
+** DONE PR push spinner branch
+** DONE translations!!
+*** DONE add translations of text to sql table!!
+*** DONE answer_type_to_s in answer.rb translations, add them!!!
+*** DONE Translations!!! They mess up pdf!!!
+
+** DONE move issues to review
+** DONE do we need selectionProxy, selections, choices, valueOpenFormattedOriginal?
+** DONE send multi-answer and currency and number in proper format to effacts in eanswer.rb
+when-changed lib/tasks/debug_eanswer.rake lib/effacts/eanswer.rb -c rake dc:debug_eanswer
+** DONE do a word search on value_open!!!
+app/views/dossiers/reports/dmb/document.xml.erb:1317:45:    <% if answer.answer_type == 3 && answer.value_open.present? %>
+app/views/checklists/report.xml.builder:10:32:        xml.answer_open answer.value_open
+app/views/checklists/show.html.haml:47:53:                  = label_tag "answer[#{answer.id}][value_open]", "Datum: "
+app/views/checklists/report_pdf_wko.html.erb:205:77:                 if answer.question.tent_question_id == 'Q05802' and answer.value_open.present? and answer.value_open != ''
+Above four are not used anymore, according to Johnny
+
+app/models/dashboard_observation_row.rb:30:17:        current_value_open = nil
+
+app/helpers/public_reports_helper.rb:83:15:    if answer.value_open.present?
+app/serializers/answer_serializer.rb:2:118:  attributes :id, :checklist_id, :category_string, :activity, :deleted, :created_at, :user_id, :value, :value_text, :value_open, :answer_type, :priority_override, :priority
+app/serializers/api/v1/answer_serializer.rb:2:118:  attributes :id, :checklist_id, :category_string, :activity, :deleted, :created_at, :user_id, :value, :value_text, :value_open, :answer_type, :priority_override, :priority
+app/models/concerns/historable.rb:82:22:#     answer_history.value_open != self.value_open ||
+app/models/concerns/eventable.rb:17:24:    elsif respond_to?(:value_open)
+
+app/models/answer_history.rb:6:14:  serialize :value_open, JSON
+app/models/answer_history.rb:19:61:    AnswerHistory.where(:answer_id => answer.id).where.not(:value_open => answer.value_open.to_json).order('id desc').first
+app/models/dashboard_answer_row.rb:4:109:  #attributes :group_id, :user_id, :user_name, :checklist_id, :question_id, :question, :answer_id, :value, :value_open, :activity, :date, :priority,
+app/models/dashboard_checklist_row.rb:83:118:        answer_date = answer.created_at.to_date if ((answer.value.present? && answer.value.between?(0, 2)) || answer.value_open.present?)
+app/models/answer.rb:19:3:  VALUE_OPEN_TYPE_MAP = { 2 => "date", 3 => "text", 5 => "list-single-answer", 6 => "list-multiple-answer",
+app/assets/javascripts/dashboard/charts/simple_list_with_filter.js:205:58:          //several subkeys, we need to add the original value_open value(s) to
+app/assets/javascripts/dashboard/collections/collectionProxy.js:102:16:      return d.value_open;
+app/controllers/api/v1/answers_controller.rb:105:47:      params.require(:answer).permit(:value, :value_open, :user_id, :priority_override, :deleted)
+app/controllers/api/v2/answers_controller.rb:11:52:        # if (@answer.answer_type == 5 and @answer.value_open.present?)
+app/workers/dashboard_answer_worker.rb:12:68:      if last_answer_row.answer != answer.value || last_answer_row.value_open != answer.value_open
+test/models/answer_test.rb:12:20:    assert @answer.value_open == @answer_history.value_open
+test/models/task_test.rb:31:34:  def test_task_history_added_on_value_open_change
+test/models/event_test.rb:15:22:    # assert @answer.value_open == @answer_history.value_open
+test/controllers/answers_controller_value_open.rb:10:26:  def generic_test type, value_open, result, debug = false
+test/controllers/answers_controller_test.rb:29:23:                     'value_open'=>nil,
+lib/effacts/eanswer.rb:64:18:      if @object.value_open.present?
+
+** DONE add tests and validations for new question types
+when-changed test/controllers/answers_controller_value_open.rb  app/validators/value_open_validator.rb -c rake test test/controllers/answers_controller_value_open.rb 
+
+** DONE test migration
+*** DONE rename count methods and remove duplicate count task
+
+** DONE sloppy ipad transitions, isn't too bad
+** DONE replace code prompt with native browser prompt
+** DONE replace values with value? NO
+** DONE remove priority from verify
+** DONE  api/v1 answer serializer should not be modified
+update and get.of open values
+** DONE edit open value buttons dissappear after saving answer yes/no/nvt!!!
+** DONE add tests for api/v1/answer_controller value_open
+** DONE validation more than 5 minuts
+** DONE Use "DC" instead of "DigCheck" for the from sender.
+** DONE add screenshots, put demo online 
+** DONE Less error redness
+** DONE Put the credentials in an initializer or YML file.
+** DONE remove phone numbers
+Execute task:
+rake dc:set_user_phone_column_to_nil
+** DONE add phone nr to admin editor
+** DONE validate admin phone input
+** DONE example email validate error msg
+** DONE removed border-radius from input box
+** DONE send email if no phone number 
+** DONE verify code email
+   If you want to receive an sms instead please update your mobile phone number
+   at DC.
+
+** DONE screenshot of signed question (who/when line)
+** DONE respond to github issue
+** DONE PR fix_google maps branch
+** DONE Hmm, the refresh tab notification is something to consider. Make in issue for that :) 
+Add that we only do it on the desktop browser. As tablets already refresh themselves when you're inactive long enough.
+
+** DONE push support question branch
+** DONE if then question answer to Lucas 
+
+** DONE add time and identity of signer to answer in DC
+** DONE currency defaults to euro
+   When entering just a number
+
+** DONE Enter to update/save
+** DONE add extra zero to currency for display if only one decimal
+** DONE add more to questionTypesInfo
+   In models/answer.js:
+    isFormattedType: function () { 
+      return ~['text', 'currency', 'number', 'percentage', 'url', 'email'].indexOf(this.get('valueOpenType'));
+    }.property(),
+
+    //Some answers do not include the yes/no/nvt buttons
+    isValueOnly: function () { //no ja/nee/nvt
+      return ~[9,10,11,12,13,14,15,17,18,19,20].indexOf(this.get('answerType'));
+    }.property('answerType'),
+
+** DONE change priorityoverrideproxy to priorityOverride?
+** DONE error msg is hidden when save cancel buttons are hidden
+** DONE have to set types on input fields for ipad!!
+http://www.the-art-of-web.com/html/html5-form-validation/
+https://developer.apple.com/library/safari/documentation/AppleApplications/Reference/SafariHTMLRef/Articles/InputTypes.html
+http://blog.teamtreehouse.com/using-html5-input-types-to-enhance-the-mobile-browsing-experience
+
+
+
+** DONE controller.init super call??
+** DONE test pdf output with new question types
+** DONE don't modify 00base_models.js !!!
+** DONE scan code help popup is too big
+** DONE clean up css for gps icon button to enter local address
+** DONE dashboard is not updating
+** DONE question types info to answer model
+** DONE slider is not showing with no value
+** DONE validate time on server
+** DONE time update/save button
+** DONE can't set slider to empty string
+** DONE change date into with save/cancel buttons
+** DONE scanner src into mixin
+** DONE fix timepicki
+- DONE set time on opening to time in timepicki!!
+- DONE cancelling a empty value_open goes wrong
+http://coryforsyth.com/2014/09/24/communicating-with-ember-js-components-using-sendaction/
+
+** DONE compare eanswer with master
+make sure merge went well
+
+
+** DONE merged master
+
+
+** DONE include number widget png to staging/production 
+asset stamp is added, but timepicki doesn't know the stamp
+** DONE push show-remarks-
+** DONE tests for time
+** DONE tel replace ()
+** DONE check time input with ipad
+** DONE add links to issues to branch/pull requests
+** DONE Date is not working in IE
+** DONE cancel don't work for date
+** DONE date is not formatted according to locale
+** DONE TEST!!!! return sms is not DC on iphone??? But unknown?
+   for iphone code has to be longer than 2 chars
+** DONE on iphone don't use tel type!!!
+you can't enter decimals :-<
+
+** DONE search params in localstorage bugs
+** DONE clicking yes/no/nvt while value_open is open bug
+It saves the answer with the modified value, and original value_open. But then
+closes the save-cancel buttons and doesn't restore the value_open
+Buttons should stay visible.
+
+
+** DONE extract value_open as component
+*** merge my field types with existing field types systme
+For example the date-field
+   
+** DONE different example text for scancode if !isIpad
+** DONE open save/cancel on focus address search
+** DONE add location info to address type
+
+** DONE empty string is save not update
+** DONE something funny with list and showing "choose something" on refresh
+** DONE Add Signed at 18 augustus 2015 13:37 by admin to pdf
+
+** DONE editing yes/no/nvt closes save/cancel buttons
+** DONE Focus url input on edit
+** DONE when saving value_open offline, when it comes online again what then?
+
+** DONE flash of update when button is save 
+** DONE show saving.. instead of save/update cancel block when saving
+   am just hiding buttons immediately now
+
+** DONE Click to enter time place holder text, also for date after cancel
+** DONE BUG Save debounced answer when navigating away
+Save immediately.
+** DONE on dossier search address gps button doesn't go away after blur
+** DONE enter to enter valueopen stopped working
+** DONE save button is still flashing for lists
+** DONE ie9, ipad can't save valuta properly
+   placeholder of 123 doesn't get replaced with value
+** DONE still getting flash of save for lists
+** DONE ipad: placeholder for time and date not showing
+** DONE ipad: On ipad, when modifying date on jukebox date chooser, update button doesn't 
+show till clicking away jukebox
+   no harm, but should be same as timepicker, 
+** DONE ipad: date question  placeholder is always showing, after having been entered and then refresh
+
+** DONE hide list questions buttons on button click, not on save
+** adres input for 'my location' -> save buttons don't show
+** DONE clicking priority doesn't close other priorities
+** DONE time input, on save hide time widget as well
+
+** DONE infinity scroll
+** DONE check offline
+
+
+** ie9 time is in light font!!!
+** ie9: cancel edit of value open and placeholder disappears
+** ie9: remove edited value and text is in light font while editing, dark after updating
+** DONE show normal number on focus
+** DONE hide gps button on dossier 
+** DONE shared dossier there's no google map when read location only??o i
+** DONE remove uri edit button, edit when clicked outside text
+** DONE remark layout is messed up
+** DONE hide gps button when not focussed
+
+** DONE validator.rb accepts only null and { type: type }
+** DONE check translation migration (esp. dutch translation for one of them)
+** DONE google map zoom back to 8 or 1 whatever
+** DONE date iso Please enter a date.
+
+** DONE updating of date and cancel is not going ok
+** DONE currency is not going ok
+
+** write test for value_open and api/v1
+** Check/uncheck unedited boolean qtype: debounce works, but still saves
+** google map on dossier is acting weird.
+Different with minimal and dev db ???!!!!
+** translations
+** set time on edit to local time
+** refactor places where address-search is used, use the action don't pass so much into the component.
+** add verify code mailer tests
+** HALFDONE time format locality bound
+
+** verify should be disabled perhaps when sharing
+** url history and scanner, do they work together??
+see also code-scanner.js
+
+** phone needs some kind of formatting on display after parsing
+** DONE maybe hide detail button in sharing? @victor
+- checklist and checklist.move namespace are reversed
+- when closing search filters with triangle localstora
+
+** test sharing properly
+** make time component
+*** reset button?
+*** time format locality bound
+*** make sure format fo time is XX:XX in value_open_type.js
+
+
+** DONE find all TODO: FIXME: etc
+** DONT FORGET!!! set DEBOUNCE_INTERVAL to 3000
+** DONT FORGET!!! remove ipad=true statement from answer
+** DONT FORGET!!! REMOVE ALL window.test!!!!
+** REMOVE ALL CONSOLE STATEMENTS!!!!!
+** TEST on ie
+** TEST verify for all questions
+** TEST Barcode scanner
+http://www.pic2shop.com/developers.html
+https://github.com/LazarSoft/jsqrcode
+https://github.com/zxing/zxing/wiki/Scanning-From-Web-Pages
+https://hacks.mozilla.org/2014/12/quaggajs-building-a-barcode-scanner-for-the-web/
+http://blog.cdeutsch.com/2013/09/how-to-add-barcode-scanning-to-your-web.html
+
+Install pic2shop (iphone app) and add this link to a page::
+<a href="pic2shop://scan?callback=http://192.168.1.2:8080/EAN"">picshop iphone</a>
+After code is scanned you will get a request to your server with EAN filled in
+with the barcode.This will also open a new tab in safari.
+But only if url is different.
+https://omz-forums.appspot.com/pythonista/post/6306197401501696
+http://alandix.com/code/barcode-reader/
+https://itunes.apple.com/au/app/icody-wifi-barcode-scanner/id360767978?mt=8
+http://www.makeuseof.com/tag/how-to-build-a-custom-barcode-application-with-pic2shop-pro-wordpress/
+http://www.appthology.net/en/support/guides/guide-to-icodys-callback-scripting/
+http://www.appthology.net/en/support/guides/usage-of-icodys-webscan/
+http://www.appthology.net/en/ios-apps/icody/
+
+http://192.168.1.2:8080/open-scanner.html#EAN
+
+http://www.appthology.net/icodyscripting?barcode=###barcode###&type=###type###&date=###date###&location=###location###';
+http://192.168.1.2:8080?barcode=###barcode###&type=###type###&date=###date###&location=###location###';
+
+*** Settings/help button 
+With links to download apps, plus option to set which app to use.
+*** QR codes?
+Yes!!, 
+But need to set the type before scanning, also regex for callback would have to
+be adjusted
+
+*** DONE Test ipad mini with icody
+*** DONE Record type of the code
+*** DONE Set host of callback!!! So localhost:5000 or digitalechecklisten.nl etc
+*** TEST Disable code scan-button on android and desktop
+
+*** Use icody as well?
+** TEST offline functionality!!!!!!!!!!!!!
+Don't show contact DC!!!! When offline that is...
+** TEST in all browsers and devices
+DONE transitions on ie9 don't work
+ipad scrolls page away on code input with keyboard
+ipad slow transitions
+
+** FIX UP development.rb and database.yml and test.rb
+** DONE TEST what about iphone???
+** DONE TEST address question
+*** DONE extract google address search
+*** DONE fix dossier location search
+*** DONE add instructions on how to unblock geocoder permissions
+https://support.google.com/maps/answer/152197?hl=en
+
+*** DONE merge extract google address input branch
+** questions
+*** happy with email, sms and swal messages?
+*** Validation error messages are ok?
+Validation error messages are under the input box now, what kind of feedback
+would work?
+*** phone number validation in admin
+*** answer serializer api/v1 ?
+*** eanswer value_open is formatted in dutch locale
+Value is in 'waarde', dates in 'waardeDatum'
+*** sql translation migration german and dutch
+*** DONE hash secret in answer table?
+*** DONE credentials for twilio are in code now, ok?
+*** DONE not everybody has (mobile) phone entered into system?
+Add notification about that in email?
+Phone numbers need to be +614.. !!!
+*** DONE DigCheck?
+Alphanumeric Sender ID
+
+Alphanumeric sender IDs are used for branded one-way messaging. Alphanumeric sender IDs may be used at no additional cost when sending an SMS to countries that are supported. Accepted characters include both upper- and lower-case ASCII letters, the digits 0 through 9, and space: [A-Za-z0-9 ]. When using an alphanumeric sender ID, at least 1 letter and no more than 11 alphanumeric characters may be used.
+*** NO log verify code messages?
+  maybe for billing purposes? 
+*** NO track delivery?
+*** empty filter button should list non ja/nee/nvt questions?
+*** Verification is needed for any change, but perhaps it's only necessary to verify
+for setting to 'true' for instance. Or maybe a signature question is unmutable
+after set? 
+*** Happy with edit boxes?
+I've put a box around value open fields again, removed the edit pen icon, edit
+on focus.
+*** DONE Validation expires after 5 minutes. Ok?
+Validation code expires after 5 minutes.
+*** DONE You can only verify when online!!
+*** DONE locales of nl, en, de, au is enough?
+*** tent has all question types?
+*** proper formatting for effacts?
+- Export to effacts is as string. So number as dot separated number, currency
+  preceded with currency code, list answers as json string. Json stringified
+  arrays come out as "["one", "two"]", they might need to be formatted before
+  sending to effacts?
+
+
+
+** reduce answer types but with flags:
+From discussion on Slack with Lucas on Aug 13 2015:
+Ideally you'd want two main flags called hasValue and hasValueOpen. And a hash with flags and other info to specify what the value and value_open do and display and allow etc, such as answer_choices, which buttons of ja/nee/nvt etc. But we started with only the ja/nee/nvt and a simple value_open by default and now we're adding flags to then take away again
+
+You can leave the question types of tent_id 74,75, 76 and 188 (only ja/nee/nvt,
+date, text, list) as is, and I'll recognize them by their type in DC on import
+and categorize them properly. And any future questions build them with flags. So you'll need 12 more question types over the 5 we've got now (text, nummer, valuta, percentage, address, tijd, datum, telefoon nummer, lijst, boolean, url, email) and set flags on them to build the different question types we haven now other than the first 5.
+
+Flags are better, but I think can adapt once we swap from tent to dc/admin to make questions.  
+
+It got too complex for him, so we're using types with flags baked in, so all
+useful permutations.
+
+- with slider?
+- verify?
+- scan?
+- value_only?
+
+  Answer type should not be a number, but a description:
+-valueOpenType=false or type -valueButtons=['Yes', 'No'] or ['Yes', 'No', 'Nvt'] or []
+-verified -multiple (for list types) range (for numbers and time and date) 
+codeType (EAN,QR etc), allowed currencies, answerChoices
+** research sms services more
+http://www.quora.com/Whats-the-Cheapest-and-most-reliable-SMS-API
+http://www.programmableweb.com/news/255-sms-apis-twilio-sms-tropo-and-nexmo/2012/10/02
+When you send an sms using Twillio using a from code that's shorter than 2 chars, it shows up as from 'unknown', but only on iphone. Android shows the 'DC' as from. Officially the return string can be a two letter code, see https://www.twilio.com/docs/api/rest/sending-messages#alpha-sender-id In any case, easiest solution is to use a three or more letter return code, so not 'DC', but 'DigCheck' or something, so iphone users can have an idea where the sms message came from
+
+[13:50] Michiel van Oosten: Oh yeah, I removed the box around the value_open when not editing the value. Looks a bit better in my opinion, but one line of code to bring back again :smile:
+
+[14:32] Lucas Oost Lievense: We cannot use Digitale Checklisten in the sms?
+
+[14:41] Lucas Oost Lievense: The phonenumber is a good one. I still want to connect contacts to a checklistquestion. So you are able to search and add a contact or create a new contact. One of the reasons is the you want to register who you talked to when you did an inspection or audit. That is a direct relation between the checklist and that contact and not with the dossier and the contact. But.... let's add that to the want to have-list and not make it yet
+
+[14:52] Michiel van Oosten: In regards to the return code for the sms:  Accepted characters include both upper- and lower-case ASCII letters, the digits 0 through 9, and space: [A-Za-z0-9 ]. When using an alphanumeric sender ID, at least 1 letter and no more than 11 alphanumeric characters may be used. (from https://www.twilio.com/docs/api/rest/sending-messages#alpha-sender-id)
+
+
+[15:13] Lucas Oost Lievense: Should we not just use our phonenumber for the sms? 0031203032052
+
+[15:15] Michiel van Oosten: I'm sure that's possible.Let me try.
+
+[15:20] Michiel van Oosten: Well, it's not as easy as just inserting the phone number as 'from'. I'll look into it a bit more.
+
+[15:37] Michiel van Oosten: 'from' parameter: A Twilio phone number or alphanumeric sender ID enabled for the type of message you wish to send. Phone numbers or short codes purchased from Twilio work here. You cannot (for example) spoof messages from your own cell phone number.
+You could use: D0203032052 , it's 11 chars and has at least one 1 letter in it.
+
+[15:45] Lucas Oost Lievense: Strange
+
+[15:46] Lucas Oost Lievense: Can we get a pro account with features like that?
+
+[15:50] Lucas Oost Lievense: I expect quite a lot from this so we better do it as good as possible
+
+[16:07] Michiel van Oosten: Thought it might a phone carrier restriction, but just sent a message using textmagic service with mymobile nr as 'from' (as registered and verified by textmagic). Was able to text back as well. I'll look into it a bit more, but twilio seems definitely to exclude a 'from' phone number other than a code or a twilio number. It does a lot with voice call api's though. Textmagic just does sms (duh).
+** use Intl api to format 
+test on ipad mini.
+** finish demo.js for chin
+each branch its own db
+import chin_minimal to mysql
+do migration, bundler, possibly precompile
+put start script in demo.json:
+DATABASE_URL=mysql2://root:mypwd@localhost/<db_name>; rails s -p PORT -e development
+
+** question types need more info!!!!
+- slider -> range and step
+- code -> EAN (number), QR (url, text, number, currency etc)** questin types
+- selection -> single or multi, and answer_choices
+- currency -> allowed currencies
+- number -> range allowed
+- date -> date range
+- time -> time range
+
+
+** Slider question
+** Time question
+Make componenent
+** Handsign question
+** Take photo question
+<input type="file" accept="image/*;capture=camera">
+** Capture sound question
+** Capture video question
+
+
+
+** if then question and formula
+*** use mal to define formulas and definitions
+*** conditions
+Transform whatever form the conditions are in after entered, into mal and store
+them like that with the questions
+Evaluate mal expressions with the answers' values and value_opens in the
+namespace, and any other variable.
+
+Find all the show/hide calls of all conditions, pick any condition, follow graph
+up till you get to condition that can get resolved to show or hide. You can
+detect circular dependencies this way. Hidden questions have undefined values.
+
+Find all root answers -> answers that ar shown no matter what, sot that are not
+mentioned in any show/hide calls
+
+Same system can be used for formula questions.
+
+If parent is hidden, child is hidden no matter the result of any conditions.
+
+Go through all conditions, 
+
+*** hide category if it contains no questions
+http://mistic100.github.io/jQuery-QueryBuilder/demo.html
+http://www.taffydb.com/writingqueries
+http://dev.datasift.com/blog/query-builder
+
+
+
+** translations for verify code email!!
+   see translation migration
+      return I18n.formatMessage('Last updated at {date} by {name}', {
+        date: this.get('updatedAt'),
+        name: this.get('user.name')
+      });
+** Study https://app.safetyculture.io/#/
+** answer_choices null refer issue in commit
+
+
+** smooth out dropbox transition css
+** what to do when locale isn't set???
+** dashboard sorting bug on select hack
+
+** integrate with dossier field types
+** put online with demo
+   combine with docker!!?!?!?!
+   in prod mode?
+
+** new question types
+https://tekstentoelichting.nl/effacts/form?method=ListDisplay&id=15
+*** DONE percentage type question
+*** DONE url type question
+*** DONE email type question
+*** DONE signature/verify user question
+https://github.com/mdp/rotp
+https://www.twilio.com/docs/howto/walkthrough/account-verification/ruby/rails#12
+https://www.textmagic.com/sms-pricing/
+https://github.com/bobes/textmagic/
+test@axion5.net sp
+Yx21lWhob9
+*** address question
+*** ifttt question
+*** formula question    
+*** address question
+*** select one or more answers from results of external db call
+
+
+* NEW ISSUES
+*** Don't save or retrieve all props for all models all the time!
+*** check better logger with IE9
+*** ??
+https://github.com/digitalechecklisten/chinchilla/issues/923
+https://github.com/digitalechecklisten/chinchilla/issues/923
+*** pikaday weird behaviour
+https://github.com/digitalechecklisten/chinchilla/issues/956
+*** Don't show inactive checkists/questions
+https://github.com/digitalechecklisten/chinchilla/issues/779
+*** Lock checklist after completing
+*** url field dossier type
+https://github.com/digitalechecklisten/chinchilla/issues/954
+*** save on dirty dossier/checklist index pages
+https://github.com/digitalechecklisten/chinchilla/issues/964
+    See last commit msg
+
+*** notify user on new version
+https://github.com/digitalechecklisten/chinchilla/issues/989
+
+*** Checklist workflow
+https://github.com/digitalechecklisten/chinchilla/issues/983
+Set name and date in popup on new checklist
+
+* add precompile and bundler to demo js init script
+* study heaps analytics
+* add tests to picture controller
+https://github.com/digitalechecklisten/chinchilla/issues/903#issuecomment-115189067
+see add_picture_test branch
+* dossier url field type
+* does iconsj4k4j35345.png belong in .gitignore?
+* check remaining pull requests for correctness
+* running rails on demo@ninja is not performant
+* DONE add csrf to dropzone
+* DONE try to use demo on axion.ninja with dc app.
+Install ruby, mysql etc on server, see dc wiki
+* DONE make issue for pdf translation
+  done
+* DONE reset password template translations
+  made issue
+* issue comment
+Current state of affairs and some rambling:
+
+Basically implented all question types. Remaining ones are same as existing but
+without the ja/nee/nvt buttons, so got them for free :->
+
+Still working out the dashboard and making sure it works as expected.
+
+As a proposal changed the editing of open values and lists: 
+
+When clicking on a value to edit it an update button appears. Value and answer
+doesn't get updated till update button is clicked. A cancel button restores the
+answer to what it was before. Before when somebody took more than 3 seconds
+pause before finishing typing in an answer autosave would have already saved the
+incomplete answer to the server.
+
+Another change is the selecting of one or more answers from a list: 
+No dropdown, but an inline expanding of the list. Users can at their leisure
+select the desired answers, then again an update button commits the answer. The
+list then shrinks to the selected/ticked answers. Also has a cancel button.
+
+Internally the problem is how to store typed fields and multi answers. I
+implemented the simplest solution which requires the least amount of changes to
+api (just some validating) and ui, but requires adapting the dashboard somewhat:
+
+All values of all types are stored in the value_open field as a string. Multi
+answers are stored as json stringified array. Type can be deduced and formatting
+localized when displayed (in pdf, dashboard, checklist etc), see points below.
+
+I thought about creating an answer row for every selected answer in a multi
+answer question, but it would require housekeeping on the api side every time an
+multi answer is saved and retrieved, since they would have to be collated on
+retrieval and separated on saving, unless you all that on the client side, but same
+mess. Plus the number of answers would not match the number of answers/questions
+that are actually in the ui of checklists. It would skew numbers in the
+dashboard which would then have to be adapted to show correct numbers. And
+creating the pdf report would have to be adapted, and every where else answers
+are reported or analyzed etc.
+
+Another solution would be to adapt the creating of the csv and/or dashboard
+tables and add extra rows when a answer is of the multi type. Dashboard would
+also still show skewed numbers and would have to be adapted.
+
+But even though the alternate solutions have some advantages they seem messy to
+me.
+
+One could store open values always in an json stringified object such as { type:
+'number', value: '1234' } or { type:'currency', currency: 'EUR', value: '123.45'
+} etc, but then they would have to be decoded every time you read them out. At
+the moment I'm doing it a bit more pragmatically. json for multi, string for
+numbers, text and currencies, but in a defined and validated format.
+
+
+- Tent needs to be configured to send specified data so DC can work out question
+  types: Maybe add a flag to indicate value only (so no ja/nee/nvt) and a flag
+  for list answers whether it is multi-answer. In response to Lucas' last
+  comment: I agree to setup tent so that users can intuitively and easily create the
+  various quesion types. DC just needs to be able to work out and create the
+  various question/answer types in a consistent manner on import. 
+- Lists of values (multi answer list) are saved as json, currency is saved as
+  <3 letter currency code><number> (eg EUR123.45) and number as string of digits with dot as
+  decimal separator (eg 123.456). 
+- It's the the responsibility of ui to display values properly formatted, using
+  user's locale. 
+- The open value entry editor validates currencies and numbers, and is quite
+  forgiving but unambiguous: $123,34 , USD 123,34 , US$123,34 and 123,34 $ are all valid
+  entries, as is $1 123,34 or $1.123,34 However use of comma or dot for decimal
+  separator is dependant on user locale. After entering and clicking update
+  button value gets displayed in a locale standard format. So entering US$1123,34
+  becomes 1.123,34 $ for instance in 'de' locale. 
+- Numbers and currencies get validated as you type, red outline and the absence
+  of update button means input is no good!
+- Numbers never get converted to a real number type to avoid javascript or ruby
+  corrupting the input, they are entered as strings and stay strings, but they
+  do get normalized to using a dot decimal separator. So unlimited precision!
+- If the values need to be processed as numbers somewhere the converting can be
+  done then. Currencies are numbers preceded with a 3 letter currency code, see
+  http://www.xe.com/iso4217.php for all possible codes. 
+- Currently valid locales: nl, en, de, au, recognized currencies: EUR, USD, AUD,
+  GBP (and their currency symbols $,£,€ and variations) More can be added, or
+  all, but that would require loading the table and all 
+- Dashboard works out type of open answer, formats it and groups it properly, so
+  you can for instance filter on all the questions that have a particular
+  answer, even when that answer is a selection in a multi answer list type of
+  question.
+  However dashboard will need to be adapted a little more again to: the list of
+  filters is now not what it should be, and doesn't work properly when multi
+  answers are involved.
+- Pdf output also formats its output properly.
+- Open values (currencies, numbers and text) display cancel and update buttons
+  when editing. Editing starts when clicking the value. Alternatively a little
+  pencil can be displayed perhaps.
+- Multi answer list questions work similarly. After clicking one of the values
+  all values are displayed with only the selected ones having a green tick.
+  Freely edit the selection then click update button and non selected answers
+  will disappear with selected remaining.
+- Currencies and numbers are displayed in locale dependant format.
+- I adapted the dashboard seed task and database.yml while testing. To prevent
+  changes like these to end up in master maybe we can parameterize the update
+  task and use an environment variable for the dev db?
+
+Questions:
+*** locales of nl, en, de, au is enough?
+*** tent has all question types?
+*** proper formatting for effacts?
+- Export to effacts is as string. So number as dot separated number, currency
+  preceded with currency code, list answers as json string. Json stringified
+  arrays come out as "["one", "two"]", they might need to be formatted before
+  sending to effacts?
+- Are there any other places where open answers are displayed other than pdf,
+  dashboard, effacts and checklist?
+- List [multiple answers, value only] question type is missing?
+- What dossier field types are needed/required/missing? You can certainly use
+  the same validator for numbers and currencies though.
+
+TODO
+- export format of questions from tent needs to be decided on and implemented
+- is date formatted in dashboard (and other places) according to locale?
+- what to do when locale isn't set???
+- send multi-answer and currency and number in proper format to effacts in eanswer.rb
+- add tests for answer#update of open values
+- test in all browsers and devices
+  
+* snippets
+
+** twilio
+{
+  "sid": "SM6cfe6c401dfc40129982520636cee079",
+  "date_created": "Fri, 17 Jul 2015 05:41:30 +0000",
+  "date_updated": "Fri, 17 Jul 2015 05:41:30 +0000",
+  "date_sent": null,
+  "account_sid": "AC2151d3a40a1f2fc330f2ab87a7ee1f41",
+  "to": "+61401609832",
+  "from": "DigCheck",
+  "body": "Bla2",
+  "status": "queued",
+  "num_segments": "1",
+  "num_media": "0",
+  "direction": "outbound-api",
+  "api_version": "2010-04-01",
+  "price": null,
+  "price_unit": "USD",
+  "error_code": null,
+  "error_message": null,
+  "uri": "/2010-04-01/Accounts/AC2151d3a40a1f2fc330f2ab87a7ee1f41/Messages/SM6cfe6c401dfc40129982520636cee079.json",
+  "subresource_uris": {
+    "media": "/2010-04-01/Accounts/AC2151d3a40a1f2fc330f2ab87a7ee1f41/Messages/SM6cfe6c401dfc40129982520636cee079/Media.json"
+  }
+}
+
+class VerifyCodeMailer < ActionMailer::Base
+  default from: "info@digitalechecklisten.nl"
+  helper IntlHelper
+
+  def send_code(user, code)
+    @user = user
+    @code = code
+    mail(to: @user.email, subject: 'Verify code for Digitale Checklisten')
+  end
+
+end
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
+  </head>
+  <body>
+    <h1>Hi <%= @user.name %></h1>
+    <p>
+        <%=translate("Please enter this code to verify your identity: #{@code}")%>
+    </p>
+  </body>
+</html>
+
+Hi <%= @user.name %>
+
+<%=translate("Please enter this code to verify your identity: #{@code}", @user.locale)%>
+# Preview all emails at http://localhost:3000/rails/mailers/verify_code_mailer
+class VerifyCodeMailerPreview < ActionMailer::Preview
+  def send_code_preview
+    VerifyCodeMailer.send_code(User.first, 123)
+  end
+end
+
+
+localhost:5000/admin/update/138202
+
+    // ((mailto\:|(news|(ht|f)tp(s?))\://){1}\S+)
+        // number.toLocaleString(locale, {style:'currency', currency: currency, useGrouping: true}) : false;
+// function testToLocaleString(n, locales, currencies) {
+//   locales.forEach(function(locale) {
+//     currencies.forEach(function(currency) {
+//       console.log(locale + " " + currency + " " + n.toLocaleString(locale, {style:'currency', currency:currency, useGrouping:true}));
+//     });
+//   });
+// }
+
+// console.log(testToLocaleString(1000.001, ["nl", "de", "en", 'au'], ["EUR", "GBP", "USD", "AUD"]));
+
+
+
+
+* questions
+- I convert all empty strings into null for value_open, most likely the result of
+clicking or touching the box by accident, without actually entering a value.
+- There are a number of answers with null for answer_type, I assume they're type 1
+Some of the updates are recent ?
+- Value_open is found in some report templates, are they still used?
+
+- What about the other question types on tent?
+
+- Only implemented sofar for de, en and nl locales, can easily add locales if
+  needed, or all locales.
+
+- Happy with json being like { type: "currency", value:"123,45", currency:"AUD" }?
+Very easy for dashboard, but takes up space in db, since answer_type is already
+in the rows for answers and answer_histories. You could on creating of
+dashboard_answer_rows put the jsons in there
+- I can use t, v, and c for type, currency, value,
+- I can use numbers for type instead of string
+- I can leave out type, but then have to add it to the json when creating dashboard_answer_rows
+
+- Ruby json only parses objects and arrays, javascript parses other types as
+  well (string, boolean), so using object to describe all types instead of
+  sometimes array, sometimes object and/or adjusting json serializer in rails
+- Lucas: when setting the choices of a question the type reverts back to 5, 118
+  in tent
+- do users need a 'please refresh browser for new version?'
+
+- formatting of boolean? true/false or checked/unchecked or 1/0, Lucas wants ja/nee
+
+- Should text input field be a text area
+- What to do with the boolean question in dashboard? Is open value!! L. says:
+  yes is open value, treat it as such.
+- Foto question, profile editor?  
+-
+
+Try http://dc-demo.ngrok.com/  username admin@test.com password irma  to try it live. Try to enter dates, currencies, numbers. Is the validation practical? The icons for the single choice list need to be replaced still though.
+
+* slack
+Email and sms works, demo is up at http://dc-demo.ngrok.com
+
+You should get email and sms on:
+jeradus@gmail.com 31641765054
+lucasoostlievense@gmail.com 31652033384
+
+But you need to log in using the above email addresses.  Password is still irma
+Email is still minimal, but it'd be easy to add links to checklist, dossier etc.
+
+Question 20, the 'signature' question, requires verification. I've also enabled
+verification for demo purposes question 3 (text) and 5 (list).
+
+Verification is needed for any change, but perhaps it's only necessary to verify
+for setting to 'true' for instance. Or maybe a signature question is unmutable
+after set? 
+
+I've put a box around value open fields again, removed the edit pen icon, edit
+on focus.
+
+Validation error messages are under the input box now, what kind of feedback
+would work?
+
+Validation code expires after 5 minutes.
+
+It's possible to track delivery of sms, however is not implemented. Also it
+might be an idea to log these verification events, if nothing else to keep track
+of how many sms are sent, they cost about 10 cents each. 
+
+
+deleting_coupled_user_save_the_checklist_directly_964
+
+
+
+google_maps_search_in_dossier_doesnt_always_work_978
+
+* conflicts merge 6/8/15
+# Auto-merging test/test_helper.rb
+# CONFLICT (content): Merge conflict in test/test_helper.rb
+# Auto-merging test/fixtures/answers.yml
+# CONFLICT (content): Merge conflict in test/fixtures/answers.yml
+# Auto-merging test/controllers/answers_controller_test.rb
+# Auto-merging lib/effacts/eanswer.rb
+# CONFLICT (content): Merge conflict in lib/effacts/eanswer.rb
+# Removing lib/effacts/eaction.rb
+# Auto-merging db/schema.rb
+# CONFLICT (content): Merge conflict in db/schema.rb
+# Auto-merging config/routes.rb
+# Auto-merging config/environments/test.rb
+# CONFLICT (content): Merge conflict in config/environments/test.rb
+# Auto-merging app/views/layouts/chinchilla.html.erb
+# CONFLICT (content): Merge conflict in app/views/layouts/chinchilla.html.erb
+# Removing app/views/clearance_mailer/change_password.html.erb
+# Auto-merging app/views/checklists/report_pdf.html.erb
+# Auto-merging app/models/answer.rb
+# Auto-merging app/helpers/setup_app_helper.rb
+# Auto-merging app/helpers/intl_helper.rb
+# CONFLICT (content): Merge conflict in app/helpers/intl_helper.rb
+# Auto-merging app/controllers/api/v2/answers_controller.rb
+# CONFLICT (content): Merge conflict in app/controllers/api/v2/answers_controller.rb
+# Auto-merging app/controllers/api/v1/answers_controller.rb
+# Auto-merging app/assets/stylesheets/screen.scss
+# CONFLICT (content): Merge conflict in app/assets/stylesheets/screen.scss
+# Auto-merging app/assets/stylesheets/icons.scss
+# Auto-merging app/assets/stylesheets/header.scss
+# Auto-merging app/assets/stylesheets/forms.scss
+# CONFLICT (content): Merge conflict in app/assets/stylesheets/forms.scss
+# Auto-merging app/assets/stylesheets/answer.css.scss
+# CONFLICT (content): Merge conflict in app/assets/stylesheets/answer.css.scss
+Auto-merging app/assets/javascripts/views/dossier_location_field_view.js
+CONFLICT (content): Merge conflict in app/assets/javascripts/views/dossier_location_field_view.js
+# Auto-merging app/assets/javascripts/views/answer_view.js
+# Auto-merging app/assets/javascripts/templates/default/dossier/field_types/location.hbs
+# CONFLICT (content): Merge conflict in app/assets/javascripts/templates/default/dossier/field_types/location.hbs
+# Auto-merging app/assets/javascripts/templates/default/dossier/field_types/email.hbs
+# Auto-merging app/assets/javascripts/templates/default/checklists/show.hbs
+# CONFLICT (content): Merge conflict in app/assets/javascripts/templates/default/checklists/show.hbs
+# Auto-merging app/assets/javascripts/templates/default/checklists/_answer.hbs
+# CONFLICT (content): Merge conflict in app/assets/javascripts/templates/default/checklists/_answer.hbs
+# Auto-merging app/assets/javascripts/routes/01-session.js
+# Removing app/assets/javascripts/models/models.js
+# Auto-merging app/assets/javascripts/models/dossier.js
+# Auto-merging app/assets/javascripts/models/00base_models.js
+# Auto-merging app/assets/javascripts/helpers/date_field.js
+# CONFLICT (content): Merge conflict in app/assets/javascripts/helpers/date_field.js
+# Auto-merging app/assets/javascripts/controllers/notes.js
+# CONFLICT (content): Merge conflict in app/assets/javascripts/controllers/notes.js
+# Auto-merging app/assets/javascripts/controllers/login.js
+# CONFLICT (content): Merge conflict in app/assets/javascripts/controllers/login.js
+# Auto-merging app/assets/javascripts/controllers/dossier/show.js
+# CONFLICT (content): Merge conflict in app/assets/javascripts/controllers/dossier/show.js
+# Auto-merging app/assets/javascripts/controllers/checklist/show.js
+# CONFLICT (content): Merge conflict in app/assets/javascripts/controllers/checklist/show.js
+# Auto-merging app/assets/javascripts/controllers/checklist/move.js
+# CONFLICT (content): Merge conflict in app/assets/javascripts/controllers/checklist/move.js
+Auto-merging app/assets/javascripts/controllers/answer.js
+CONFLICT (content): Merge conflict in app/assets/javascripts/controllers/answer.js
+# Auto-merging app/assets/javascripts/components/detail-buttons.js
+# CONFLICT (content): Merge conflict in app/assets/javascripts/components/detail-buttons.js
+# Auto-merging Gemfile.lock
+# Auto-merging Gemfile
+Automatic merge failed; fix conflicts and then commit the result.
+
+
+CHECK LOCATION SEARCH in DOSSIER!!!!
