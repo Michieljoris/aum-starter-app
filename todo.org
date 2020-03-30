@@ -1,8 +1,8 @@
 #+TITLE: todo
-* Load bugsnag api keys from gitignored .env file in update-html-string
 * Set app name in update-html task config
-* Load revolt.edn from base dir of repo
-* remove duplication between revolt.edn and main.figwheel
+Remove app-dev from update-html. Think if this matters.
+* Build prod jar
+** remove duplication between revolt.edn and main.figwheel
 * import branches:
 -old-aum master branch!!!!! look at commits
 -admin-misc-fixes
@@ -28,7 +28,6 @@
   "Stops all systemic systems"
   (interactive)
   (cider-interactive-eval "(systemic.core/stop!)"))
-* migrate the tests over from aum-old
 * add db migration lib
 * icons
 * DONE foreign libs (react!!)
@@ -39,16 +38,26 @@
 * Clean up, browse and copy useful stuff from all DC notes to my own pagora notes
 * Clean up github
 * Make intro/guide to repos
-* Modules
-** Add security (auth etc) as module
-** Add paging and routing as module
-** Testrunner as module
-** Download etc as module
-** Event store
-** Calc active users
-** Data inspector
+* Migrate over:
+** aum tests
+** As modules
+*** Add security (auth etc) as module
+bugsnag, authorization, login, logout etc
+- Load bugsnag api keys from gitignored .env file in update-html-string
+*** Add paging and routing as module
+*** Testrunner as module
+*** Download etc as module
+*** Event store
+*** Calc active users
+*** Data inspector
 * Data entry environment design document
 mydesign.deed
+* Get multiple remotes working!!!
+- frontend goes to aum by default. But perhaps we want to call on some other api
+- backend should be able to fetch data async and push
+
+* Maybe
+** Load revolt.edn from base dir of repo
 * write docs
 ** make-cmp and om-data
 ** backend parser
@@ -59,4 +68,3 @@ mydesign.deed
 ** revolt
 ** config for front and backend
 multimethods!
-* Get remotes working!!!

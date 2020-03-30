@@ -9,8 +9,14 @@
    [bidi.bidi :as b]
    [integrant.core :as ig]
    [clojure.pprint :refer [pprint]]
-
+   [clojure.tools.namespace.repl :as n]
    [taoensso.timbre :as timbre]))
+
+
+(n/set-refresh-dirs "src" "libs-src" "src-frontend")
+;; (n/disable-unload!)
+;; (def pp pprint)
+;; (n/refresh)
 
 ;; (timbre/info :#w "++++++++++ Loaded dev user namespace ++++++++++")
 (defn restart []
@@ -25,6 +31,8 @@
 
 ;;RESTART ====================
 (restart)
+;; (dev/halt)
+;; (dev/go)
 ;;RESTART ====================
 
 ;; (dev/go)

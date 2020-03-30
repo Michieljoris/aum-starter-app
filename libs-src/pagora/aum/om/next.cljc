@@ -14,8 +14,8 @@
               [taoensso.tufte :as tufte :refer-macros (defnp p profiled profile)]
               [goog.object :as gobj]
               [goog.log :as glog]
-              [js.react :as react]
-              [js.react-dom :as react-dom]
+              [js.react]
+              [js.react-dom]
               [pagora.aum.om.next.cache :as c]])
    [pagora.aum.om.next.impl.parser :as parser]
 
@@ -36,13 +36,14 @@
    [cljs.analyzer.api :as ana-api]
    [taoensso.timbre :as timbre]
    [clojure.string :as str])
+
   #?(:clj  (:import [java.io Writer])
      :cljs (:import [goog.debug Console])))
-
 ;; (tufte/add-basic-println-handler! {})
 
-(def pp pprint)
+
 ;; =============================================================================
+
 
 ;;Defui
 ;;Utilities
@@ -478,13 +479,13 @@
                                {:doc docstring})))
                     []
                     (this-as this#
-                      (.apply react/Component this# (js-arguments))
+                      (.apply js/React.Component this# (js-arguments))
                       (if-not (nil? (.-initLocalState this#))
                         (set! (.-state this#) (.initLocalState this#))
                         (set! (.-state this#) (cljs.core/js-obj)))
                       this#))
            set-react-proto! `(set! (.-prototype ~name)
-                                 (goog.object/clone react/Component.prototype))
+                                 (goog.object/clone js/React.Component.prototype))
            ctor  (if (-> name meta :once)
                    `(when-not (cljs.core/exists? ~name)
                       ~ctor
@@ -855,7 +856,7 @@
             ;; (js/console.log  *shared*)
             ;; (js/console.log  *parent*)
             ;; (js/console.log  *depth*)
-            (react/createElement class
+            (js/React.createElement class
               #js {:key               key
                    :ref               ref
                    :omcljs$reactKey   key
@@ -2710,9 +2711,9 @@
          optimize     (fn [cs] (sort-by depth cs))
          history      100
          root-render  #?(:clj  (fn [c target] c)
-                         :cljs #(react-dom/render %1 %2))
+                         :cljs #(js/ReactDOM.render %1 %2))
          root-unmount #?(:clj   (fn [x])
-                         :cljs #(react-dom/unmountComponentAtNode %))
+                         :cljs #(js/ReactDOM.unmountComponentAtNode %))
          pathopt      false
          migrate      default-migrate
          easy-reads   true}

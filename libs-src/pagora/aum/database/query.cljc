@@ -137,14 +137,14 @@
   fns an appropriate validating fn is found using the :db-config as
   set in the env and by calling security/get-validation-fun. This will
   also throw an exception if no validation fn is found. For any extra
-  hugsql fns a validate-sql-fn method will need to be defined, since
+  hugsql fns a validate-sql-fun method will need to be defined, since
   it will throw an exception by default.
 
   It is possible to use this fn to just call (and possibly log) sql
   fns with complete custom processing of params, results and custom
   validations by passing in fns for all keys starting with aum-.
   However in practice it'll be probably enough to extend the various
-  multimethods (process-params, process-result and validate-sql-fn).
+  multimethods (process-params, process-result and validate-sql-fun).
 
   Minimal env param:
 {:db-conn some-db-conn
@@ -156,7 +156,7 @@
  :sql {:aum-process-params your-process-params
        :aum-process-result your-process-result
        :aum-hugsql-ns \"your-hugsql-fns-ns\"
-       :aum-validate-sql-fn your-validate-sql-fn
+       :aum-validate-sql-fun your-validate-sql-fun
        :hugsql-ns \"more-hugsql-fns-ns\"}
  }
 

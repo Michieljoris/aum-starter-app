@@ -1,4 +1,4 @@
-(ns pagora.aum.database.validate-sql-fn
+(ns pagora.aum.database.validate-sql-fun
   (:require [pagora.aum.database.query :as q]
             [pagora.aum.security :as security]
             [taoensso.timbre :as timbre :refer [info]]))

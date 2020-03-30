@@ -14,10 +14,14 @@
 
 (def ^{:dynamic true} *schema-warnings* true)
 
+;; (ns-unmap *ns* 'process-user)
+
 (defmulti process-user
   "foo"
-  (fn [env user role]
-    role))
+  (fn [env user]
+
+      (timbre/info :#pp {:again :there!!!})
+    (:id user)))
 
 (defmethod process-user :default
   [env user]

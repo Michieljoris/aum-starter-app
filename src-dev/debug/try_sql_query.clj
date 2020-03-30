@@ -3,7 +3,7 @@
    [pagora.clj-utils.database.connection :as db-connection]
    [pagora.aum.database.process-params]
    [pagora.aum.database.process-result]
-   [pagora.aum.database.validate-sql-fn]
+   [pagora.aum.database.validate-sql-fun]
    [pagora.aum.database.schema :as schema]
    [pagora.aum.database.query :refer [sql]]
    [clojure.java.jdbc :as jdbc]
@@ -13,7 +13,6 @@
    [cuerdas.core :as str]
    [clojure.pprint :refer [pprint]]
    [taoensso.timbre :as timbre :refer [info]]))
-
 
 ;; Test sql fn
 (comment

@@ -4,6 +4,7 @@
              [pagora.clj-utils.network.http-get :as network]
              ;;           ;; [pagora.aum.test.snapshot :as snapshot]
              ])
+   [pagora.clj-utils.core :as cu]
    [pagora.aum.util :as au]
    [pagora.aum.security :as security]
    [pagora.aum.om.next.impl.parser :as omp]
@@ -54,7 +55,7 @@
 (defmethod event-msg-handler :aum/query
   [{:keys [?data ?reply-fn uid] :as ev-msg }
    {:keys [parser parser-env config websocket]}]
-  (do ;; try
+  (try
     (let [query      ?data
           query-type (if (mutation? query) "Mutation" "Read")]
       (when (:query-log config)
@@ -66,11 +67,10 @@
 
       ;; Parser might set status to something other than :ok
       (reset! (:state parser-env) {:status :ok})
-
-      (let [user     (get-user-by-ev-msg parser-env ev-msg)
+      (let [user   {:id 1 :name "admin"}  ;; (get-user-by-ev-msg parser-env ev-msg)
             response {:value (if user
-                               (let [user      (security/process-user parser-env user)
-                                     user      (select-keys user
+                               (let [user (security/process-user parser-env user)
+                                     user (select-keys user
                                                             (security/get-whitelist parser-env :read :user user))
                                      {:keys [chsk-send!]} websocket]
                                  (parser {:user user
@@ -94,12 +94,12 @@
                                 :config config}))
               (send-response {:uid uid :?reply-fn ?reply-fn :query query :response response
                               :config config}))))))
-    ;; (catch #?(:clj Exception :cljs :default) e
-    ;;     (timbre/info e)
-    ;;   (let [{:keys [msg context stacktrace] :as error} (cu/parse-ex-info e)]
-    ;;     (?reply-fn
-    ;;      {:status :error
-    ;;       :value {:message msg :query ?data :context context :stacktrace [:not-returned]}})))
+    (catch #?(:clj Exception :cljs :default) e
+        (timbre/info e)
+      (let [{:keys [msg context stacktrace] :as error} (cu/parse-ex-info e)]
+        (?reply-fn
+         {:status :error
+          :value {:message msg :query ?data :context context :stacktrace [:not-returned]}})))
     ))
 
 (defmethod event-msg-handler :app/call-external-api

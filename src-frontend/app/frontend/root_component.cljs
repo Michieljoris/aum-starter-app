@@ -3,7 +3,6 @@
    [sablono.core :as html :refer-macros [html]]
    [pagora.aum.om.next :as om :refer-macros [defui]]
    [taoensso.timbre :as timbre]
-   [js.react :as react]
    [pagora.aum.frontend.util :refer [make-cmp om-data]]
    )
   )
@@ -27,10 +26,10 @@
      ])
   Object
   (render [this]
-    (let [data (om-data this)]
+    (let [{:keys [props state computed] :as data} (om-data this)]
       (timbre/info :#pp {:data data})
       (html [:div
-             "Hello"
+             "Hello " (-> props :user first :name)
              ;; (foo this :foo)
              ]))
     )

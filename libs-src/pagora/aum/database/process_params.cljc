@@ -59,7 +59,7 @@
   (let [{:keys [keys vals]} (cu/map->keys-and-vals mods)
         cols (hyphened-keywords->underscored-strings keys)]
     (assoc params
-           :table-keyword table ;;used in bilby validate-sql-fn multimethod
+           :table-keyword table ;;used in bilby validate-sql-fun multimethod
            :table (db-inspect/table-name env table) :cols cols :vals vals
            :no-timestamp? (db-inspect/no-timestamp? env table))))
 
