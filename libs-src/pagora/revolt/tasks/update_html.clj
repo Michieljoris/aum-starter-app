@@ -13,16 +13,13 @@
          (wrap-with-quotes environment) " data-appversion="
          (wrap-with-quotes version) "></script>" )))
 
-
 (defn update-html-string [html-string {{:keys [sha tag branch timestamp version env]} :ctx
                                        :as options}]
   (let [{:keys [bugsnag-api-key-frontend
                 include-build-info-in-html
-                app-name path
-                load-app-dev]} (get options (or (keyword env) :dev))
+                app-name path]} (get options (or (keyword env) :dev))
         bugsnag-ph "<!--bugsnag-->"
         app-js-ph "<!--app-js-ph-->"
-        app-dev-js-ph "<!--app-dev-js-ph-->"
         build-json-ph "<!--build.json-->"
         app-name-ph "<!--app-name-->"
         html-string
@@ -37,14 +34,9 @@
                                                                      "\",sha:\"" sha
                                                                      "\",env:\"" env
                                                                      "\"}</script>"))
-          load-app-dev (str/replace app-dev-js-ph
-                                    (str "<script type=\"text/javascript\" src=\"/" path "/app-dev.js\"></script>"))
           true (str/replace app-js-ph
-                            (str "<script type=\"text/javascript\" src=\"/" path "/app.js\"></script>"))
-          
-          )
-        ]
-    (str/replace html-string (re-pattern (str/join "|" [bugsnag-ph app-dev-js-ph build-json-ph])) "")))
+                            (str "<script type=\"text/javascript\" src=\"/" path "/app.js\"></script>")))]
+    (str/replace html-string (re-pattern (str/join "|" [bugsnag-ph build-json-ph])) "")))
 
 
 
@@ -60,10 +52,8 @@
 
 ;; (invoke {:env "prod"} {:src-path "resources/admin-template.html"
 ;;                        :dest-path "resources/admin.html"
-;;                        :dev {:load-app-dev true
-;;                              :include-build-info-in-html false}
-;;                        :prod {:load-app-dev false
-;;                               :include-build-info-in-html true
+;;                        :dev {:include-build-info-in-html false}
+;;                        :prod {:include-build-info-in-html true
 ;;                               :bugsnag-api-key-frontend "123"}
 ;;                        }
 ;;         nil)

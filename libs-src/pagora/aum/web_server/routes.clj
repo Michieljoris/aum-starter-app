@@ -85,6 +85,4 @@
 (defmethod ig/init-key ::routes [k {:keys [config websocket]}]
   (when (:integrant-log config) (timbre/info :#g "[INTEGRANT] creating" (name k)))
   (let [routes (make-routes config websocket)]
-
-    ;; (timbre/info :#pp {:routes routes})
     routes))

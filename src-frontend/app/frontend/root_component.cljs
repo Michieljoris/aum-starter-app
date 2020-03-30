@@ -28,9 +28,10 @@
   (render [this]
     (let [{:keys [props state computed] :as data} (om-data this)]
       (timbre/info :#pp {:data data})
-      (html [:div
-             "Hello " (-> props :user first :name)
-             ;; (foo this :foo)
+      (html [:div {:class "level"}
+             [:div {:class "level-item has-text-centered"}
+              "Aum starter app " (-> props :user first :name)]
+
              ]))
     )
   )

@@ -44,6 +44,9 @@
 
         com.bhauman/figwheel-main {:mvn/version "0.2.4-SNAPSHOT"}
         fipp {:mvn/version "0.6.17"}
+        joplin.core {:mvn/version "0.3.11"}
+        joplin.jdbc {:mvn/version "0.3.11"}
+        stch-library/sql {:mvn/version "0.1.2"}
 
         ;; Html clojure style
         sablono {:mvn/version "0.8.4"}  ; Optional, just for HTML
@@ -81,9 +84,11 @@
         com.layerware/hugsql {:mvn/version "0.4.9"}
 
         clojure.jdbc/clojure.jdbc-c3p0 {:mvn/version "0.3.3"}
-        org.clojure/java.jdbc {:mvn/version "0.7.8"}
-        mysql/mysql-connector-java {:mvn/version "5.1.47"
-                                    ;; "8.0.15"
+
+        org.clojure/java.jdbc {:mvn/version "0.7.11"}
+        mysql/mysql-connector-java {:mvn/version
+                                    "5.1.47"
+                                    ;; "8.0.19"
                                     }
 
         com.taoensso/sente {:mvn/version "1.13.1"}

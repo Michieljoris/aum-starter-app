@@ -1,70 +1,64 @@
 #+TITLE: todo
-* Set app name in update-html task config
-Remove app-dev from update-html. Think if this matters.
-* Build prod jar
-** remove duplication between revolt.edn and main.figwheel
-* import branches:
+* Portfolio
+** Make intro/guide to repos
+** Clean up, browse and copy useful stuff from all DC notes to my own pagora notes
+** Clean up github
+
+* Aum
+** write docs
+*** make-cmp and om-data
+*** backend parser
+*** frontend parser
+*** database config
+*** webpack and foreign-libs
+*** bin scripts
+*** revolt
+*** config for front and backend
+multimethods!
+** Minimal aum functionality
+*** Build prod jar
+**** remove duplication between revolt.edn and main.figwheel
+*** Get multiple remotes working!!!
+- frontend goes to aum by default. But perhaps we want to call on some other api
+- backend should be able to fetch data async and push
+*** Use namespaced keywords for db columns
+*** Maybe
+**** Load revolt.edn from base dir of repo
+*** Put libs-src in github repos
+** Aum modules
+*** add db migration lib
+See clj.joplin for how to run the up and down migrations.
+Should make revolt tasks for them
+*** Add security (auth etc)
+bugsnag, authorization, login, logout etc
+- Load bugsnag api keys from gitignored .env file in update-html-string
+*** Add paging and routing
+*** Testrunner
+*** Download etc
+*** Event store
+*** Calc active users
+*** Data inspector
+
+** Aum Migrate over:
+*** icons
+Get template editor working
+->>> data entry design!!!
+*** testrunner
+*** Download
+*** event store
+*** data inspector
+*** calc active users
+*** paging and routing
+*** aum tests
+*** import branches:
 -old-aum master branch!!!!! look at commits
 -admin-misc-fixes
 -user-on-off-switch ??
 -calc-active-users-implementation (includes event-store and export-active-accounts)
-* Add emacs shortcuts for restart, reload namespaces etc
-;; Fix docstring highlighting for `defsys`
-(put 'defsys 'clojure-doc-string-elt 2)
 
-;; The below functions allow you to control systemic from Emacs.
-;; Personally, I have found binding them to keys to be very convenient.
-(defun systemic/restart ()
-  "Restarts all systemic systems"
-  (interactive)
-  (cider-interactive-eval "(systemic.core/restart!)"))
-
-(defun systemic/start ()
-  "Starts all systemic systems"
-  (interactive)
-  (cider-interactive-eval "(systemic.core/start!)"))
-
-(defun systemic/stop ()
-  "Stops all systemic systems"
-  (interactive)
-  (cider-interactive-eval "(systemic.core/stop!)"))
-* add db migration lib
-* icons
-* DONE foreign libs (react!!)
-* Get template editor working
-->>> data entry design!!!
-* Make simple checklist
-* Get mystack going properly for app
-* Clean up, browse and copy useful stuff from all DC notes to my own pagora notes
-* Clean up github
-* Make intro/guide to repos
-* Migrate over:
-** aum tests
-** As modules
-*** Add security (auth etc) as module
-bugsnag, authorization, login, logout etc
-- Load bugsnag api keys from gitignored .env file in update-html-string
-*** Add paging and routing as module
-*** Testrunner as module
-*** Download etc as module
-*** Event store
-*** Calc active users
-*** Data inspector
-* Data entry environment design document
-mydesign.deed
-* Get multiple remotes working!!!
-- frontend goes to aum by default. But perhaps we want to call on some other api
-- backend should be able to fetch data async and push
-
-* Maybe
-** Load revolt.edn from base dir of repo
-* write docs
-** make-cmp and om-data
-** backend parser
-** frontend parser
-** database config
-** webpack and foreign-libs
-** bin scripts
-** revolt
-** config for front and backend
-multimethods!
+* Deed project
+** Make simple checklist
+** Get mystack going properly for app
+** Data entry environment design document
+mydesign.deed and mydeed.deer
+data entry environment realisation

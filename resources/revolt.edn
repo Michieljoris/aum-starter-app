@@ -1,47 +1,45 @@
 {
  ;; Tasks
  :pagora.revolt.task/aot    {:exclude-namespaces ["pagora.revolt." "revolt."]
-                          :extra-namespaces [;; mount.core
-                                             clojure.tools.reader.reader-types
-                                             ;; clojure.tools.logging.impl
-                                             ]}
+                             :extra-namespaces [;; mount.core
+                                                clojure.tools.reader.reader-types
+                                                ;; clojure.tools.logging.impl
+                                                ]}
 
  :pagora.revolt.task/write-info   {:path "resources/build-info.json"}
 
  :pagora.revolt.task/update-html {:src-path "resources/app-template.html"
-                               :dest-path "resources/app.html"
+                                  :dest-path "resources/app.html"
 
-                               :dev {:load-app-dev true ;; add script link to app.html that loads the user namespace, also see figwheel-main.edn
-                                     :include-build-info-in-html false
-                                     :path "app"
-                                     :app-name "Pagora"}
-                               :prod {:load-app-dev false;; add script link to app.html that loads the user namespace, also see figwheel-main.edn
-                                      :include-build-info-in-html true
-                                      :path "app"
-                                      :app-name "pagora"
-                                      ;;TODO load from env!!
-                                      :bugsnag-api-key-frontend "3464720f5367914849487b96cb428fc8" ;anything but nil adds the bugsnag script tag in app.html
-                                      :bugsnag-api-key-server "d87f64fd8593faed9e04f531efc6a082"}
-                               }
+                                  :dev {:include-build-info-in-html false
+                                        :path "app"
+                                        :app-name "Pagora"}
+                                  :prod {:include-build-info-in-html true
+                                         :path "app"
+                                         :app-name "pagora"
+                                         ;;TODO load from env!!
+                                         :bugsnag-api-key-frontend "3464720f5367914849487b96cb428fc8" ;anything but nil adds the bugsnag script tag in app.html
+                                         :bugsnag-api-key-server "d87f64fd8593faed9e04f531efc6a082"}
+                                  }
 
  ;;This should match the version in deps.edn!!!!!
  ;; :pagora.revolt.task/copy-newrelic-jar {:version "4.2.0"}
  
  :pagora.task/info   {:name "pagora-app"
-                   :package pagora-app
-                   :version "0.0.1"
-                   :description "pagora app"}
+                      :package pagora-app
+                      :version "0.0.1"
+                      :description "pagora app"}
 
  :revolt.task/test   {:report :pretty}
 
- :pagora.revolt.task/sass   {:source-path "scss"
-                          :output-dir "public/app"}
+ :pagora.revolt.task/sass   {:source-path "src-styling/scss"
+                             :output-dir "public/app"}
 
  :pagora.revolt.task/assets {:assets-paths ["assets"]
-                          :exclude-paths ["assets/app"]
-                          :public-path "public/"
-                          :gzip true
-                          :update-with-exts ["html"]}
+                             :exclude-paths ["assets/app"]
+                             :public-path "public/"
+                             :gzip true
+                             :update-with-exts ["html"]}
 
  :revolt.task/codox  {:source-paths ["src"]
                       :source-uri "http://github.com/mbuczko/revolt-edge/blob/{version}/{filepath}#L{line}"
@@ -107,15 +105,15 @@
                                 :source-paths ["src" "src-frontend"]}]}
 
  :pagora.revolt.task/capsule {:exclude-paths #{"test" "src-frontend"}
-                             ;; :aliases [:git-deps]
-                             :output-jar "dist/app.jar"
-                             :capsule-type :fat
-                             :main "app.core"
-                             :min-java-version "1.8.0"
-                             :jvm-args "-server"
-                             :system-properties "ENV=prod"
-                             :caplets {"MavenCapsule" [["Repositories" "central clojars(https://repo.clojars.org/)"]
-                                                       ["Allow-Snapshots" "true"]]}}
+                              ;; :aliases [:git-deps]
+                              :output-jar "dist/app.jar"
+                              :capsule-type :fat
+                              :main "app.core"
+                              :min-java-version "1.8.0"
+                              :jvm-args "-server"
+                              :system-properties "ENV=prod"
+                              :caplets {"MavenCapsule" [["Repositories" "central clojars(https://repo.clojars.org/)"]
+                                                        ["Allow-Snapshots" "true"]]}}
 
  ;; plugins
 
@@ -125,7 +123,7 @@
  :revolt.plugin/rebel {:init-ns "clj.user"
                        :init-banner "Welcome to the rebel.\n"}
 
- :revolt.plugin/watch {:on-change {:pagora.revolt.task/sass "glob:scss/*.scss"
+ :revolt.plugin/watch {:on-change {:pagora.revolt.task/sass "glob:src-styling/scss/*.scss"
                                    ;; :revolt.task/test "glob:**/*.clj"
                                    }}
 
