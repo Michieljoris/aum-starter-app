@@ -28,11 +28,11 @@
 (defn mutation? [query]
   (some (comp symbol? :dispatch-key) (:children (omp/query->ast query))))
 
-(defn send-response [{:keys [uid reply-fn query response config]}]
+(defn send-response [{:keys [uid ?reply-fn query response config]}]
   (when (get-in config [:query-log])
     (timbre/info :#w (if (mutation? query) "Mutation" "Read")" reply sent ")
     (when (au/is-development? config) (pprint response)))
-  (reply-fn response))
+  (?reply-fn response))
 
 
 ;; Handlers ----------
@@ -56,9 +56,7 @@
    {:keys [parser parser-env config websocket]}]
   (do ;; try
     (let [query      ?data
-          query-type (if (mutation? query) "Mutation" "Read")
-          parser-env (parser-env)]
-
+          query-type (if (mutation? query) "Mutation" "Read")]
       (when (:query-log config)
         (if (au/is-development? config)
           (do
@@ -92,9 +90,9 @@
               (do
                 (timbre/info :#y "Simulating network latency of " (/ (:latency config) 1000.0) " seconds")
                 #?(:clj (Thread/sleep (:latency (config))))
-                (send-response {:uid uid :?reply-fn :?reply-fn :query query :response response
+                (send-response {:uid uid :?reply-fn ?reply-fn :query query :response response
                                 :config config}))
-              (send-response {:uid uid :?reply-fn :?reply-fn :query query :response response
+              (send-response {:uid uid :?reply-fn ?reply-fn :query query :response response
                               :config config}))))))
     ;; (catch #?(:clj Exception :cljs :default) e
     ;;     (timbre/info e)

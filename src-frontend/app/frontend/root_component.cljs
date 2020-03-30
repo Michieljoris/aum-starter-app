@@ -23,14 +23,15 @@
   static om/IQuery
   (query [this]
     [:client/reload-key
-     {:foo (om/get-query Foo)}])
+     {:user [:id :name]}
+     ])
   Object
   (render [this]
     (let [data (om-data this)]
       (timbre/info :#pp {:data data})
       (html [:div
              "Hello"
-             (foo this :foo)
+             ;; (foo this :foo)
              ]))
     )
   )

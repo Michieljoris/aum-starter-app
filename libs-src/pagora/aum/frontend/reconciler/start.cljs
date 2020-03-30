@@ -25,11 +25,11 @@
 (def default-app-state
   {:client/reload-key :foo})
 
-(defn aum-remote [query response-cb]
-  ;; (timbre/info :#b query)
-  (let [chsk-send! (websocket/get-chsk-send!-fn)]
-    (chsk-send! [:aum/query query] 8000
-                response-cb)))
+(defn make-aum-remote [app-config]
+  (fn [query response-cb]
+    (let [chsk-send! (websocket/get-chsk-send!-fn app-config)]
+      (chsk-send! [:aum/query query] 8000
+                  response-cb))))
 
 (defn make-value-merge-hook [hooks]
   (fn [value]
@@ -74,5 +74,5 @@
                         ;;               )
                         ;;:instrument (plomber/instrument)
                         :history-size (:history-size app-config)
-                        :remotes (merge {:aum aum-remote} remotes)
+                        :remotes (merge {:aum (make-aum-remote app-config)} remotes)
                         :shared {:debug (:debug app-config)}}))

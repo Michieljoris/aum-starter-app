@@ -78,8 +78,8 @@
 
 (def chsk-send! (atom send-fn))
 
-(defn get-chsk-send!-fn []
-  (if (:mock-backend? (config))
+(defn get-chsk-send!-fn [app-config]
+  (if (:mock-backend? app-config)
     (let [channel (get-or-make-channel)]
       (fn [query timeout cb]
         (put! channel {:event :chsk-send!
