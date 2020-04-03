@@ -481,10 +481,10 @@
                    :refs refs
                    :sparsify-query? true
 
-                   :resolve-prop bilby.frontend.reconciler.parser.denormalize-hooks/resolve-prop
-                   :resolve-join bilby.frontend.reconciler.parser.denormalize-hooks/resolve-join
-                   :check-for-prop bilby.frontend.reconciler.parser.denormalize-hooks/check-for-prop
-                   :resolve-join-to-query bilby.frontend.reconciler.parser.denormalize-hooks/resolve-join-to-query
+                   :resolve-prop aum.frontend.reconciler.parser.denormalize-hooks/resolve-prop
+                   :resolve-join aum.frontend.reconciler.parser.denormalize-hooks/resolve-join
+                   :check-for-prop aum.frontend.reconciler.parser.denormalize-hooks/check-for-prop
+                   :resolve-join-to-query aum.frontend.reconciler.parser.denormalize-hooks/resolve-join-to-query
                    })]
       result
       )

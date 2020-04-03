@@ -1,21 +1,21 @@
 (ns pagora.aum.modules.events.experimental.events-consumer
   (:require
    ;; [digicheck.common.util :refer [json->clj]]
-   ;; [bilby.reconciler.parser.mutate-helpers :refer [is-dirty]]
+   ;; [aum.reconciler.parser.mutate-helpers :refer [is-dirty]]
    [digicheck.common.util :as u :refer [hyphen->underscore underscore->hyphen]]
    [clojure.data.json :as json]
    [digicheck.macros :refer [assert-x]]
 
    [fixtures.core :as fixtures]
-   [bilby.database
+   [aum.database
     [inspect :refer [table-name]]
     [queries :as query]]
 
    [digicheck.database.connection :as db-conn]
-   [bilby.database.schema :as schema]
+   [aum.database.schema :as schema]
 
    [hugsql.core :as hugsql]
-   [bilby.database.query :refer [sql make-query-params]]
+   [aum.database.query :refer [sql make-query-params]]
    ;; String manipulation
    [clojure.test :refer [deftest is are]]
    [cuerdas.core :as str]

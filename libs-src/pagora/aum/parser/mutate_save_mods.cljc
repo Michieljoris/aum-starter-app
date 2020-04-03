@@ -239,7 +239,7 @@
 
 
 (comment
-  (binding [bilby.security/*schema-warnings* false]
+  (binding [aum.security/*schema-warnings* false]
     (let [mods  {:qbucket { "41ab77e4-bb4c-41cf-add2-aef4f5144ea8" {:updates {:name "foo"
                                                                               :group-id 10
                                                                               :type "template"
@@ -275,16 +275,16 @@
 
                      (let [db-conn    database.connection/db-conn
                            db-config  database.config/db-config
-                           raw-schema (bilby.database.schema/get-schema db-conn)
-                           schema     (bilby.database.schema/make-condensed-schema raw-schema)
+                           raw-schema (aum.database.schema/get-schema db-conn)
+                           schema     (aum.database.schema/make-condensed-schema raw-schema)
                            ;; _ (pprint (get schema "users"))
                            state      (atom {:status :ok})
                            config     dc-admin.backend.app.config/config
                            env        {:parser-config (merge config {:allow-root true :print-exceptions true})
-                                       :bilby-keys [:db-config :parser-config :sql :db-conn :schema :cb :subquery-path :bilby-keys]
+                                       :aum-keys [:db-config :parser-config :sql :db-conn :schema :cb :subquery-path aum-keys]
                                        :db-conn       db-conn
                                        :db-config     db-config
-                                       :schema        (bilby.security/secure-schema schema db-config)
+                                       :schema        (aum.security/secure-schema schema db-config)
                                        :raw-schema    raw-schema
                                        :state         state
                                        :parser        parser.core/parser
@@ -312,9 +312,9 @@
 
 
 ;; (require
-;;  '[bilby.app-config :refer [config]]
+;;  '[aum.app-config :refer [config]]
 ;;  '[clojure.test :refer [deftest is]]
-;;  '[bilby.test.util :as tu :refer [debug-tests unload-all-tests unmap-all-interns in-context truthy?
+;;  '[aum.test.util :as tu :refer [debug-tests unload-all-tests unmap-all-interns in-context truthy?
 ;;                                   make-context query]]
 ;;  )
 

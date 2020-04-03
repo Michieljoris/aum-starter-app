@@ -41,6 +41,9 @@
         ;; org.clojure/clojurescript {:mvn/version"1.10.597"} ;; Use of undeclared Var goog.log/warn
 
         org.clojure/clojurescript {:mvn/version"1.10.520"}
+        tupelo {:mvn/version "0.9.200"}
+
+
 
         com.bhauman/figwheel-main {:mvn/version "0.2.4-SNAPSHOT"}
         fipp {:mvn/version "0.6.17"}
@@ -133,7 +136,7 @@
 
         ;; Testing -----------------------
         ;; https://github.com/juxt/iota
-        ;; juxt/iota {:mvn/version "0.2.3"  } ;Infix Operators for Test Assertions, copied to bilby.test.iota
+        ;; juxt/iota {:mvn/version "0.2.3"  } ;Infix Operators for Test Assertions, copied to aum.test.iota
         ;; org.clojure/test.check {:mvn/version "0.9.0"} ;; only if you need generators
         ;; eftest {:mvn/version "0.5.4"  }
         ;; https://github.com/nubank/matcher-combinators

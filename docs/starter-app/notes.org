@@ -1,0 +1,25 @@
+#+TITLE: doc
+
+** Bootup
+*** dev
+**** clj
+When calling bin/dev-backend the last plugin (rebel) is configured in
+resources/revold.edn under the :revolt.plugin/rebel.init-ns to load the clj.user
+ns.
+In clj.user a restart fn is defined that inits aum, inits a integrant system
+with it and then calls (dev/go) on it. This kicks of all the init-key fns in the
+various namespaces (db, server etc).
+**** cljs
+When starting figwheel (by either bin/dev-figwheel or space-m-" in Emacs) the
+complier options in dev.cljs.edn get used to produce the js from cljs. The :main
+options is set to cljs.user. This is the first file loaded in the frontend by
+goog.require and all the dependent files are loaded after that. So cljs.user
+should require app.frontend.core. This is enough to get the app going.
+
+* dev-backend
+revolt rebel task loads the user namespace
+*  Config keys need to be assigned scalar values (so no maps or vectors) so we
+ can set them in env vars on the command line
+
+* Something like the following would run the jar (in the target directory)::
+ CLJ_ENV=prod DB_USER=test DB_PASSWORD=abc DB_URL="//localhost:3306/" DB_NAME=some_db QUERY_LOG=true  SQL_LOG=true HTTP_LOG=false SERVER_PORT=8080 SERVER_IP=0.0.0.0 java -jar prod.jar

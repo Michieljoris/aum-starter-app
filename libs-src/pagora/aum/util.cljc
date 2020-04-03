@@ -449,7 +449,7 @@
   ([env query] (:table-data (perform-query env query false)))
   ([{:keys [parser] :as env} query denormalize?]
    (let [state-for-parse (atom nil)
-         env (merge (select-keys env (into [:user] (:bilby-keys env)))
+         env (merge (select-keys env (into [:user] (:aum-keys env)))
                     {:state state-for-parse})
          env (assoc-in env [:parser-config :normalize] (not denormalize?))
          result (parser env query)]

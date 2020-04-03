@@ -7,7 +7,6 @@
    [pagora.aum.frontend.channel.core :refer [start-channel-listener! channel-msg-handler]]
    [pagora.aum.frontend.channel.msg-handler]
    [pagora.aum.frontend.reconciler.start :refer [start-reconciler] ]
-   [pagora.aum.frontend.websockets.dispatcher :refer [websocket-msg-handler]]
    [pagora.aum.frontend.websockets.core :as websocket]
    [pagora.clj-utils.timbre :refer [console-appender]]
    ;; [components.root-component :refer [RootComponent]]
@@ -61,11 +60,7 @@
                            :appenders {:console (console-appender)}})
     (assoc aum-config :app-config app-config)))
 
-(defn make-websocket-msg-handler [aum-config]
-  (fn [ev-msg]
-    (websocket-msg-handler ev-msg aum-config)))
-
 (defn go [aum-config]
   (timbre/info :#b "App started")
   (start-channel-listener!)
-  (websocket/start! (make-websocket-msg-handler aum-config)))
+  (websocket/start! aum-config))

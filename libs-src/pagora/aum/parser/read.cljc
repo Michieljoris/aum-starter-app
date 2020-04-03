@@ -66,7 +66,7 @@
       (om-util/ident? (:key ast))
       (:om-process-roots parser-config))) ;;this treats every key as a reference to a table
 
-;;The bilby read multimethod handles errors itself, and;places them in the
+;;The aum read multimethod handles errors itself, and;places them in the
 ;;result value; at the key that caused the error
 (defmethod read :default
   [{:keys [parser-config db-config state ast user parser query] :as env} key {:keys [custom-read] :as params}]
@@ -77,7 +77,7 @@
              (not custom-read))
       ;;Process key as a query over a table
       (process-ast env key params)
-      {:value (let [env (select-keys env (into [:state :user] (:bilby-keys env)))
+      {:value (let [env (select-keys env (into [:state :user] (aum-keys env)))
                     env (update env :subquery-path #(conj (or % []) key))]
                 ;; (timbre/info "------ " (:subquery-path env))
                 ;; (timbre/info "------ "  custom-read query params)

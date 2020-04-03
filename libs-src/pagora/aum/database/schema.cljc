@@ -97,7 +97,7 @@
 
 
 ;; #?(:cljs
-;;    (let [test-db-conn (make-db-connection {:db-name "bilby_test" :print-spec true})]
+;;    (let [test-db-conn (make-db-connection {:db-name "aum_test" :print-spec true})]
 ;;      (timbre/info "SCHEMA:")
 ;;      (js/console.log ">>" (get-tables test-db-conn))))
 

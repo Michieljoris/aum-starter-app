@@ -5,7 +5,7 @@
               "src-dev"
               ]
  :css-dirs ["target/assets/public/app"]
- :open-url false ;;"http://localhost:[[server-port]]/admin.html"
+ :open-url false ;;"http://localhost:[[server-port]]/app.html"
  ;; :pprint-config true
  ;; :reload-dependents true
  :reload-clj-files #{:cljc}

@@ -3,7 +3,7 @@
             #?(:clj
                [jdbc.pool.c3p0 :as pool])
             [taoensso.timbre :as timbre]
-             ;; #?(:cljs [bilby.js.alasql])
+             ;; #?(:cljs [aum.js.alasql])
              ))
 
 

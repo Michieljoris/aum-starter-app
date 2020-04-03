@@ -1,0 +1,1706 @@
+#+TITLE: notes-aum
+
+* Minimal aum functionality
+** Build prod jar
+*** remove duplication between revolt.edn and main.figwheel
+** Get multiple remotes working!!!
+- frontend goes to aum by default. But perhaps we want to call on some other api
+- backend should be able to fetch data async and push
+** Use namespaced keywords for db columns
+** Maybe
+*** Load revolt.edn from base dir of repo
+** Put libs-src in github repos
+
+* New features
+** steal from repos, mainly untangled
+    http://untangled-web.github.io/untangled/reference/reference.html#_overall_network_plumbing
+
+* Issues and Bugs
+** Issues and bug, sort out
+*** Write/refactor tests for process-mutation-symbol now we're using hook :priority_2:
+*** Enforce max length of 255 for translations
+*** reeval invalidate on input and is invalidated
+*** saving empty record, with no cols modified
+gives no error from backend but warning, so no error dialog on frontend
+This is because when saving dossier type only joined fields might be changed, so
+it's valid to save unmodified dossier type record. But still would like
+notification/action in frontend when saving bare unjoined record!!!
+
+*** extract autocomplete into component
+Is duplicated now for group select dialog and in new user
+*** not client/error, client/warning etc but client/message
+{:type error/warning/notice/etc :context {..} :message "..."}
+*** replace route and page with screen!!!
+    or at least consistently page
+*** on timeout, give option to try again!!!!!!
+    when connection is back!!!!!
+    or try automatically. Block sending till reponse is received. Just retry last
+    one if chsk/timeout is received
+*** some indication we're waiting for more data from the backend :minor:
+*** option to reload/refresh record!!! :priority_3:
+refresh by clicking button, instead of refresh             :priority_3:
+    For instance for user password-expires-at
+    Use the revert button for this. Make a request for the record as well as
+    reverting first to meta record.
+*** Some easy reliable way to show (error) msgs
+*** limit-clause for joins?
+Seems limit clause only is applied to root of joined query
+Yes, that's because with a join we getting all rows for all rows joined too, and
+we apply the limit later in code.
+(defn limit [{:keys [count offset]} rows]
+  (let [rows (if offset (drop offset rows) rows)]
+    (if count (take count rows) rows)))
+But we're still returning all events in the table/by-id, not so good. That will
+have to filtered, because we no still get all 1000 of them in the tables.
+But for a join to a single row we can apply limit in the sql statement
+*** method of retrieving schema
+       ;; There's a few more ways to get at schema data, like SHOW TABLES and
+   ;; DESCRIBE TABLE, and from the INFORMATION_SCHEMA database: the TABLES and
+   ;; COLUMNS tables. The metadata comes with the connection. Might be a slight
+   ;; performance benifit when testing, since we build specific databases with
+   ;; different schemas for the tests.
+
+*** Tests for self joins and aliases etc
+    templates_templates table
+    person with join to itself as well?
+    So person with boss_id column which is also a person.
+*** Test limit-max setting.
+*** Test asking for foreign key -and- join
+*** spec.test
+     https://stackoverflow.com/questions/40697841/howto-include-clojure-specd-functions-in-a-test-suite
+*** cors and ajax sente doesn't work
+No Access-Control-Allow-Origin on headers in response
+But cors is working ok though
+The req-handler returns a response with the headers on it
+However sente strips seems to strip them
+Should work at least when server serves frontend app
+
+*** disable devtools in prod env
+*** Check csrf, anti-forgery, can't turn it off for some reason???
+    And get an error
+*** I think it's possible to lock up server with a massive query.
+Especially with lots of subjoins, like in templates
+*** Standardize error reporting from aum
+    So {:status
+*** return schema where strings are keywords, and plural db names are
+;; singular, hyphens instead of underscores are used. At the moment this
+;; conversion happens in database.inspect.
+*** Make staging env fully functional/useful
+*** Use ident as key.
+Eg:  {[some-table 1] [:id :name}
+     is basically shortcut for:
+    ({:some-table [:id :name]} {:where [:id := 1})
+*** elasticsearch for fuzzy search
+*** Don't use reply for websocket, but broadcast
+So change in one browser updates other browsers/tabs
+*** production nrepl server
+*** ph/ or _ in query instead of:process-roots config key
+     Maybe mark roots by prefix or namespace (like ph/some-key, as in
+     placholder) instead? Or prefix with _? You can then get rid of
+     process-roots config key in aum, because you can indicate in the query
+     itself whether a key is a table or placeholder..
+
+*** namespace table column keywords
+ :dossier-type/id :dossier-type/name etc
+*** refactor current-user to authenticated
+      and fetch current user props with normal query
+*** get aot task to work
+ java.lang.IllegalArgumentException: HTTP Host may not be null
+
+ at digicheck.elastic.core$client.invokeStatic(core.clj:15)
+	at digicheck.elastic.core$client.invoke(core.clj:14)
+
+*** Don't parse if not expanded!!!
+In read-key templates
+          value (when (and data
+                           (or (= query-root :om.next/root)
+                               (= query-root data)))
+                  (timbre/info "Diving into tree for " data)
+                 ;;TODO adapt aum-next denormalize so that query-roots are not
+                 ;;recursively parsed???
+                 ;;Or somehow don't keep parsing when it's not shown on the page!!!
+                 ;;So when it's not expanded!!!
+                  (db->tree env {:query query
+                                 :data data
+                                 :refs @state}))
+
+- recursive complex queries!!!
+
+*** Backend returns tempids twice in the response
+
+*** deleting multiple fields at once doesn't work with new post-remote
+maybe delete-dossier-fields plural?
+** Security
+
+*** Disallow unlimited recursion in queries!!!
+So no '... as subquery!!! And set the max per table? In table config? Or set
+some global max recursion.
+*** test whether :ssl-redirect true :hsts true still works on staging and production
+
+*** on :unauthorited response, do proper logout, don't just show login screen :priority_2:
+*** Check that password validity etc settings work
+ Add :password-validity-period-retention :password-validity-period-days when security branch is merged to validation.clj for groups for throw-if-empty
+
+*** xss
+Escape any and all user input
+
+*** I think it's possible to lock up server with a massive query.
+Especially with lots of subjoins, like in templates
+
+
+*** sql-validate is always performed, but whitelists and scope only when doing an om-query!!
+  Maybe in process-params apply these at all time!!
+
+*** Set domain in production for cookie in loginscreen namespace.
+
+*** Set a limit to how many records for any given table an admin can create?
+In theory, by using the api directly they could create millions of let's say
+users, or dossier types etc.
+
+
+
+
+* Aum modules
+** add db migration lib
+** integrations
+** Add security (auth etc)
+*** bugsnag, authorization, login, logout etc
+- Load bugsnag api keys from gitignored .env file in update-html-string
+
+*** Process-user and calc-role snippets
+#+TITLE: pagora
+
+;; (defn superaccount? [db-conn account-id]
+;;   (-> (q/get-cols-from-table db-conn {:cols ["superaccount" "id" "name"] :table "accounts"
+;;                                       :where-clause ["where id = ?" account-id]})
+;;       first
+;;       :superaccount))
+
+;; (defn calc-role
+;;   "Calculates role depending on account-id and any listing in admins table,"
+;;   [{:keys [db-conn config] :as env} {:keys [account-id ] :as user}]
+;;   (when (some? user)
+;;     (cond
+;;       (= account-id (:pagora-account-id config)) "super-admin"
+;;       :else (let [admin-account-ids (->> (q/get-cols-from-table db-conn {:cols ["account_id"] :table "admins"
+;;                                                                          :where-clause ["where user_id = ?" (:id user)]})
+;;                                        (map :account_id))
+;;                   account-admin? (cu/includes? admin-account-ids account-id)]
+;;               (cond
+;;                 account-admin? (if (superaccount? db-conn account-id) "superaccount-admin" "account-admin")
+;;                 :else "user"
+;;                 )
+;;               ))))
+
+
+;; A much better option is a total separation of Users and Accounts. A user can
+;; have several accounts (usually with a default one selected), and they can use
+;; a single login to access each, and each account may have multiple users
+;; associated with it.
+;;So we need:
+;;accounts_users table
+
+;; So account-id is not which account a user belongs to but which account the
+;; user wants to access.
+
+;; After that a user has a role within that account. Such as account-admin. If
+;; the account is a super account (so administering more than just its own
+;; account) then if the user has the account-admin role it might also have the
+;; superaccount-admin
+
+;;So we'd need a accounts-users-roles table.
+
+;; (defmethod process-user "superaccount-admin"
+;;   [{:keys [db-conn] :as env} user]
+;;   (let [role (calc-role env user)
+;;         subaccount-ids (->> (q/get-cols-from-table db-conn {:cols ["id"] :table "account"
+;;                                                             :where-clause ["where account_id = ?" (:account-id user)]})
+;;                          (mapv :id))
+;;         ;;Can't be empty else sql query crashes (used in scope in database config)
+;;         subaccount-ids (if (seq subaccount-ids) subaccount-ids [-1])] ;; but IN (-1) always results in false, same result.
+;;     (assoc user
+;;            :role role
+;;            :subaccount-ids subaccount-ids)))
+** Add paging and routing
+** tagging
+Why not tag table, with ids in the 'tags' column?
+And adjust parser somewhat to retrieve not just belongs-to-one, but belongs-to-many?
+Or use many-to-many, so join table. But search will be a pain, unless we
+normalize tags into tags column in elasticsearch or something?
+Or just inline tags. Problem is renaming a tag then, also adding description etc
+to tag becomes hard..
+
+All tags for an item
+All items for: one tag, t1 AND t2, t1 OR t2, t1 AND not t2
+Tag cloud: how many items per tag
+Change tag? Possibly add and change meta data of tag?
+
+A tag (text) field on question
+Plus tags table: [tag, question-id]
+http://howto.philippkeller.com/2005/04/24/Tags-Database-schemas/
+http://howto.philippkeller.com/2005/05/05/Tags-with-MySQL-fulltext/
+http://howto.philippkeller.com/2005/06/19/Tagsystems-performance-tests/
+
+https://stackoverflow.com/questions/20856/recommended-sql-database-design-for-tags-or-tagging
+https://stackoverflow.com/questions/2885564/ways-to-implement-tags-pros-and-cons-of-each
+https://stackoverflow.com/questions/1810356/how-to-implement-tag-system
+
+** Translations
+*** smarter translations
+- use params in translation keys, so interpolation
+- load translations zipped!!!???!!!!
+** Testrunner
+** Download etc
+** Event store
+Also see script in modules/events/experimental
+** ifttt
+Since jobs are essentially work triggered by events, can we not just monitor the
+database, either though mysql triggers or polling, and design rules that execute
+code if certain 'rules' match?
+
+The problem would shift to design and creation of these 'rules'.  Basically creating a ifttt system.
+
+For instance, on creation of an invitation the rule would be:
+
+If new record in invitation send invitation email to linked contact.
+
+So you need an 'event' such as
+ (on-new-record table) => record
+and an 'action/job' such as
+(send-email (:user-id record) "You got an invitation!!")
+And an if construct that pumps output of event to input of action.
+
+Changing status or comment replies could be handled the same way.
+
+Initially these rules could be written in clojure, later on some kind of ui
+could be designed to put these clojure expressions together. Or at least the
+more straightforward kind of rules.
+
+You'd want a 'rules' database.
+
+Some of these rules might be frontend concern only. For instance a rule that says:
+
+if in a checklist of a certain template for a certain user or group this question  gets answered yes, show answers with these ids or from this category, else hide them.
+
+So no attaching rules directly to questions and templates. Templates get shared and different people/groups would like to use different rules perhaps.
+
+I'm just wondering how many features/problems could be covered by properly
+implementing a rules database plus execution mechanism/engine, and eventually a
+ui to edit/create these rules. It might be possible to kill more than one bird
+with this, like ifttt, workflow, alerts.
+
+I've built something before when I was playing with couchdb where work would
+happen triggered by database events, the decoupling of crud code and event
+handling code is really nice.
+
+You could get rid of jobs in rails , making it a more of a plain crud api, or at least simplifying it and isolating 'if event then action/job' functionality.
+
+Jacob's adding of location to login even could easily be a rule for instance as well.
+
+(if login-event (set-location-from-ip  login-event-record)
+
+or
+
+(if failed-login-event (send-email (:user failed-login-event-record) "Failed login attempt!"))
+
+This rule could be per group/user/global etc.
+
+Once you've got our events and actions and conditions, possibilities are endless.
+
+You can write these actions/jobs in clojure . Like (set-location-from ip record) and implement some kind of priority queue if execution engine gets overworked.
+
+** Calc active users
+** Data inspector
+
+* Aum Migrate over:
+-- icons
+-- Get template editor working?
+->>> data entry design!!!
+-- testrunner
+-- Download
+-- event store
+-- data inspector
+-- calc active users
+-- paging and routing
+-- aum tests
+-- import branches:
+-old-aum master branch!!!!! look at commits
+-admin-misc-fixes
+-user-on-off-switch ??
+-calc-active-users-implementation (includes event-store and export-active-accounts)
+
+
+* syncing, push changed server data
+
+Keep track of all current queries of connected clients
+When a mutation happens, run all queries over result of mutation.
+The result is just a partial db, but only the modified bits, so that should work.
+Notify all clients that have a query that gives a result over the mutated data.
+Send them that query result to merge with their data.
+Their current query is kind of their subscription to data.
+
+Decoupling of read and write would be cool.
+Let all reads just happen, but a mutation can get stored in a mutation
+queue/db/table.
+Since reads are many, mutations few, you could build delay the mutations. Then
+pause the query processing, take the current batch of mutations, keep queuing
+any further mutations, lock database, process the mutations one by one, in the order they came
+in, bundle up the results, run every current query over it, broadcast result to
+their connected client., then go back to processing queries,
+
+Something like that?
+
+Problem is async and latency in updating and querying.
+
+Also is latency problem
+This is a writing problem
+Server needs to be single threaded for write operations, to make writes
+sequential.
+Every entity on the client is stored with a sequential index
+When writing an attribute of the entity increase the seq.
+Client sends entity id, seq and one or more attributes to save.
+Server only updates attr when seq is same.
+
+Also, how does http-kit work? Single threaded? Do all requests get processed one
+by one, or in parallel at all?
+
+https://hashrocket.com/blog/posts/websocket-shootout The Clojure server is built
+on the HTTP Kit web server. The interesting parts are in server.clj.
+
+When a client connects they are stored in an atom of channels. This gives us
+concurrency safety, which is important since Clojure will handle requests in
+parallel.
+
+
+* Scaling!!
+Multithreading question
+https://github.com/ptaoussanis/sente/issues/227
+https://github.com/ptaoussanis/sente/issues/265
+https://github.com/ptaoussanis/sente/issues/265
+Process each group parallel. The data doesn't intersect so that's no problem.
+And one group's IO blocking won't affect other groups. Withing a group, a user
+can only send a mutation till ack has come back from last one. So that'll
+prevent the one user from saturating the server. A group can have maybe max 100
+users? Every request should not take longer than 100ms. So that's 10 requests
+per second. If every user makes 1 update per 10 seconds we can have 100 users
+online at the same time. But in practice my guess is this will be much less. So
+1000 users might still be ok. But we should make sure that every update takes
+not more than 100ms!!!! If it does, or it might, we need to do the work in a thread!!!
+
+
+* Problems
+http://tonsky.me/blog/the-web-after-tomorrow/
+** Frontend queries datascript
+and gets map to give to react
+
+** Syncing problem
+Also is latency problem
+This is a writing problem
+Server needs to be single threaded for write operations, to make writes
+sequential.
+Every entity on the client is stored with a sequential index
+When writing an attribute of the entity increase the seq.
+Client sends entity id, seq and one or more attributes to save.
+Server only updates attr when seq is same.
+
+** Browser limited storage problem
+We can not duplicate the server's db, but need to make do with a (small) subset.
+about 5 or 10mb for localstorage
+- compress before persisting
+- make system for expiring/culling datoms
+- keep track of how big the datascript db is
+- components can ask for data if it's missing
+- can keep much more in memory
+*** Every component knows what it needs
+If it's not there it can ask, once every component has asked for what it needs,
+a map can be built and the request sent to the server.
+But make a hash of it first and send that first? So only send the map when the server hasn't seen it yet.
+Or a ui page needs to declare the data map it needs first perhaps.
+
+** Partial collection problem
+As a result of a search, or filter. Or just paged results, sorted in whatever way.
+** Subscription problem (biggest problem)
+Clients need to indicate what data they're interested in
+http://deepstream.io/tutorials/simple-app-using-react.html
+https://medium.com/apollo-stack/graphql-subscriptions-in-apollo-client-9a2457f015fb#.wmepyd6jf
+** Ideas from other libs/frameworks/articels
+*** Articles
+***** http://grokbase.com/t/gg/clojure/157kvm98qv/building-falcor-relay-for-clojure-clojurescript
+In a recent talk, David Nolen talks about a great idea for Om Next, where components declaratively describe what data they’re interested in. [omnext] I’d like to explore the optional server-side router part. The idea is that you write your code on the front-end as if you have *all* the data; then, in the background, you download just enough data to do it. This idea has also been explored by Facebook with Relay, and Netflix with Falcor.
+
+Since David suggested using Datomic pull syntax to describe what data you’re interested in, Datascript was my first port of call. The author of Datascript has also written a superb article on exactly this topic. [webtmrw]
+
+Falcor has it easier, though; because it solves a very specific problem. It does asynchronous access for strictly hierarchical model objects whose schema is known completely ahead of time, and without any querying capabilities like Datascript’s.
+
+The challenge is that Datascript is really just a bunch of tuples in a few sorted sets. [dsint] We’re trying to teach it about data that *doesn’t* live there. While Datascript makes it easy to write additional backends (IDB, ISearch, IIndexAccess), those APIs are synchronous, so I can’t do much in the browser.
+
+The obvious piece of data to ferry around is the datom; the hard part is:
+
+1. knowing if there’s datoms you don’t know about, but live on the server,
+2. as the server, knowing which datoms are relevant.
+
+One approach might be to just run queries on the server as well as on the client. Another is to add “hints” that there’s some data here, but you just don’t know what it is. (The problem is that the latter breaks pretty easily; it’s not like you can do range queries on `:go-ask-the-server`…)
+
+Finally, there’s backing this data with, say, a legacy REST API or something. That’s fine as long as you do it on the server, because the blocking restriction goes away.
+
+Due to my relative inexperience with Datascript/Datomic, I wanted to reach out to the mailing list before continuing. Is anyone else working on something similar? Good results, dead ends?
+
+[omnext]: https://www.youtube.com/watch?v=ByNs9TG30E8
+[webtmrw]: http://tonsky.me/blog/the-web-after-tomorrow/
+[dsint]: http://tonsky.me/blog/datascript-internals/
+*** Tonsky article:
+http://tonsky.me/blog/the-web-after-tomorrow/
+*** Falcor
+Retrieve only requested data needed to build ui.
+Single server endpoint. (data is api)
+To avoid allowing the cache to grow larger than the available memory on the device, developers can configure a maximum size for the cache. When the cache grows beyond the maximum size, the least-recently-used values are purged. This makes it possible to run the same application on an inexpensive mobile device or a powerful desktop machine.
+Batch/bundle requests
+In addition to batching outgoing requests, the Falcor Model dedupes requests. If a request is made for a value for which there is already an outstanding request, no additional request is made.
+Refs for objects to normalize data (deduping duplicates in json tree, making it
+a graph).
+
+*** Relay
+Colocations of declarative parameterized queries for data with the view that consumes the data.
+
+Never again communicate with your data store using an imperative API. Simply declare your data requirements using GraphQL and let Relay figure out how and when to fetch your data.
+
+Queries live next to the views that rely on them, so you can easily reason about your app. Relay aggregates queries into efficient network requests to fetch only what you need
+
+Relay lets you mutate data on the client and server using GraphQL mutations, and offers automatic data consistency, optimistic updates, and error handling.
+
+Given a set of query fragments, a mutation, a query that represents all parts of the world that might change as a result of this mutation (the ‘fat query’), and a set of behaviors to exhibit when the server responds (the ‘query configs’), Relay will ensure that all of the data necessary to perform the mutation has been fetched, and that your client-side data stays in sync with the server after the mutation.
+*** re/frame
+re-frame is a pattern for writing SPAs in ClojureScript, using Reagent.
+
+*** Meteor
+*** Virtualdom.js
+https://github.com/Matt-Esch/virtual-dom
+Clojurescript version, kind of: dominator
+https://github.com/dubiousdavid/dominator
+*** Elm
+http://elm-lang.org/
+Uses virtualdom.js
+Signals in clojurescript:
+https://github.com/jamesmacaulay/zelkova
+implementing-elm-architecture-clojurescript:
+http://spin.atomicobject.com/2015/07/09/implementing-elm-architecture-clojurescript/
+*** Cycle.js
+https://www.youtube.com/watch?v=uNZnftSksYg
+http://cycle.js.org/
+Uses RxJs
+Uses virtualdom.js
+Purely functional (no this, classes etc)
+*** dato
+https://github.com/datodev/dato
+Dato is an alternative approach to building apps, heavily inspired by Meteor, Firebase, and Parse, but with a strong bent towards using FP to make app design, iteration, tooling, and implementing features considerable easier. By default it comes with lag-compensation, security rules, and server-side function call. It'll eventually extensible so that e.g. offline apps, Operational Transform (Etherpad/Google Docs-like functionality), and other behaviors should be accessible and efficient.
+
+
+
+* om-next
+
+** om-css
+   https://github.com/untangled-web/om-css
+  anmonteiro has one as well
+
+mitchelkuijpers [1:32 PM]
+I made om-css (anmonteiro's) reloading working by doing a bit of a hack hehe:
+
+```     (sift :move {#"^public\/js\/main\.outout\.css$" "public/css/next.css"})
+
+Could use that to get sourcemaps working for sass??
+** testing
+   http://jakemccrary.com/blog/2015/12/19/clojurescript-treat-warnings-as-errors/
+   http://tech.adstage.io/2016/09/12/how-we-test-full-stack-clojure.html
+** env keys
+   (:query-root :path :pathopt :ast :state :parser :logger :shared :target :query)
+** drag/drop and trees
+*** trees
+    https://github.com/chenglou/react-treeview/blob/master/react-treeview.css
+    http://jsfiddle.net/infiniteluke/908earbh/9/
+    https://github.com/pqx/react-ui-tree
+
+    https://ynonperek.wordpress.com/2015/12/11/visualising-a-tree-structure-with-react-redux/
+    https://github.com/alexcurtis/react-treebeard
+    https://github.com/jonmiles/react-bootstrap-treeview
+    https://github.com/danielstocks/react-sortable
+    https://github.com/jirivrany/react-treeview-recursive
+*** drag/drop
+    https://bevacqua.github.io/dragula/
+    https://github.com/Jannis/om-next-kanban-demo
+    https://github.com/griffio/om-next-03
+
+** devcards
+   http://rigsomelight.com/devcards/#!/devdemos.defcard_api
+** snippets 3-12-15
+*** what you need to do is add ﻿⁠⁠⁠⁠:user/name﻿⁠⁠⁠⁠ to  ﻿⁠⁠⁠⁠:keys﻿⁠⁠⁠⁠ in the reconciler's ﻿⁠⁠⁠⁠:merge﻿⁠⁠⁠⁠ function
+
+[3:43]
+so that it gets read after the remote result returns
+
+danielstockton   [3:43 PM]
+do you have an example of something similar?
+
+anmonteiro       [3:43 PM]
+there's something else you can do too
+
+[3:44]
+you can use the ﻿⁠⁠⁠⁠:value {:keys ...}﻿⁠⁠⁠⁠ that your remote mutation returns to auto-queue them automatically in an overridden merge function
+This way if you add ﻿⁠⁠⁠⁠{:value {:keys [:user/name]}}﻿⁠⁠⁠⁠ to your ﻿⁠⁠⁠⁠'user/login﻿⁠⁠⁠⁠ mutation on the ﻿⁠⁠⁠server﻿⁠⁠⁠, ﻿⁠⁠⁠⁠merge﻿⁠⁠⁠⁠ will know to re-read those because they arrive in the remote result too
+
+I'm afraid I don't have a concrete example to show you, but Compassus does something with ﻿⁠⁠⁠⁠:keys﻿⁠⁠⁠⁠ in merge which maybe can give you some insight into how it works: https://github.com/compassus/compassus/blob/master/src/main/compassus/core.cljc#L295-L298
+
+danielstockton   [3:47 PM]
+in my case, every remote read should be re-read once I have a token and adding all the keys from the remote doesn't seem nice
+
+[3:47]
+it should re-read the query for the current-route, in the general case
+
+[3:48]
+i only have ﻿⁠⁠⁠⁠:user/name﻿⁠⁠⁠⁠ for now but this is the simplest case
+
+anmonteiro       [3:48 PM]
+that's something you can also do easily
+
+[3:48]
+you have the reconciler and the state in ﻿⁠⁠⁠⁠merge﻿⁠⁠⁠⁠
+
+[3:48]
+so you can get the current route, and obtain the query of the component which pertains to that route
+
+danielstockton   [3:49 PM]
+and then just update :keys to be that query?
+
+anmonteiro       [3:49 PM]
+not quite :slightly_smiling_face:
+
+[3:50]
+if the query is all keywords, then yes
+
+[3:50]
+if not you need to extract their "dispatch-key"
+
+danielstockton   [3:50 PM]
+right, so query->ast and map :dispatch-key
+
+anmonteiro       [3:50 PM]
+e.g. ﻿⁠⁠⁠⁠{:some/join [:foo :bar]}﻿⁠⁠⁠⁠ -> ﻿⁠⁠⁠⁠:some/join﻿⁠⁠⁠⁠
+
+[3:51]
+﻿⁠⁠⁠⁠(map (comp :dispatch-key om.next.impl.parser/expr->ast) query)﻿⁠⁠⁠⁠
+
+[3:51]
+something like this ^
+***  the app-state-db is the entire app-state where ﻿⁠⁠⁠⁠db->tree﻿⁠⁠⁠⁠ will look when resolving idents & links
+
+[12:40]
+the “some-data” parameter is the subset of data that you want to denormalize
+
+molstt [12:40 PM]
+ok, thanks!
+
+anmonteiro [12:40 PM]
+(it can be a single ident)
+
+[12:41]
+﻿⁠⁠⁠⁠(om/db->tree [:foo/name :foo/other] [:foo/by-id 0] app-state﻿⁠⁠⁠⁠ (edited)
+
+[12:41]
+would probably return:
+```{:foo/name "Foo", :foo/other "some other value"}
+```
+
+[12:42]
+given that your app-state contained:
+```{:foo/by-id
+ {0 {:foo/name "Foo", :foo/other "some other value"}}}
+```
+
+alex-glv [12:42 PM]
+I think I started grokking readers. It was really tough to comprehend what’s the flow of data like deeper into the query from root to children and bubbling back up. Will write a blog post hope it’ll help some others. The existing docs are good once you start getting it, but definitely for people who are very comfortable with cljs.
+
+anmonteiro [12:43 PM]
+:+1:
+
+alex-glv [12:43 PM]
+@anmonteiro some good stuff in your posts, @tony.kay also very helpful resources with om-tutorial. Definitely needs to go into “unofficial” docs section somewhere in wiki.
+
+molstt [12:44 PM]
+ok, so it is a selector rather than "some-data"... will try it out
+
+[12:45]
+but isn't it strange that @state is often supplied as "some-data" ?
+
+anmonteiro [12:46 PM]
+@molstt if you pass your root query and want to denormalize the whole state, sure
+
+[12:46]
+I never actually do that though
+
+[12:46]
+the most common thing is to call ﻿⁠⁠⁠⁠db->tree﻿⁠⁠⁠⁠ like this: ﻿⁠⁠⁠⁠(om/db->tree query (get st k) st)﻿⁠⁠⁠⁠ (edited)
+
+[12:46]
+where ﻿⁠⁠⁠⁠k﻿⁠⁠⁠⁠ is the key your parser dispatched on
+
+molstt [12:48 PM]
+mhm.. but (get st key) returns data from the database, while [:key 24] and :key are selectors.. isn't it two very different things?
+
+anmonteiro [12:49 PM]
+@molstt ﻿⁠⁠⁠⁠(get st key)﻿⁠⁠⁠⁠ could return a selector :slightly_smiling_face:
+
+molstt [12:49 PM]
+ah
+
+[12:49]
+I see..
+
+[12:49]
+it must
+
+[12:49]
+I suppose
+
+anmonteiro [12:50 PM]
+normally it’ll return an ident or a list of idents, yes
+*** Been struggling with remote tempids migration, I created a small repro case here: https://gist.github.com/julienfantin/26cacfda7fc9192a3ed5942534d934ca would love some feedback!
+
+anmonteiro [3:25 PM]
+@jfntn FWIW here’s one example you could look at:
+https://github.com/awkay/om-tutorial/blob/master/src/cards/om_tutorial/om_specs.cljs#L14
+ GitHub
+awkay/om-tutorial
+om-tutorial - WORK IN PROGRESS
+
+
+jfntn [3:25 PM]
+@anmonteiro thanks I did look at that and the test in fact fails
+
+anmonteiro [3:25 PM]
+@jfntn oh and I’ve put a gist together some time ago:
+https://gist.github.com/anmonteiro/085d3d0636a3bc14f9f7
+
+anmonteiro [3:34 PM]
+@jfntn just confirmed that gist works for me with alpha45
+*** I have a send fn that's passing a result like ﻿⁠⁠⁠⁠{'sym {:result {:tempids {#om/id["-1"] 123}}}}﻿⁠⁠⁠⁠ to the callback, but ﻿⁠⁠⁠⁠default-migrate﻿⁠⁠⁠⁠ is getting ﻿⁠⁠⁠⁠{}﻿⁠⁠⁠⁠ as its ﻿⁠⁠⁠⁠tempids﻿⁠⁠⁠⁠argument
+
+[3:24]
+What result shape does the reconciler expect for remote tempids substitution? (edited)
+
+anmonteiro [3:27 PM]
+@jfntn I think you need to pull ﻿⁠⁠⁠⁠:tempids﻿⁠⁠⁠⁠ out of the result
+
+[3:27]
+such that it becomes e.g. ﻿⁠⁠⁠⁠{'sym {:result {} :tempids {#om/id["-1"] 123}}}﻿⁠⁠⁠⁠
+
+jfntn [3:36 PM]
+@anmonteiro ok cool, now ﻿⁠⁠⁠⁠default-migrate﻿⁠⁠⁠⁠ is getting ﻿⁠⁠⁠⁠{[:db/id #om/id["-1"]] [:db/id 123]}﻿⁠⁠⁠⁠ but the default-merge gives me something unexpected, replacing the app state with the result...
+
+anmonteiro [3:38 PM]
+@jfntn your app state is normalized right?
+
+jfntn [3:57 PM]
+@anmonteiro ah indeed my optimistic update was assoc’ing into the denormalized path, I changed it to ﻿⁠⁠⁠⁠{:denorm [:db/id #om/id["-1"]] :db/id {#om/id["-1"] ...denorm-data…}﻿⁠⁠⁠⁠ but I’m still getting nothing but the remote result in the app-state after it's migrated
+*** if you configure :pathopt true then your read fns needs to check for :om.next/root
+dnolen 01:13:31
+
+this means parsing is starting somewhere other than :root
+dnolen 01:13:39
+
+oops
+dnolen 01:13:52
+
+I mean check for :query/root
+dnolen 01:14:44
+
+by default this is :om.next/root
+dnolen 01:15:00
+
+but if you enable :pathopt and the component has an ident
+dnolen 01:15:09
+
+:query/root will be that instead
+tony.kay 01:16:03
+
+ok, so on entry to the read function, check for :query/root...what do you do if
+you can't support that root? dnolen 01:18:04
+
+return nil
+*** the structure of mutation return value is:
+dnolen 17:28:11
+
+{:value {:keys … :tempids … :result ...} :action (fn [] ..)}
+
+*** [(do/it! …) ‘:please/read]
+dnolen 19:37:19
+
+quoting will always refetch it doesn’t matter what you say in read
+How does the quoted thing know what the remote AST(s) will be if they aren't returned by read?
+dnolen 19:39:34
+
+@jannis you can do this via metadata
+
+@jannis: you can do [(do/it! …) ~(with-meta ‘(quote :please/read) {:remote …}))]
+dnolen 19:42:32
+
+and I’m more than happy to add a helper for that
+dnolen 19:42:34
+
+something like
+dnolen 19:42:46
+
+[(do/it! …) ~(force :please/read :remote)]
+Force helper:
+https://github.com/omcljs/om/commit/9220e84833b80b15999075ad90f0c9e05d88c53f
+
+    (spy :info (om/transact! this `[(admin/login ~credentials) ~(with-meta (list 'quote :route/dossier-types)
+                                                                  {:target :remote})])
+
+
+*** https://clojurians-log.clojureverse.org/om/2015-11-11.html
+*** Hey all, is there any way to view what changes trigger an update on a specific component?
+dnolen 16:41:18
+
+@gardnervickers: changes don’t trigger updates
+dnolen 16:41:26
+
+reads in a transaction do
+dnolen 16:41:53
+
+the main exceptions at the moment is that we schedule the component that requested a transaction for updates
+gardnervickers 16:42:00
+
+ahhh
+dnolen 16:42:03
+
+set-state! also triggers updates
+dnolen 16:42:23
+
+set-params! and set-query! as well, but again this only applies to the component that invoked these things.
+dnolen 16:42:54
+
+so basically the only the thing that changes is the thing that requested a change
+dnolen 16:43:08
+
+if you want more to change it must be explicitly requested
+
+*** It looks like there's no access to Om's transaction history (except by looking up a transaction by the uuids logged to the the js console).  I saw ITxIntercept but not sure how that would be used.
+
+[9:26]
+I had thought of logging the last transaction, and a diff of app-state before and after for debugging purposes.  Is that a bad idea?
+
+[9:29]
+The goal is to write clojure.spec for app-state, add a watch to the app-state atom and validate as it changes.  Logging why it changed seemed helpful.
+
+petterik [9:33 PM]
+I'm also playing around with transaction history, but for another purpose. To get the most recent history-id: `(last (.-arr (-> reconciler :config :history)))`
+
+alpheus [9:35 PM]
+That is all I needed.  Didn't know about -arr
+
+jasonjckn [10:28 PM]
+@alpheus i do DIFF on app state, it's a wonderful debugging tool
+
+[10:28]
+@alpheus TX history isn't the only way to DIFF app state, here's what I do
+
+[10:29]
+@alpheus
+```(defonce install-app-state-diff-once
+  (add-watch app-state :app-state-diff
+             (fn [_ _ old new]
+               (let [d (diff new old)
+                     d (filter-keys #(not (#{"untangled" "om.next"} (namespace (first %)))) d)]
+
+                 (if-not (empty? d)
+                   (js/console.log "APP-STATE DIFF: " d))))))
+
+```
+
+[10:29]
+in other words, I use a watch (edited)
+
+alpheus [10:30 PM]
+we're doing almost exactly the same thing
+
+jasonjckn [10:30 PM]
+what did you use for your diff function?
+
+[10:30]
+just curious
+
+alpheus [10:30 PM]
+clojure.data/diff
+
+jasonjckn [10:31 PM]
+cool
+
+alpheus [10:32 PM]
+I misunderstood what the reconciler history was for -- I'd hoped to get the transaction, not the state.  With a watch, I've already got the state.
+
+alpheus [10:38 PM]
+In other words, I'd wanted the final tx argument that om.next/transact* prints on the console
+
+jasonjckn [10:40 PM]
+i think you need to wrap transact in your own function for that
+
+alpheus [10:42 PM]
+yeah
+
+[10:46]
+Coming full-circle, implementing ITxIntercept gives you the tx after all.
+
+jasonjckn [10:51 PM]
+does ITxIntercept let you intercept all transactions?
+
+[10:52]
+what if you transact on the reconciler
+
+anmonteiro [10:52 PM]
+@jasonjckn not txns against the reconciler
+
+jasonjckn [10:52 PM]
+k
+
+[10:52]
+would be nice to support a way to intercept all transactions I think that would be useful
+
+[10:53]
+although I don't have a specific use case in mind atm
+
+alpheus [10:53 PM]
+what should tx-intercept return?
+
+jasonjckn [10:53 PM]
+the transactions
+
+[10:53]
+[(...) (...)]
+
+alpheus [10:53 PM]
+but in the loop, the return value of tx-intercept is assigned to parent
+
+[10:54]
+(the loop inside om.next/transact!)
+
+[10:54]
+uh, maybe I'm mis-reading that
+
+jasonjckn [10:55 PM]
+*nods*
+
+alpheus [10:55 PM]
+oh, ignore me
+*** I'm also playing around with transaction history, but for another purpose. To get the most recent history-id: `(last (.-arr (-> reconciler :config :history)))`
+*** https://github.com/compassus/omify
+ GitHub
+compassus/omify
+omify - om.next-ify plain React components.
+
+
+[1:20]
+haven’t had the time to write docs, but you can get the big picture from the devcards examples:
+https://github.com/compassus/omify/blob/master/src/devcards/omify/devcards/core.cljs (edited)
+
+[1:20]
+(I also included one using Recharts)
+
+ethannavis [2:16 AM]
+awesome, looks pretty straightforward. thanks @anmonteiro
+
+[2:16]
+is the only difference between `omify!` and `omify` that the first defs a new symbol while the other doesn’t? (edited)
+
+anmonteiro [2:17 AM]
+@ethannavis: no that's not what it does
+
+[2:18]
+`omify!` and `omify` are akin to ClojureScript's `specify!` and `specify`, respectively
+
+[2:18]
+So `omify!` mutates its argument, while `omify` returns a copy, preserving the original JS component
+
+[2:19]
+You don't need to `def` anything for `omify!`
+
+[2:20]
+You can `(omify! js/Recharts.LineChart ...)` for example
+
+[2:20]
+This modifies the original component (in the library)
+
+ethannavis [2:20 AM]
+ah, ok got it
+
+[2:21]
+literally has to do with mutability
+
+anmonteiro [2:21 AM]
+Yep
+
+ethannavis [2:21 AM]
+reading up on reify & specify now
+
+anmonteiro [2:21 AM]
+There might be cases where you don't want to mutate the original object
+
+[2:22]
+Because some other place in your app uses it or something. That's what `omify` os for
+
+[2:23]
+@ethannavis: also note you must use `omify.core/factory` for those components
+
+[2:24]
+Also 1 cool thing about `omify`(!) is that you can override `Object` methods too :-)
+
+ethannavis [2:25 AM]
+interesting, i’ll have to diff the two factory methods to see the magic
+
+[2:25]
+and yeah I saw that! very cool
+
+anmonteiro [2:25 AM]
+Shouldn't be the common case, but still
+*** also @jasonjckn can’t use `om/factory` on non-om components
+
+[8:49]
+which makes me wonder if rendering a non-om component from a non-om factory would cause issues (indexer, reconciler, etc.) (edited)
+
+jasonjckn [8:50 PM]
+well you could use  (om/ui ... )  to wrap it
+
+[8:51]
+(defn react-to-om [react query ident] (om/ui IQuery (query [_] query) Ident (ident [_] ident) Object (render [] react )
+
+ethannavis [8:52 PM]
+hadn’t seen that function before
+
+[8:52]
+interesting
+
+[8:52]
+@anmonteiro: thoughts? ^^^
+
+jasonjckn [8:52 PM]
+i this hack so that I don't have to create factories
+
+[8:53]
+ ```(defmacro ui [q & forms]
+  {:pre [(or (map? q) (vector? q) (list? q))]}
+
+  `(let [factory-fn# (atom nil)
+
+         new-ui# (om.next/ui
+                     ~'static cljs.core/IDeref
+                     (~'-deref [this#]
+                      @factory-fn#)
+
+                     ~'static om.next/IQuery
+                     (~'query [this#]
+                      ~q)
+
+                     ~@forms)]
+
+     (reset! factory-fn#
+             (om.next/factory new-ui# {:keyfn admin.util/uid-gen}))
+
+     new-ui#))
+```
+
+[8:53]
+(def MyNewComp (ui ...) )
+
+[8:53]
+`MyNewComp` is the om/react class, then `@MyNewComp` to get the factory
+
+ethannavis [9:46 PM]
+interesting, I like that
+
+
+----- August 20th -----
+anmonteiro [12:15 AM]
+@ethannavis I suppose that would work for the simplest case
+
+[12:16]
+However I fail to see a solution for e.g. children
+*** why is it that after mutations the parser gets om.next/full-query?
+
+ag [4:50 AM]
+how can I temporarily disable log messages like `[om.next] transacted`
+
+[4:50]
+?
+
+ag [4:57 AM]
+nvmd… picked into the source. apparently setting `goog.log.ENABLED = false` does that
+
+anmonteiro [11:53 AM]
+@ag: easier to pass `:logger nil` to the reconciler
+
+[11:53]
+For production builds set closure-defines goog.DEBUG false
+
+new messages
+anmonteiro [12:46 PM]
+@solussd: I still don’t understand the problem you’re having, it seems that everything should work
+
+[12:47]
+happy to look at a minimal case
+
+[12:48]
+mutations get passed the full query because of incremental rendering
+
+[12:49]
+if a component down the tree performs a transaction, Om Next doesn’t re-render from root. Instead, it only re-renders the subtree rooted at the component that called `transact!`
+
+[12:49]
+this is why `full-query` is needed
+
+[12:49]
+so that the component that `transact!`s gets the query focused at its subtree
+
+solussd [4:42 PM]
+@anmonteiro: Ok, that makes sense and explains some behavior I’m seeing.
+
+[4:46]
+At least some of my issues were caused by transacting against the reconciler directly instead of the root component for route updates.
+
+anmonteiro [4:48 PM]
+@solussd: transacting against the reconciler is just fine but it also provides a finer-grained level of control
+
+[4:48]
+which means you need to deal with the consequences of that
+
+solussd [4:49 PM]
+what is an example of a consequence?
+
+anmonteiro [4:49 PM]
+one of those being that you need to queue your ~root~ desired query for re-read because Om won’t queue any components by default when transacting against the reconciler (edited)
+
+[4:49]
+(since no components have performed the transaction)
+
+solussd [4:50 PM]
+I’m familiar with providing keys to reread in a transact! call, is queuing a query different?
+
+anmonteiro [4:53 PM]
+@solussd same thing, just provide a query instead of a key
+
+[4:53]
+which leads us to another limitation of transacting against the reconciler
+
+[4:53]
+Om won’t `transform-reads` by default when you `transact!` against the reconciler
+
+[4:53]
+meaning that the keys you provide to re-read don’t get expanded into the query they reference
+
+[4:53]
+so you must provide the exact query you want to be re-read
+
+[4:54]
+here’s an example:
+https://github.com/compassus/compassus/blob/master/src/main/compassus/core.cljc#L100
+
+***   Trying to understand how to work with remotes. As I understood my send functions has to call cb arguments with new data. And this cb then forwards this data to my merge function? Is it so?
+artemyarulin 14:33:29
+Sorry for the dumb questions :simple_smile:
+danielstockton 14:35:19
+@artemyarulin: Pretty much. merge goes on to call merge-tree, merge-idents and migrate
+danielstockton 14:35:33
+merge-tree adds the new data to your app state and migrate updates tempids
+danielstockton 14:36:02
+you probably don't have to provide a custom implementation for merge, just :merge-tree and maybe :migrate
+artemyarulin 14:37:03
+Hm, :merge and :merge-tree are different?
+artemyarulin 14:37:49
+I guess I need :merge-tree in order to merge the new data into the right place in state
+
+@artemyarulin: implementing :merge means you want to take complete control over how merging happens
+dnolen 14:45:06
+it exists for custom storage users i.e. DataScript or something else
+dnolen 14:45:28
+if all you want to do is control how the data gets merged using the default db, :merge-tree is enough
+artemyarulin 14:46:17
+oh, cool, thanks. When do I need to use :merge-idents?
+dnolen 14:47:58
+only if you think you need more control over that
+dnolen 14:48:18
+in general you don’t need to do any of this if you’re using the default db
+dnolen 14:48:43
+:merge-tree is probably the only one people will normally supply themselves
+artemyarulin 14:48:55
+Cool, it’s clear for me. Thank you!
+
+ (defn custom-merge-tree [a b] (if (map? a) (merge-with into a b) b)) It'll merge keys without overwriting,
+
+ (defn merge-tree [db data] (doseq [[k v] data] (merge-data db k v)) @db/conn)
+
+ (defn merge-ident
+  [_ state ident response]
+  (let [data (get-in response [:body :data])]
+    (if (or (not= 200 (:status response)) (nil? data) (empty? data))
+      (.warn js/console (str "Unable to merge-ident for ident: " ident ". Response is: " response))
+      (db/transact! [data]))))
+
+:merge-tree (fn [_ data]
+            (prn data)
+            (doseq [t (vals (into {} (filter #(keyword? (first %)) data)))]
+                (d/transact! conn t))
+            @conn)
+
+
+** how to
+*** record screen
+simplescreenrecorder
+***  use react refs
+https://medium.com/@roman01la/om-next-for-react-devs-application-state-53af3ec7c42a#.6bgkqbwmg
+*** throw catch exceptions
+    https://stackoverflow.com/questions/3835331/custom-exceptions-in-clojure
+(try (
+    (throw (ex-info "ex-info msg string" {:type :python-exception :bla :eels}))
+    )
+    (catch clojure.lang.ExceptionInfo e
+    (let [msg (.getMessage e)
+            data (ex-data e)]
+        (info "Msg:" msg)
+        (info "Data:" data))
+    ))
+
+*** disable logging
+how can I temporarily disable log messages like `[om.next] transacted`
+nvmd… picked into the source. apparently setting `goog.log.ENABLED = false` does that
+@ag: easier to pass `:logger nil` to the reconciler
+For production builds set closure-defines goog.DEBUG false
+*** server side rendering  0
+    https://crossclj.info/ns/com.ladderlife/cellophane/0.3.4/project.clj.html
+*** remotes
+    For each remote that you list in the reconciler (default is just :remote), the parser will run with :target set in the env to that remote.
+   Http-caching
+You declare remotes:
+#+BEGIN_SRC clojure
+(def reconciler
+  (om/reconciler
+    {:state   {:search/results []}
+     :parser  (om/parser {:read read})
+     :remotes [:remote :search]}))
+#+END_SRC
+You add remote to read:
+#+BEGIN_SRC clojure
+(defmethod read :dashboard/items
+[{:keys [state ast]} k _]
+(let [st @state]
+{   :value   (into [] (map #(get-in st %)) (get st k))
+    :dynamic (update-in ast [:query]
+            #(->> (for [[k _] %]
+                    [k [:favorites]])
+                (into {})))
+    :static  (update-in ast [:query]
+            #(->> (for [[k v] %]
+                    [k (into [] (remove #{:favorites}) v)])
+                (into {})))}))
+#+END_SRC
+Return (modified) ast from remote keys
+
+Supply send fn to reconciler
+#+BEGIN_SRC clojure
+(def reconciler
+  (om/reconciler
+    {:state   {:search/results []}
+     :parser  (om/parser {:read read})
+     :send    (send-to-chan send-chan)
+     :remotes [:remote :search]}))
+#+END_SRC
+Send fn gets 2 args, 1st a map of remotes to ast of read fn result, 2nd a callback
+
+Send function needs to do the remote call, then call callback with new/updated data.
+
+This callback simply takes novelty and merges it back into the application state.
+
+
+
+*** get-query
+    (om/get-query (om/class->any reconciler AnimalsList))
+   but also just (om/get-query AnimalsList) ??
+*** set-query!
+    (om/set-query! (om/class->any reconciler AnimalsList)
+    {:params {:start 0 :end 5}})
+*** time travel
+    (reset! app-state
+      (om/from-history reconciler #uuid "e0a07c41-413a-430c-8c91-976a155241c3"))
+    Just query:
+    (om/from-history reconciler #uuid "9e7160a0-89cc-4482-aba1-7b894a1c54b4")
+*** transact at the repl
+     (om.next/transact! reconciler '[(increment)])
+     Or:
+     (def my-parser (om/parser {:read read :mutate mutate}))
+     (my-parser {:state my-state} '[(increment)])
+     @my-state
+     ;; => {:count 1} ;;mutated
+     Or:
+     (def my-state (atom {:count 0}))
+     (my-parser {:state my-state} [:count :title])
+     ;; => {:count 0, :title :not-found}
+*** om/tree->db
+     (def norm-data (om/tree->db RootView init-data true))
+*** om/db->tree
+;; (om/db->tree query data app-data)
+;; denormalize
+;; data, using
+;; app-data to resolve
+;; idents, then apply
+;; query
+
+
+
+ (defmethod read :items
+  [{:keys [query state]} k _]
+  (let [st @state]
+    {:value (om/db->tree query (get st k) st)}))
+
+    You can write really simple apps with db->tree, and when you reach a point in the query that the remainder can leverage that tool to great effect. But you have to understand how to work with the parsing system to do anything non-trivial.
+
+** good to know
+*** from clojurians
+ and pass the query as the second argument to the callback in your send function
+ (for dealing with unions perhaps)
+
+ you can also add a 3rd argument to `set-query!`
+a vector specifying the keys to re-read
+e.g. `(om/set-query! this {:query [:foo]} [:bar])` <- re-reads `:bar`
+*** signatures
+**** read and mutate: [env key params]
+     So, the read function you write:
+
+     Will receive three arguments:
+     An environment containing:
+     :parser:   The query parser
+     :state:    The application state (atom)
+     :query:    if the query had one E.g. {:people [:user/name]} has :query [:user/name]
+     A key whose form may vary based on the grammar form used (e.g. :user/name).
+     Parameters (which are nil if not supplied in the query)
+     Must return a value that has the shape implied by the grammar element being read.
+
+     The signature of a read function is:
+
+     (read [env dispatch-key params])
+
+     where the env contains the state of your application, a reference to your parser (so you can call it recursively, if you wish), a query root marker, an AST node describing the exact details of the element's meaning, a path, and anything else you want to put in there if you call the parser recursively.
+
+     The parse will create the output map.
+     (keys env) in mutation=>
+     (:query-root :path :pathopt :reconciler :ast :state :component :parser :logger :shared :target)
+     (keys env) in read =>
+     (:query-root :path :pathopt :ast :state :parser :logger :shared :target :query)
+**** indent [this props]
+**** params [this]
+**** query [this]
+**** render [this]
+    props: (om/props this)
+*** disable transaction logging in console
+
+in `om.next` how can one disable printing transaction logs? At least temporarily. I have a huge logs that when printed slow down my app.
+
+@denik i didn't try it out, but i think you can use the logger option for the reconciler to pass in something else, e.g. a logger which doesn't log at all. https://github.com/omcljs/om/blob/master/src/main/om/next.cljs#L1647(edited)
+
+@denik: simply pass `:logger nil` to the reconciler
+
+** example apps
+https://github.com/anmonteiro/om-next-fullstack
+https://github.com/swannodette/om-next-demo
+https://github.com/griffio?tab=repositories
+https://github.com/griffio/om-next-01
+https://github.com/griffio/om-next-02
+https://github.com/griffio/om-next-03
+https://github.com/griffio/om-next-04
+https://github.com/griffio/om-next-05
+
+https://github.com/danielstockton/om-next-frontend
+
+https://github.com/jdubie/om-next-router-example
+
+https://github.com/jdubie/om-next-starter
+
+https://github.com/madvas/cljs-react-material-ui-example
+https://github.com/madvas/todomvc-omnext-datomic-datascript
+
+https://github.com/codebeige/om-next-dataflow
+https://github.com/advancedtelematic/parking-visualization
+https://github.com/Jannis/om-next-kanban-demo
+https://github.com/omcljs/om/blob/master/src/devcards/om/devcards/tutorials.cljs
+https://libraries.io/github/jordillonch/om-next-datagrid-example
+https://github.com/colinf/om-chat-base
+https://github.com/artemyarulin/om-next-cross-platform-template
+https://github.com/anmonteiro/aemette
+https://github.com/akmiller78/tut-omnext-tempids
+https://github.com/olivergeorge/stripboard
+
+** routing
+A routing library for Om Next
+https://github.com/anmonteiro/compassus
+
+** learn
+*** videos etc
+**** The Front End Architecture Revolution • David Nolen
+https://www.youtube.com/watch?v=nDNU2pmuJA8
+http://www.ustream.tv/recorded/61483785
+**** Om Next - David Nolen
+https://www.youtube.com/watch?v=ByNs9TG30E8
+**** Om Next - David Nolen
+https://www.youtube.com/watch?v=MDZpSIngwm4
+**** David Nolen: Hello Om Next! (October 27, 2015)
+https://www.youtube.com/watch?v=xz389Ek2eS8
+**** Clients in Control by dnolan
+http://www.datomic.com/videos.html
+**** ClojureNYC 9-29-15 by dnolan
+http://livestream.com/intentmedia/events/4386134
+**** Fast full stack testing in om.next - Jack Dubie
+https://www.youtube.com/watch?v=M1Tl-YLqkQc
+**** Om (next) Overview Data Flow and Interactions  (Tony Kay)
+https://www.youtube.com/watch?v=IlNrmKYA7Ig
+**** Om Next and DataScript Localisation Demo
+https://www.youtube.com/watch?v=-E2Z9bca4-w
+**** António Monteiro - Clients in control:
+http://beta.craft-conf.com/
+**** Podcasts:
+http://blog.cognitect.com/cognicast/093
+https://www.functionalgeekery.com/episode-40-david-nolen/
+
+*** tutorials/docs
+**** om/next wiki
+https://github.com/omcljs/om/wiki/Documentation-%28om.next%29
+https://github.com/omcljs/om/wiki/Quick-Start-%28om.next%29
+https://github.com/omcljs/om/wiki/Components,-Identity-&-Normalization
+https://github.com/omcljs/om/wiki/Queries-With-Unions
+https://github.com/omcljs/om/wiki/DataScript-Integration-Tutorial
+https://github.com/omcljs/om/wiki/Remote-Synchronization-Tutorial
+https://github.com/omcljs/om/wiki/Applying-Property-Based-Testing-to-User-Interfaces
+https://github.com/omcljs/om/wiki/Transitioning-the-Indexer-from-the-static-tree-to-the-runtime-tree
+https://github.com/omcljs/om/wiki/Thinking-With-Links%21
+https://github.com/omcljs/om/wiki/Om-Next-FAQ
+***** empty still
+https://github.com/omcljs/om/wiki/Temporary-Identity
+^^ (empty)
+https://github.com/omcljs/om/wiki/Recursive-Queries
+^^ (empty)
+https://github.com/omcljs/om/wiki/Path-Optimization
+^^ (empty)
+
+**** awkay
+https://github.com/awkay/om/wiki/Om-Next-Overview
+https://github.com/awkay/om-tutorial
+
+**** for javascript devs
+https://medium.com/@roman01la/om-next-for-react-devs-application-state-53af3ec7c42a#.6bgkqbwmg
+https://medium.com/@roman01la/om-next-for-react-devs-components-and-elements-2df95435d804#.ooifqs6g1
+https://medium.com/@roman01la/om-next-for-react-devs-introduction-and-project-setup-52b88f87264#.tipu02hqy
+
+**** reconciler
+https://medium.com/@kovasb/om-next-the-reconciler-af26f02a6fb4#.ffpdb87vs
+
+**** omnext end to end
+http://marianoguerra.org/posts/omnext-end-to-end-part-i-backend.html
+http://marianoguerra.org/posts/omnext-end-to-end-part-ii-frontend.html
+
+**** anmonteiro
+ https://anmonteiro.com/2016/01/om-next-query-syntax/
+ https://anmonteiro.com/2016/01/exploration-patterns-om-next-part-1/
+ https://anmonteiro.com/2016/01/exploration-patterns-om-next-part-2/
+ https://anmonteiro.com/2016/01/writing-om-next-reloadable-code-a-checklist/
+ https://anmonteiro.com/2016/02/om-next-meets-devcards-the-full-reloadable-experience/
+ https://anmonteiro.com/2016/02/routing-in-om-next-a-catalog-of-approaches/
+ https://anmonteiro.com/2016/05/clients-in-control-om-next-craft-conf-2016/
+ https://anmonteiro.com/2016/06/the-quest-for-a-unified-routing-solution-in-om-next/
+
+**** more blog posts
+     https://medium.com/@softwarecf/om-next-normalisation-7db6f2a8f89f#.wgmscdabc
+     https://medium.com/@softwarecf/om-data-access-43ee0b45976c#.l65gao26l
+ https://circleci.com/blog/why-we-use-om-and-why-were-excited-for-om-next/
+
+ How to build a remote:
+ https://juxt.pro/blog/posts/course-notes-2.html
+ https://dvcrn.github.io/clojurescript/react/2015/10/27/going-native-with-om-next.html
+ https://anmonteiro.com/
+ https://anmonteiro.com/2015/12/om-next-study-material/
+
+*** slides
+https://speakerdeck.com/anmonteiro
+
+
+* Aum
+** image upload resize in browser
+    https://stackoverflow.com/questions/19262141/resize-image-with-javascript-canvas-smoothly
+    https://stackoverflow.com/questions/2434458/image-resizing-client-side-with-javascript-before-upload-to-the-server
+    https://gist.github.com/dcollien/312bce1270a5f511bf4a
+    https://hacks.mozilla.org/2011/01/how-to-develop-a-html5-image-uploader/
+    https://github.com/rossturner/HTML5-ImageUploader/blob/master/src/main/webapp/js/ImageUploader.js
+    https://github.com/sidraval/image-crop
+    https://github.com/nodeca/pica
+    https://github.com/mikera/imagez
+    https://github.com/josephwilk/image-resize r
+
+** ?? When record is not saved because all props are not allowed backend returns warning
+   But this is not shown in frontend. This is because dossier types can be empty,
+   but the joined fields not. So no msg is appropriate then. But for records with
+   no joins we would like some feedback. On the other hand this should be not
+   allowed in the first place, saving a record with disallowed fields.
+   But resurrect the little black box popup perhaps
+
+** Set/edit color logo scheme
+**** Add help text
+**** Set maximum sizes!
+**** Multiple sizes for normal and iphone!!!
+**** DONE Have dc app respond to theme images
+**** Add custom avatar image
+**** Grab these images on backend and get to frontend via a macro.
+  And calculate sizes there from them.
+**** In rails put logo and brand data-urls somewhere more sane.
+  Not in group model perhaps.
+  Also grab from images on disk. So create data uri from brand and logo png/jpeg
+**** Only show preview checkbox if anything's different!!
+**** BUG Set color not to nil for default color, don't use merge-themes
+    On save if color is the same as default then mod it to nil.
+
+
+** Better data explorer, including vcr
+    see explorer namespace
+
+
+** user management for billing purposes
+** implement state in url.
+ And history etc, back/forward button.
+ https://github.com/juxt/bidi
+ https://github.com/venantius/accountant
+ https://github.com/kibu-australia/pushy
+ https://lispcast.com/mastering-client-side-routing-with-secretary-and-goog-history/
+
+
+** Feedback/bug report form a la chrome
+ So with screenshot, text, url, file upload, system info
+
+
+** more per group translations options
+
+*** In dc app fetch shadow translations scoped to group_id for efficiency
+    Added note about it in translations.rb model
+*** when switching between groups have same translation open!!
+*** What if supergroup wants -its- translations as the root translation???
+    That's easy in dc app, we just filter the shadow translation on the group id
+    of the super group.
+
+    For the regular translations in aum we currenlty get the shadow translations
+    filtered by user group id. We would need to get the shadow translations of
+    the users group's group-id, as well as the shadow translations for group.
+
+    In aum in the translation editor we need to get and show the shadow
+    translation of super group as well as the shadow translation of the group it self.
+
+    But all this only if the option on the supergroup is to fall back to -its-
+    translations before falling back to the root translation
+
+*** use (:locales config) whenever listing/enumerating locales
+     so for example on page-config and translations admin page
+
+*** DONE have option on translation page for dc admin to see what translation keys in app are -not- in translatiion table!!
+    and have option to import them
+
+*** Translations are not fetched when not logged in!!!!
+**** Make sure that current group translations are used when logged out. Same as theme
+
+
+** Extract undo-redo to mutate helpers
+
+** Underline red any form errors, so -> reeval invalidate on input and is invalidated
+
+** reconciler.core Network level success status, not response status :success? cb-success?
+   What do we do with this in mock mode or e2e test modes?
+
+
+
+** Saving of joined data!, and undo/redo/revert/is-dirty!!!
+*** Solution:
+**** 1a. Generic undo/redo/revert
+**** 1b. Generic is-dirty
+**** 2. Calc-mods
+- unsaved-records should be called unsynced-records or out-of-sync-records
+- Make a new mutation: save-records (plural: "records").
+- We have a list of tables that are edited on a page, or we pass in a list of
+  tables we like to save in one hit.
+- And a list of all 'unsaved' records. So all out of sync records. All records
+  with 'mods'. We create a table-data map with all mods per table and id. Which
+  we send to the backend.
+- Every time we do a modify record 'unsaved-records' gets updated. Might as well
+  add the actual mods to it actually
+- When we receive our mods back from backend we update unsaved-records. If a mod
+  of a record doesn't have the _error or _out-of-sync or _unable-to-sync or
+  _sync_failed key set it will be removed from unsaved-records.
+- Undo/redo updates unsaved-records
+- When deleting a new record update unsaved-records
+- When deleting a records remove all unsaved joins from unsaved-records
+**** 3. Saving data
+
+1. Save mods as table-data. So like
+    #+BEGIN_SRC clojure
+      {:mods {:dossier-type {1 {:name "changed-name"
+                                :group-id 1 ;;belongs to group
+                                :company-id "C1-tempid"} ;;belongs to company
+                             "D2-tempid" {:name "new dossier-type"}} ;;has-many fields, belongs-to group, company
+              :group {"1" {:name "modified group name"}} ;;has-many dossier-type
+              :company {"C1-tempid" {:name "new company"}} ;;has-many dossier-type
+
+              ;;:dossier-type-id 1 -> we rename the status all dossier of that dossier
+              ;;type with that status. So all dossier with status "1".
+              :status {1 {:label "changed-label-name"} ;;add a multimethod hook for table/prop
+                       ;;we soft delete, so just save prop as normal or:
+                       ;;in hook on table we check for :deleted prop delete the row if we want
+                       2 {:deleted true ;;or
+                          :client-prop/deleted true}
+                       }
+              :field {5 {:label "changed-label"} ;;dossier-type-id 1
+                      "F1-tempid" {:label "bla"
+                                   :more :props
+                                   :dossier-type-id "D2-tempid"}} ;;belongs-to dossier-type, has-many options
+              :option {1 {:text "changed-text"} ;;belongs-to field
+                       "O1-tempid" {:text "bla"
+                                    :order 2
+                                    :field-id "F1-tempid"}
+                       }}}
+    #+END_SRC
+2.We use our db-config to work out the graph of our mods
+   a. Find the roots in the graph of the mods (So the roots are company and group in the mods above)
+   b. Take the first root
+   c. Save the record (it either succeeds or fails)
+   d. If it fails we return original record table-data (empty map if new) with error data added to
+   record map and then if:
+       1. it's a new record we do not save any children but for all children,
+          recursively we return original record data (empty map) with error data
+          added (parent couldn't be updated!) and with rest of roots go to b
+       2.it's an existing record we continue saving children and for every child
+       we start at c. again
+   e. If it succeeds then for every child of the record go to c.
+   f. Once we're out of children for the root go to b. with rest of roots
+
+If a save succeeds we add an empty :_error key to the record to clear the key
+and indicate that the save was successful.
+
+We save from has-many's graph root down so we know the ids to fill in to the
+children when parent is a new record.
+
+NOTES:
+- If a parent that exists already fails to update children will get saved. If
+their validation depends on the parent at all then it will succeed when
+otherwise it might not have if parent hadn't failed to save. But parent should
+be set back to the original value in the frontend. And frontend should be more
+careful with saving invalid records.
+- We could have a 'soft' validate. Where it doesn't throw an exception but
+  returns a 'cleaned' or correct record to save. Which would be handy to
+  'correct' a deleted flag for instance. And other props would still be saved
+  then, instead of the whole record not getting saved. So you remove the props
+  with 'illegal' values from the record to save..
+
+**** 4. Error reporting
+For a mutation we record the error under the save-record mutation key in the
+result. However better is just to put the errors in table-data under the
+relevant record. And just merge that. The component then gets the error itself.
+If some application wide error reporting is needed we can set app-state in the
+reconciler's pre-merge hooks. So we can set :client/warning. So component
+localized error reporting.
+**** 5. Duplicate normalized data.
+    Like for statuses and options. Just add a hook on table and do your thing.
+    If in the hook you see that the label is updated for a status you update all
+    dossiers that have status-id set to the id of the status.
+**** 6. Reversing a delete
+1. soft delete (setting a delete flag)
+    Validation will fail, record will not save at all and original table-data
+    will be returned.
+2. hard delete
+ Validation will fail, record will be deleted and original table-data
+    will be returned. However these hard deletes are not part of saving a
+   record. And have their own mutation. Which will fail and should return
+   original table-data then.
+   In general avoid hard deletes as much as possible. We want to mutate data,
+   record the change and move on. Not remove any data ever really. If a record
+   is deleted that's its last state, not to be modified anymore and should be in
+   the db as such.
+
+**** 7. Moving an item to a different parent wich backend doesn't accept
+    So parent-id ref is not accepted, cause new parent is not allowed to have
+    it, or old parent is not allowed to let go of it. Whatever the case,
+    parent-id ref is not going to be updated.
+    So we have a problem in the frontend cause we moved a ref from a list of
+    idents from one parent to another. And this needs to be moved back. Which is
+    purely a frontend concern. So tackle this in a pre-merge-hook I think, for
+    the particular situation.
+
+** Write recursive self join tests
+Including returning props of the join by adding qbucket-qbucket/order prop
+Perhaps aum-next should prefix them again properly on returning to frontend??
+
+
+** Clean up post-remote
+Move fns from aum-reconciler to some generic ns where we call the fns from
+post-remote as appropriate.
+
+** Sort out multipe remote situation.
+Like calling lawcat or tent (rails) in the middle of query. At least document
+it on how it works now. Which might be pretty ok.We can probably use om-path a
+bit more and/or add some data to the tree in our db->tree
+
+** DONE Better idea for on demand loading
+  Implemented as db->tree with hooks
+   CLOSED: [2018-10-24 Wed 15:14]
+   :LOGBOOK:
+   - State "DONE"       from              [2018-10-24 Wed 15:14]
+   :END:
+
+Improve parser so you can write read methods for all keys that get called for
+target=nil. They get called when target is a remote, which helps in modifying
+the query. But we also might want to return custom data when that key is asked
+to return data. Currently the om/db->tree fn resolves queries against the db.
+Bypassing our read methods. So plough through that fn, copy and modify it.
+
+When we control what to return, for remote and value for all keys then we can
+parse the query for more info such as what keys to load:
+[({:user [:id :name :*email :*tent-id]}
+{:offset 20 limit 20 :calc :count :where [:name :like "foo"})]
+
+We can add following params, and omit the starred props when loading the list. When
+loading a record we can set params to:
+{:where [:id := 10]}, and add starred props.
+
+We just need to make sure we always return the list data, not whatever backend
+has returned for that query. So we need to cache the return values for list like
+we do for item-batch. So when we set selected-id for that list we need to cache
+the list we already have. Or append whatever the case might be. Quite similar to item-batch.
+
+If we catch all keys when target is nil we can also replace the rest of the
+set-params with a read method that grabs some specific params from the app state
+to determine what to return to the remote and as value, like for autocomplete
+
+So we can this way have paginated lists within paginated lists for instance.
+
+We can also for instance add a param like {:calc :count} and have backend return
+something like this:
+
+{:items [{:id 1 :name "foo"} {:id 2 :name "bar"}]
+ :count 42}
+
+for this query:
+
+[{:bla [:id :name]} {:where [:limit 2] :calc :count}
+
+On read we need to return vector under items key. And maybe set a first item
+with the meta data such as count, or set as meta data to the vector (but doesn't
+work if count changes but data doesn't), or return count when asked for it in a
+client key.
+We could write another query such as:
+
+[{:calc/count {:table :bla :where [...]}]
+
+but we need to set the where clause twice in frontend, and calculate sqlvec
+twice in backend. Better would be to just have backend call the same query again
+but without the where limit clause.
+
+But being able to catch all keys with a custom read method for all targets
+(including nil) would enable on demand loading. You just set flags in app state,
+or page state by table,whatever, and adjust remote and what you return as value
+accordingly.

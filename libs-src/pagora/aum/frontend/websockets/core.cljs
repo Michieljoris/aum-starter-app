@@ -1,13 +1,12 @@
 (ns pagora.aum.frontend.websockets.core
   (:require
    [cljs.core.async :as async :refer (<! >! put! chan)]
+   [pagora.aum.frontend.websockets.dispatcher :refer [websocket-msg-handler]]
    [pagora.aum.frontend.channel.core :refer [get-or-make-channel]] ;;so we can msg to frontend mock-backend
    [taoensso.sente  :as sente]
 
    ;; logging
    [taoensso.timbre :as timbre]))
-
-(def config {})
 
 (def path "app/")
 
@@ -36,7 +35,9 @@
 ;;       url
 ;;       )))
 
-(def websocket
+(def websocket nil)
+
+(defn make-websocket [{:keys [app-config]}]
   (let [ ;; For this example, select a random protocol:
         ;; rand-chsk-type (if (>= (rand) 0.5) :ajax :auto)
         ;; _ (infof "Randomly selected chsk type: %s" rand-chsk-type)
@@ -46,7 +47,7 @@
         ;; (sente-transit/get-transit-packer) ; Needs Transit dep
 
         {:keys [chsk ch-recv send-fn state]} (sente/make-channel-socket-client!
-                                              (str path "chsk"); Must match server Ring routing URL
+                                              (str (:app-path app-config) "chsk"); Must match server Ring routing URL
                                               ;; {:type :ajax
                                               {:type :auto
                                                ;; :chsk-url-fn chsk-url-fn
@@ -117,8 +118,15 @@
   (timbre/info @stop-fn)
   (@stop-fn))
 
-(defn start! [websocket-msg-handler]
-  (reset! stop-fn  (sente/start-chsk-router! (:ch-chsk websocket) websocket-msg-handler)))
+(defn make-websocket-msg-handler [aum-config]
+  (fn [ev-msg]
+    (websocket-msg-handler ev-msg aum-config)))
+
+(defn start! [aum-config]
+  (let [websocket-msg-handler (make-websocket-msg-handler aum-config)
+        websocket (make-websocket aum-config)]
+    (alter-var-root #'websocket (constantly websocket))
+    (reset! stop-fn  (sente/start-chsk-router! (:ch-chsk websocket) websocket-msg-handler))))
 
 
 ;; (defn sente? []
