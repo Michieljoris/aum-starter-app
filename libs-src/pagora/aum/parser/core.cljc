@@ -53,7 +53,7 @@
         parser-env (update parser-env :parser-config #(merge parser-config-defaults %))
         {:keys [schema raw-schema]} (get-schema db-conn)
         schema (security/secure-schema schema db-config)
-        aum-keys [:db-config :parser-config :sql :db-conn :schema :cb :subquery-path aum-keys]
+        aum-keys [:db-config :parser-config :sql :db-conn :schema :cb :subquery-path :aum-keys]
         _ (security/validate-db-config db-config schema)
         parser-env (assoc parser-env
                           :db-conn db-conn :state (atom nil)
@@ -63,7 +63,7 @@
                           ;;destructured into the aum info keys. This aum-keys key
                           ;;allows me to pass on this info into parsers without knowing
                           ;;what keys are exactly aum keys
-                          aum-keys aum-keys)]
+                          :aum-keys aum-keys)]
     (assoc parser-env :aum (select-keys parser-env aum-keys))))
 
 

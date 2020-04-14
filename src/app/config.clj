@@ -7,6 +7,7 @@
   {:multimethod-namespaces ['app.security]
    :pagora-account-id 1
    :timbre-log-level :info
+   :app-path "app/"
    })
 
 (defmethod aum/config :dev [_]

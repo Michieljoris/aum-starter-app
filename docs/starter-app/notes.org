@@ -1,4 +1,4 @@
-#+TITLE: doc
+OBSOLETE
 
 ** Bootup
 *** dev

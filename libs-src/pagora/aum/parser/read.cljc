@@ -77,7 +77,7 @@
              (not custom-read))
       ;;Process key as a query over a table
       (process-ast env key params)
-      {:value (let [env (select-keys env (into [:state :user] (aum-keys env)))
+      {:value (let [env (select-keys env (into [:state :user] (:aum-keys env)))
                     env (update env :subquery-path #(conj (or % []) key))]
                 ;; (timbre/info "------ " (:subquery-path env))
                 ;; (timbre/info "------ "  custom-read query params)

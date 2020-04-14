@@ -74,14 +74,34 @@
 
 (def ig-system nil)
 
+;; (def aum-config nil)
+
+(defn get-config []
+  ;; :TODO-aum: return relevant key from ig-system
+ (:config ig-system)
+  )
+
+(defn get-db-conn []
+  )
+
 (defn go
   "For production use. The ig-system var could be used to halt, reconfigure and
   restart the system in production"
-  [{:keys [ig-system-config]}]
+  [{:keys [ig-system-config app-config]}]
   (let [system (ig/init ig-system-config)]
-    (alter-var-root #'ig-system (constantly system))))
+    (timbre/info :#pp (into {} (map (fn [[k v]]
+                                      [(keyword (name k)) (get system k)])
+                                    ig-system-config)))
+
+    (alter-var-root #'ig-system (constantly
+                                 system
+                                 ;; (into {} (map (fn [[k v]]
+                                 ;;                 [(keyword (name k)) (get system k)])
+                                 ;;               ig-system-config))
+                                 ))))
 
 (defn restart [{:keys [ig-system-config]}]
   (ig/halt! ig-system)
   (ig/init ig-system-config))
 
+(timbre/info :#pp ig-system)

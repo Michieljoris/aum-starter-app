@@ -39,7 +39,7 @@
 (defmethod channel-msg-handler :ws-first-open
   [{:keys [aum-config] :as msg}]
   (timbre/info :#b "Websocket opened: " msg)
-  ((:chsk-send! websocket/websocket) [:aum/frontend-config nil] 8000
+  ((:chsk-send! @websocket/websocket) [:aum/frontend-config nil] 8000
    (fn [resp]
      (let [{:keys [app-config RootComponent app-state]} (update aum-config :app-config merge resp)
            app-state (merge app-state {:client/csrf-token (get-in msg [:data :csrf-token])})

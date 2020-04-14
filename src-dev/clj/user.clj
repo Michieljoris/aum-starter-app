@@ -26,7 +26,7 @@
     ;; (timbre/info :#pp {:aum-config (:app-config aum-config)})
 
     (dev/init aum-config)
-    (dev/go)
+    (aum/go aum-config)
     ))
 
 ;;RESTART ====================

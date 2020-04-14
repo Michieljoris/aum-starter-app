@@ -159,7 +159,7 @@ users, or dossier types etc.
 
 
 
-
+* TODO get app-path to frontend!!!!!
 * Aum modules
 ** add db migration lib
 ** integrations

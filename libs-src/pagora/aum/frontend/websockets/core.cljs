@@ -35,9 +35,10 @@
 ;;       url
 ;;       )))
 
-(def websocket nil)
+(def websocket (atom nil))
 
 (defn make-websocket [{:keys [app-config]}]
+
   (let [ ;; For this example, select a random protocol:
         ;; rand-chsk-type (if (>= (rand) 0.5) :ajax :auto)
         ;; _ (infof "Randomly selected chsk type: %s" rand-chsk-type)
@@ -45,7 +46,9 @@
         ;; Serializtion format, must use same val for client + server:
         packer :edn  ; Default packer, a good choice in most cases
         ;; (sente-transit/get-transit-packer) ; Needs Transit dep
-
+        ;;TODO: get app-path from backend config!!!!!!
+        app-config (assoc app-config :app-path "app/")
+        _ (timbre/info :#pp {:app-config app-config})
         {:keys [chsk ch-recv send-fn state]} (sente/make-channel-socket-client!
                                               (str (:app-path app-config) "chsk"); Must match server Ring routing URL
                                               ;; {:type :ajax
@@ -63,7 +66,7 @@
 (def queued-send (atom nil))
 
 (defn process-queued-send []
-  (let [ws-open? (:open? @(:state websocket))
+  (let [ws-open? (:open? @(:state @websocket))
         send-fn @queued-send]
     ;; (timbre/info :#r "trying to dequeue send-fn" ws-open? send-fn)
     (when (and ws-open? send-fn)
@@ -72,7 +75,7 @@
       (send-fn))))
 
 (defn send-fn [query timeout cb]
-  (let [{:keys [chsk-send!]} websocket]
+  (let [{:keys [chsk-send!]} @websocket]
     ;; (timbre/info :#r "queueing send-fn")
     (reset! queued-send  #(chsk-send! query timeout cb))
     (process-queued-send)))
@@ -96,18 +99,18 @@
   (stop-fn))
 
 (defn chsk-reconnect! []
-  (sente/chsk-reconnect! (:chsk websocket)))
+  (sente/chsk-reconnect! (:chsk @websocket)))
 
 (def reconnect!
   (atom chsk-reconnect!))
 
 (defn chsk-connect! []
-  (when (not (:open? @(:state websocket)))
+  (when (not (:open? @(:state @websocket)))
     (timbre/info "Trying to connect..")
-    (sente/chsk-connect! (:chsk websocket))))
+    (sente/chsk-connect! (:chsk @websocket))))
 
 (defn close-ws []
-  (let [s (:socket_ (:chsk websocket))
+  (let [s (:socket_ (:chsk @websocket))
           s @s]
        (.close s)))
 
@@ -122,11 +125,11 @@
   (fn [ev-msg]
     (websocket-msg-handler ev-msg aum-config)))
 
+
 (defn start! [aum-config]
-  (let [websocket-msg-handler (make-websocket-msg-handler aum-config)
-        websocket (make-websocket aum-config)]
-    (alter-var-root #'websocket (constantly websocket))
-    (reset! stop-fn  (sente/start-chsk-router! (:ch-chsk websocket) websocket-msg-handler))))
+  (let [websocket-msg-handler (make-websocket-msg-handler aum-config)]
+    (reset! websocket (make-websocket aum-config))
+    (reset! stop-fn  (sente/start-chsk-router! (:ch-chsk @websocket) websocket-msg-handler))))
 
 
 ;; (defn sente? []
