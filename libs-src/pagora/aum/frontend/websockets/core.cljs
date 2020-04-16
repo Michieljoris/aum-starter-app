@@ -46,8 +46,6 @@
         ;; Serializtion format, must use same val for client + server:
         packer :edn  ; Default packer, a good choice in most cases
         ;; (sente-transit/get-transit-packer) ; Needs Transit dep
-        ;;TODO: get app-path from backend config!!!!!!
-        app-config (assoc app-config :app-path "app/")
         _ (timbre/info :#pp {:app-config app-config})
         {:keys [chsk ch-recv send-fn state]} (sente/make-channel-socket-client!
                                               (str (:app-path app-config) "chsk"); Must match server Ring routing URL

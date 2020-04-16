@@ -49,9 +49,10 @@ following section.
 
 ** Starter app
 
-TODO: add github link to aum-starter-app
-There is a repo that's an app using aum libs, but has no minimal content. This
-can be used to try out building features/pages.
+TODO-doc: add github link to aum-starter-app
+
+There is a repo that's an app using aum libs, but has minimal content. This can
+be used to try out building features/pages.
 
 Clone it and follow the following instructions.
 
@@ -85,33 +86,91 @@ For development also do this:
 
 TODO-aum: get this working properly!!!
     This is so that tools.deps can resolve the dependencies locally. If you
-    want deps from github replace local-deps with git-deps in the bin/backend script
+    want deps from github replace local-deps with git-deps in the bin/dev-backend script
 
 
-*** Run in production
+*** Run in development mode
 
-NOTE: the build task doesn't include deps in aliases into the uberjar. Need to
-fix the build task, but for to create an uberjar uncomment the aum-next and
-dc-util deps in deps.edn.
+It's practical to run backend and frontend separately. It's rare you need
+restart both, but being able to restarting one or the other sometimes is useful.
+Also sometimes you only need or want to work on the backend.
+
+After bin/dev-install:
+
+    bin/dev-backend
+
+which will get you a clj repl in the terminal and an nrepl server.
+
+To set config settings, for example the db, do:
+
+    DB_NAME=chinchilla bin/dev-backend
+
+See config.clj for possible settings and their defaults (replace
+hyphens with underscores and upcase the config key).
+
+Connect your editor's repl to the nrepl server at port 5700.
+
+In dev mode src-dev/clj/user.clj gets loaded (see resources/revolt.edn under the
+revolt.plugin/rebel key). In deps.edn src-dev should be included in a paths
+vector.
+
+The sexpr (restart) is uncommented in that ns so it will be executed which will
+(re)start the backend app.
+
+To compile the frontend, in another terminal do:
+
+    bin/dev-frontend
+
+which will get you a cljs repl in your terminal.
+
+See app at localhost:8080/app
+
+TODO-doc: test and document cljs repl
+# In the nrepl session in your editor run (user/cljs-repl) for a cljs repl
+
+# You might have to uncomment the connect-to-cljs-repl defn in
+# src/dev/cljs/cljs/user.cljs first.
+
+Alternatively start figwheel repl in emacs when running cider:
+cider-jack-in-cljs (SPACE-m-" in Doom emacs).
+
+
+Entry point of backend in development is at clj.user ns. It has the lifecycle methods.
+
+Entry point of frontend is at app.frontend.core. The aum/init fn initializes a
+websocket and starts it. The react component tree gets mounted after websocket first
+open event is received.
+
+NOTE: after building a prod jar, restart both backend and figwheel processes.
+This is because the out dir is cleaned before building and the dev versions of both css and js
+need to be built again. Or try modify a scss file and a cljs file to
+kickstart recompile.
+
+*** Run in production mode
+
+TODO-aum: the build task doesn't include deps in aliases into the uberjar. Need to
+fix the build task, so to create an uberjar uncomment the pagora.aum, pagora.revolt and
+pagora.clj-utils deps in deps.edn.
 
 Build production jar at dist/app.jar with:
 
-    bin/build
+    bin/prod-build
 
 This'll fetch node modules and build the js bundle as well.
 
 Set db user/password/url/db-name, server port and ip, and what logs you would
 like by setting the various environment variables and run jar (in dist dir):
 
-    CLJ_ENV=prod DB_USER=test DB_PASSWORD=abc DB_URL="//localhost:3306/" DB_NAME=chinchilla_development QUERY_LOG=true SQL_LOG=true HTTP_LOG=false SERVER_PORT=8081 SERVER_IP=0.0.0.0 NEW_RELIC_LICENSE_KEY="<some newrelic key>" java -javaagent:./newrelic-agent.jar -Dnewrelic.config.file=./newrelic.yml   -Dnewrelic.environment=production -jar dist/aum.jar
+TODO-aum: test starter app prod jar!!!
+    CLJ_ENV=prod DB_USER=test DB_PASSWORD=abc DB_URL="//localhost:3306/" DB_NAME=chinchilla_development QUERY_LOG=true SQL_LOG=true HTTP_LOG=false SERVER_PORT=8081 SERVER_IP=0.0.0.0 NEW_RELIC_LICENSE_KEY="<some newrelic key>" java -javaagent:./newrelic-agent.jar -Dnewrelic.config.file=./newrelic.yml   -Dnewrelic.environment=production -jar dist/aum.jarlk
 
 or just
 
-    bin/run
+    bin/prod-run
 
 Or all in one cmd:
 
-    bin/build-and-run
+    bin/prod-build-and-run
 
 If tools.deps complains about dirs already existing when cloning repos delete ~/.gitlibs
 
@@ -119,59 +178,7 @@ Clearing classpath cache in ~/.clojure might also help.
 
 See app at http://localhost:8090
 
-Entry point of backend in production is at app.core. It requires web-server.core
-which is at the root of the dependency tree and the main method that gets called
-from the command line. The main method calls mount/start which starts up all the
-stateful namespaces.
-
-*** Run in development
-
-It's practical to run backend and frontend separately. It's rare you need
-restart both, but being able to restarting one or the other sometimes is useful.
-
-After bin/install:
-
-    bin/backend
-
-which will get you a clj repl in the terminal.
-
-To set config settings, for example the db, do:
-
-    DB_NAME=chinchilla bin/backend
-
-See config.clj for possible settings and their defaults (replace
-hyphens with underscores).
-
-Connect your editor's repl to the nrepl server at port 5700.
-
-In dev mode src-dev is on the classpath so src-dev/clj/user.clj gets loaded.
-The sexpr (dev/start) is in that ns so it will be executed which will start the app.
-
-In the repl start/stop/reset the app with (dev/start), (dev/stop), (dev/reset)
-
-To compile the frontend, in another terminal do:
-
-    bin/figwheel
-
-which will get you a cljs repl in your terminal.
-
-See app at localhost:8080
-
-In the nrepl session in your editor run (user/cljs-repl) for a cljs repl
-
-You might have to uncomment the connect-to-cljs-repl defn in
-src/dev/cljs/cljs/user.cljs first.
-
-Entry point of frontend is at app.core. Websocket is started here and this is
-where om react tree gets mounted, after websocket first open event is received.
-
-Entry point of backend in development is at dev.clj. It has the lifecycle methods. It requires
-web-server.core which is at the root of the dependency tree.
-
-NOTE: after building a prod jar, restart both backend and figwheel processes.
-This is because the out dir is cleaned before building and the dev versions of both css and js
-need to be built again. Or try modify a scss file and a cljs file to
-kickstart recompile.
+Entry point of backend in production is at app.core (the -main fn).
 
 * Build system
 TODO: revolt

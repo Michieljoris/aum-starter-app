@@ -99,6 +99,7 @@
         com.taoensso/tufte {:mvn/version "2.1.0"}
 
 
+        expound {:mvn/version "0.8.4"}
 
 
 
@@ -261,7 +262,6 @@
         ;; inspector-jay {:mvn/version "0.3"}
         ;; proto-repl {:mvn/version "0.3.1"}
         ;; orchestra {:mvn/version "2019.02.06-1"}
-        ;; expound {:mvn/version "0.7.2"}
         ;; com.taoensso/carmine {:mvn/version "2.19.1"}
 
         ;; gnl/ghostwheel {:mvn/version "0.2.3"}
@@ -308,8 +308,8 @@
            :nrepl {:extra-deps {
                                 ;; nrepl -------------------
                                 com.cemerick/pomegranate {:mvn/version "1.1.0"}
-                                cider/cider-nrepl {:mvn/version "0.22.2"}
-                                refactor-nrepl {:mvn/version "2.5.0-SNAPSHOT"}
+                                cider/cider-nrepl {:mvn/version "0.25.0-SNAPSHOT"}
+                                refactor-nrepl {:mvn/version "2.5.0"}
                                 }}
 
            :figwheel  {:extra-deps {;; com.bhauman/figwheel-main {:mvn/version "0.2.3"}

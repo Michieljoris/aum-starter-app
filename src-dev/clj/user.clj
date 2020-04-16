@@ -1,17 +1,23 @@
 (ns clj.user
   (:require
    [pagora.aum.dev.core :as dev]
-   [app.database.config :refer [db-config]]
+   ;; [app.database.config :refer [db-config]]
    [pagora.aum.core :as aum]
+   [app.core :as app]
    ;; [pagora.aum.dev.cljs-repl :as cljs-repl]
-   [integrant.repl :refer [clear go halt init prep reset reset-all]]
+   ;; [pagora.aum.dev.integrant.repl :refer [clear go halt init prep reset reset-all]]
 
-   [bidi.bidi :as b]
-   [integrant.core :as ig]
-   [clojure.pprint :refer [pprint]]
+   ;; [bidi.bidi :as b]
+   ;; [integrant.core :as ig]
+   ;; [clojure.pprint :refer [pprint]]
    [clojure.tools.namespace.repl :as n]
-   [taoensso.timbre :as timbre]))
+   [taoensso.timbre :as timbre]
 
+   [expound.alpha :as expound]
+   [clojure.spec.alpha :as s]
+   ))
+
+(set! s/*explain-out* expound/printer)
 
 (n/set-refresh-dirs "src" "libs-src" "src-frontend")
 ;; (n/disable-unload!)
@@ -20,35 +26,26 @@
 
 ;; (timbre/info :#w "++++++++++ Loaded dev user namespace ++++++++++")
 (defn restart []
-  (let [aum-config (aum/init {:db-config db-config
-                              :app-config-ns 'app.config
-                              :frontend-config-keys [:app-path :locales]})]
-    ;; (timbre/info :#pp {:aum-config (:app-config aum-config)})
-
+  (let [aum-config (aum/init app/aum-params)]
     (dev/init aum-config)
-    (aum/go aum-config)
-    ))
+    (dev/go)))
 
 ;;RESTART ====================
 (restart)
-;; (dev/halt)
-;; (dev/go)
 ;;RESTART ====================
 
 ;; (dev/go)
 ;; (dev/halt)
 ;; (dev/reset)
+;; (aum/get-parser-env)
+(timbre/info (keys (identity aum/aum-state)))
 
-;; (def routes (:pagora.aum.web-server.routes/routes (dev/ig-system)))
-;; (def parser (:pagora.aum.parser.core/parser (dev/ig-system)))
 ;; (let [{:keys [chsk-send!]} (:websocket (:pagora.aum.websockets.core/websocket-listener (dev/ig-system)))]
 ;;   (pprint chsk-send!)
 ;;   (chsk-send! :uid-1 [:some/request-id {:name "michiel"}])
 ;;   )
 
 ;; (def version (clojure.string/trim (slurp "version")))
-
-
 
 ;; (def routes
 ;;   ;; ["" {"/app-path" {"" {:get :foo}
@@ -84,8 +81,3 @@
 ;;              {:request-method :post :server-name "juxt.pro"}
 ;;              {"/zip" (fn [req] {:status 201 :body "Created"})}}])
 
-;; (go)
-;; (halt)
-;; (def system (ig/init (make-ig-config config)))
-;; (pprint system)
-;; (ig/halt! system)

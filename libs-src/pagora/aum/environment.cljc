@@ -22,14 +22,14 @@
   #?(:clj environment-clj
      :cljs environment-cljs))
 
-(defn is-development? []
+(def is-development?
   (= environment :dev))
 
-(defn is-staging? []
+(def is-staging?
   (= environment :staging))
 
-(defn is-production? []
+(def is-production?
   (= environment :prod))
 
-(defn is-testing? []
+(def is-testing?
   (= environment :test))
