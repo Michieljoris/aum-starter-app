@@ -36,6 +36,11 @@ Set logo in source/layouts/layout.erb
 
 bundle exec middleman build --clean
 
+run bb-server in build dir
+
+. ~/.nvm/nvm.sh
+nvm use v10.15.0
+npm install bb-server -g
 
 not working:
 bundle exec middleman server
