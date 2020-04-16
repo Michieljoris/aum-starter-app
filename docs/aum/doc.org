@@ -365,7 +365,23 @@ Use om-next queries to do crud on any mysql database, where the read can
 use one or more joins from and to any table, constrained only by the
 (db-)configuration of the parser.
 * Modules
-** icons
+** Database migration
+** Integrations
+** Paging
+** Routing
+** Internationalization
+*** There is a common.i18n.cljc namespace which provides the translate fn which
+takes the current locale and a key.
+*** smarter translations
+- use params in translation keys, so interpolation
+- load translations zipped!!!???!!!!
+** Testrunner
+** Files download and upload
+** Event store
+Also see script in modules/events/experimental
+** Calc active users
+** Data inspector
+** Icons
 Icon classes like icon-cached, icon-undo, icon-redo etc are  defined in
 mui-icons.css
 
@@ -385,6 +401,7 @@ replacing the files that are already there.
 Replace the contents of mui-icons.css with the css in style.css.
 
 ** Security
+*** login/logout
 There's login/logout methods in app/security.cljc. Disabled in production.
 
 Aum comes with login and logout fns for both front and backend. However in
@@ -393,9 +410,64 @@ The remember token as set by the rails app is used to authenticate the session
 similar to how it's done in the rails app. One complication is that because how
 sente/websockets work is that to renew the session and any attached remember
 token the connection has to be renewed.
-** Internationalization
-There is a common.i18n.cljc namespace which provides the translate fn which
-takes the current locale and a key.
+
+*** bugsnag, authorization, login, logout etc
+- Load bugsnag api keys from gitignored .env file in update-html-string
+
+*** Process-user and calc-role snippets
+#+TITLE: pagora
+
+;; (defn superaccount? [db-conn account-id]
+;;   (-> (q/get-cols-from-table db-conn {:cols ["superaccount" "id" "name"] :table "accounts"
+;;                                       :where-clause ["where id = ?" account-id]})
+;;       first
+;;       :superaccount))
+
+;; (defn calc-role
+;;   "Calculates role depending on account-id and any listing in admins table,"
+;;   [{:keys [db-conn config] :as env} {:keys [account-id ] :as user}]
+;;   (when (some? user)
+;;     (cond
+;;       (= account-id (:pagora-account-id config)) "super-admin"
+;;       :else (let [admin-account-ids (->> (q/get-cols-from-table db-conn {:cols ["account_id"] :table "admins"
+;;                                                                          :where-clause ["where user_id = ?" (:id user)]})
+;;                                        (map :account_id))
+;;                   account-admin? (cu/includes? admin-account-ids account-id)]
+;;               (cond
+;;                 account-admin? (if (superaccount? db-conn account-id) "superaccount-admin" "account-admin")
+;;                 :else "user"
+;;                 )
+;;               ))))
+
+
+;; A much better option is a total separation of Users and Accounts. A user can
+;; have several accounts (usually with a default one selected), and they can use
+;; a single login to access each, and each account may have multiple users
+;; associated with it.
+;;So we need:
+;;accounts_users table
+
+;; So account-id is not which account a user belongs to but which account the
+;; user wants to access.
+
+;; After that a user has a role within that account. Such as account-admin. If
+;; the account is a super account (so administering more than just its own
+;; account) then if the user has the account-admin role it might also have the
+;; superaccount-admin
+
+;;So we'd need a accounts-users-roles table.
+
+;; (defmethod process-user "superaccount-admin"
+;;   [{:keys [db-conn] :as env} user]
+;;   (let [role (calc-role env user)
+;;         subaccount-ids (->> (q/get-cols-from-table db-conn {:cols ["id"] :table "account"
+;;                                                             :where-clause ["where account_id = ?" (:account-id user)]})
+;;                          (mapv :id))
+;;         ;;Can't be empty else sql query crashes (used in scope in database config)
+;;         subaccount-ids (if (seq subaccount-ids) subaccount-ids [-1])] ;; but IN (-1) always results in false, same result.
+;;     (assoc user
+;;            :role role
+;;            :subaccount-ids subaccount-ids)))
 * Websockets
 * Database
 ** Write validation
@@ -784,9 +856,7 @@ Then
 TODO
 
 * Debug production/staging
-
-It's possible to set some flags in local storage to get some output in console
-etc:
+** It's possible to set some flags in local storage to get some output in console etc:
 
 Set log level:
 
@@ -808,7 +878,26 @@ Show debug buttons in page bar:
 
     :debug-buttons true
 
-In boot-scripts there's tail.boot to inspect logstash output:
+*** Trying queries
+In the dev source folder there are namespaces to try out various queries:
+**** try-om-query
+You can call the backend parser with any om-next query. These are resolved
+against the database as defined in app.config and using database.config as
+defined for the whole app.
+
+There is a second version where you can build your own parser environment and
+your own parser with that again.
+**** Try sql query
+To try out any sql query. Make sure to define process-params, validate-sql-fn
+and process-result methods, and the equivalent sql fun in build-sql if you want
+it to be used in mock mode or tests.
+**** Try/test frontend parser.
+Frontend parser is a cljc file so you can eval this in a clojure repl. You can
+test here what the parser returns for queries for the nil and various remote
+targets, which is much harder to test/inspect if you have to use the ui to pass
+queries to the parser.
+
+** In boot-scripts there's tail.boot to inspect logstash output:
 
     boot boot-scripts/tail.boot -h
 
@@ -821,10 +910,10 @@ Options:
   -i, --timestamp   print timestamps
   -r, --regex VAL   VAL sets regex to filter lines.
   -l, --level VAL   VAL sets level to filter such as info or error.
-* Misc
-** Querying other sources than a mysql database
-*** Using more than one remote in the frontend
-*** Returning data fetched from another source asynchronously
+
+* Querying other sources than a mysql database
+** Using more than one remote in the frontend
+** Returning data fetched from another source asynchronously
 If a backend query can't be resolved and returned synchronously it's possible to
 push the result to the frontend when it's available.
 * config
@@ -951,25 +1040,6 @@ entries for deciding on what remote keys to send (:selected-remote-keys and :bat
 In any case, initial group-id is set in reconciler.app-state, per page, where
 it's usually set to whatever is :selected-group in storage, or if that's
 desirable, u/group-id, meaning the user's group-id.
-
-* Trying queries
-In the dev source folder there are namespaces to try out various queries:
-** try-om-query
-You can call the backend parser with any om-next query. These are resolved
-against the database as defined in app.config and using database.config as
-defined for the whole app.
-
-There is a second version where you can build your own parser environment and
-your own parser with that again.
-** Try sql query
-To try out any sql query. Make sure to define process-params, validate-sql-fn
-and process-result methods, and the equivalent sql fun in build-sql if you want
-it to be used in mock mode or tests.
-** Try/test frontend parser.
-Frontend parser is a cljc file so you can eval this in a clojure repl. You can
-test here what the parser returns for queries for the nil and various remote
-targets, which is much harder to test/inspect if you have to use the ui to pass
-queries to the parser.
 
 
 * Start aum with different ports and db:
@@ -1267,3 +1337,26 @@ So in page-state:
 You then set a key called :invalidated-fields in page state to that validate
 map. Which you can pick up in your components and use it to modify the ui if
 needed (show in red, show error message etc)
+
+* tagging
+Why not tag table, with ids in the 'tags' column?
+And adjust parser somewhat to retrieve not just belongs-to-one, but belongs-to-many?
+Or use many-to-many, so join table. But search will be a pain, unless we
+normalize tags into tags column in elasticsearch or something?
+Or just inline tags. Problem is renaming a tag then, also adding description etc
+to tag becomes hard..
+
+All tags for an item
+All items for: one tag, t1 AND t2, t1 OR t2, t1 AND not t2
+Tag cloud: how many items per tag
+Change tag? Possibly add and change meta data of tag?
+
+A tag (text) field on question
+Plus tags table: [tag, question-id]
+http://howto.philippkeller.com/2005/04/24/Tags-Database-schemas/
+http://howto.philippkeller.com/2005/05/05/Tags-with-MySQL-fulltext/
+http://howto.philippkeller.com/2005/06/19/Tagsystems-performance-tests/
+
+https://stackoverflow.com/questions/20856/recommended-sql-database-design-for-tags-or-tagging
+https://stackoverflow.com/questions/2885564/ways-to-implement-tags-pros-and-cons-of-each
+https://stackoverflow.com/questions/1810356/how-to-implement-tag-system

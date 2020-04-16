@@ -1,7 +1,7 @@
 #+TITLE: Slate
 
 git clone https://github.com/michieljoris/slate.git
-# git checkout v2.4.0
+git checkout 2.4.0
 
 rbenv install
 rbenv local

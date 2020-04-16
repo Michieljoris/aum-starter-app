@@ -16,6 +16,284 @@
     http://untangled-web.github.io/untangled/reference/reference.html#_overall_network_plumbing
 
 * Issues and Bugs
+** Aum
+*** image upload resize in browser
+    https://stackoverflow.com/questions/19262141/resize-image-with-javascript-canvas-smoothly
+    https://stackoverflow.com/questions/2434458/image-resizing-client-side-with-javascript-before-upload-to-the-server
+    https://gist.github.com/dcollien/312bce1270a5f511bf4a
+    https://hacks.mozilla.org/2011/01/how-to-develop-a-html5-image-uploader/
+    https://github.com/rossturner/HTML5-ImageUploader/blob/master/src/main/webapp/js/ImageUploader.js
+    https://github.com/sidraval/image-crop
+    https://github.com/nodeca/pica
+    https://github.com/mikera/imagez
+    https://github.com/josephwilk/image-resize r
+
+*** ?? When record is not saved because all props are not allowed backend returns warning
+   But this is not shown in frontend. This is because dossier types can be empty,
+   but the joined fields not. So no msg is appropriate then. But for records with
+   no joins we would like some feedback. On the other hand this should be not
+   allowed in the first place, saving a record with disallowed fields.
+   But resurrect the little black box popup perhaps
+
+*** Set/edit color logo scheme
+***** Add help text
+***** Set maximum sizes!
+***** Multiple sizes for normal and iphone!!!
+***** DONE Have dc app respond to theme images
+***** Add custom avatar image
+***** Grab these images on backend and get to frontend via a macro.
+  And calculate sizes there from them.
+***** In rails put logo and brand data-urls somewhere more sane.
+  Not in group model perhaps.
+  Also grab from images on disk. So create data uri from brand and logo png/jpeg
+***** Only show preview checkbox if anything's different!!
+***** BUG Set color not to nil for default color, don't use merge-themes
+    On save if color is the same as default then mod it to nil.
+
+
+*** Better data explorer, including vcr
+    see explorer namespace
+
+
+*** user management for billing purposes
+*** implement state in url.
+ And history etc, back/forward button.
+ https://github.com/juxt/bidi
+ https://github.com/venantius/accountant
+ https://github.com/kibu-australia/pushy
+ https://lispcast.com/mastering-client-side-routing-with-secretary-and-goog-history/
+
+
+*** Feedback/bug report form a la chrome
+ So with screenshot, text, url, file upload, system info
+
+
+*** more per group translations options
+
+**** In dc app fetch shadow translations scoped to group_id for efficiency
+    Added note about it in translations.rb model
+**** when switching between groups have same translation open!!
+**** What if supergroup wants -its- translations as the root translation???
+    That's easy in dc app, we just filter the shadow translation on the group id
+    of the super group.
+
+    For the regular translations in aum we currenlty get the shadow translations
+    filtered by user group id. We would need to get the shadow translations of
+    the users group's group-id, as well as the shadow translations for group.
+
+    In aum in the translation editor we need to get and show the shadow
+    translation of super group as well as the shadow translation of the group it self.
+
+    But all this only if the option on the supergroup is to fall back to -its-
+    translations before falling back to the root translation
+
+**** use (:locales config) whenever listing/enumerating locales
+     so for example on page-config and translations admin page
+
+**** DONE have option on translation page for dc admin to see what translation keys in app are -not- in translatiion table!!
+    and have option to import them
+
+**** Translations are not fetched when not logged in!!!!
+***** Make sure that current group translations are used when logged out. Same as theme
+
+
+*** Extract undo-redo to mutate helpers
+
+*** Underline red any form errors, so -> reeval invalidate on input and is invalidated
+
+*** reconciler.core Network level success status, not response status :success? cb-success?
+   What do we do with this in mock mode or e2e test modes?
+
+
+
+*** Saving of joined data!, and undo/redo/revert/is-dirty!!!
+**** Solution:
+***** 1a. Generic undo/redo/revert
+***** 1b. Generic is-dirty
+***** 2. Calc-mods
+- unsaved-records should be called unsynced-records or out-of-sync-records
+- Make a new mutation: save-records (plural: "records").
+- We have a list of tables that are edited on a page, or we pass in a list of
+  tables we like to save in one hit.
+- And a list of all 'unsaved' records. So all out of sync records. All records
+  with 'mods'. We create a table-data map with all mods per table and id. Which
+  we send to the backend.
+- Every time we do a modify record 'unsaved-records' gets updated. Might as well
+  add the actual mods to it actually
+- When we receive our mods back from backend we update unsaved-records. If a mod
+  of a record doesn't have the _error or _out-of-sync or _unable-to-sync or
+  _sync_failed key set it will be removed from unsaved-records.
+- Undo/redo updates unsaved-records
+- When deleting a new record update unsaved-records
+- When deleting a records remove all unsaved joins from unsaved-records
+***** 3. Saving data
+
+1. Save mods as table-data. So like
+    #+BEGIN_SRC clojure
+      {:mods {:dossier-type {1 {:name "changed-name"
+                                :group-id 1 ;;belongs to group
+                                :company-id "C1-tempid"} ;;belongs to company
+                             "D2-tempid" {:name "new dossier-type"}} ;;has-many fields, belongs-to group, company
+              :group {"1" {:name "modified group name"}} ;;has-many dossier-type
+              :company {"C1-tempid" {:name "new company"}} ;;has-many dossier-type
+
+              ;;:dossier-type-id 1 -> we rename the status all dossier of that dossier
+              ;;type with that status. So all dossier with status "1".
+              :status {1 {:label "changed-label-name"} ;;add a multimethod hook for table/prop
+                       ;;we soft delete, so just save prop as normal or:
+                       ;;in hook on table we check for :deleted prop delete the row if we want
+                       2 {:deleted true ;;or
+                          :client-prop/deleted true}
+                       }
+              :field {5 {:label "changed-label"} ;;dossier-type-id 1
+                      "F1-tempid" {:label "bla"
+                                   :more :props
+                                   :dossier-type-id "D2-tempid"}} ;;belongs-to dossier-type, has-many options
+              :option {1 {:text "changed-text"} ;;belongs-to field
+                       "O1-tempid" {:text "bla"
+                                    :order 2
+                                    :field-id "F1-tempid"}
+                       }}}
+    #+END_SRC
+2.We use our db-config to work out the graph of our mods
+   a. Find the roots in the graph of the mods (So the roots are company and group in the mods above)
+   b. Take the first root
+   c. Save the record (it either succeeds or fails)
+   d. If it fails we return original record table-data (empty map if new) with error data added to
+   record map and then if:
+       1. it's a new record we do not save any children but for all children,
+          recursively we return original record data (empty map) with error data
+          added (parent couldn't be updated!) and with rest of roots go to b
+       2.it's an existing record we continue saving children and for every child
+       we start at c. again
+   e. If it succeeds then for every child of the record go to c.
+   f. Once we're out of children for the root go to b. with rest of roots
+
+If a save succeeds we add an empty :_error key to the record to clear the key
+and indicate that the save was successful.
+
+We save from has-many's graph root down so we know the ids to fill in to the
+children when parent is a new record.
+
+NOTES:
+- If a parent that exists already fails to update children will get saved. If
+their validation depends on the parent at all then it will succeed when
+otherwise it might not have if parent hadn't failed to save. But parent should
+be set back to the original value in the frontend. And frontend should be more
+careful with saving invalid records.
+- We could have a 'soft' validate. Where it doesn't throw an exception but
+  returns a 'cleaned' or correct record to save. Which would be handy to
+  'correct' a deleted flag for instance. And other props would still be saved
+  then, instead of the whole record not getting saved. So you remove the props
+  with 'illegal' values from the record to save..
+
+***** 4. Error reporting
+For a mutation we record the error under the save-record mutation key in the
+result. However better is just to put the errors in table-data under the
+relevant record. And just merge that. The component then gets the error itself.
+If some application wide error reporting is needed we can set app-state in the
+reconciler's pre-merge hooks. So we can set :client/warning. So component
+localized error reporting.
+***** 5. Duplicate normalized data.
+    Like for statuses and options. Just add a hook on table and do your thing.
+    If in the hook you see that the label is updated for a status you update all
+    dossiers that have status-id set to the id of the status.
+***** 6. Reversing a delete
+1. soft delete (setting a delete flag)
+    Validation will fail, record will not save at all and original table-data
+    will be returned.
+2. hard delete
+ Validation will fail, record will be deleted and original table-data
+    will be returned. However these hard deletes are not part of saving a
+   record. And have their own mutation. Which will fail and should return
+   original table-data then.
+   In general avoid hard deletes as much as possible. We want to mutate data,
+   record the change and move on. Not remove any data ever really. If a record
+   is deleted that's its last state, not to be modified anymore and should be in
+   the db as such.
+
+***** 7. Moving an item to a different parent wich backend doesn't accept
+    So parent-id ref is not accepted, cause new parent is not allowed to have
+    it, or old parent is not allowed to let go of it. Whatever the case,
+    parent-id ref is not going to be updated.
+    So we have a problem in the frontend cause we moved a ref from a list of
+    idents from one parent to another. And this needs to be moved back. Which is
+    purely a frontend concern. So tackle this in a pre-merge-hook I think, for
+    the particular situation.
+
+*** Write recursive self join tests
+Including returning props of the join by adding qbucket-qbucket/order prop
+Perhaps aum-next should prefix them again properly on returning to frontend??
+
+
+*** Clean up post-remote
+Move fns from aum-reconciler to some generic ns where we call the fns from
+post-remote as appropriate.
+
+*** Sort out multipe remote situation.
+Like calling lawcat or tent (rails) in the middle of query. At least document
+it on how it works now. Which might be pretty ok.We can probably use om-path a
+bit more and/or add some data to the tree in our db->tree
+
+*** DONE Better idea for on demand loading
+  Implemented as db->tree with hooks
+   CLOSED: [2018-10-24 Wed 15:14]
+   :LOGBOOK:
+   - State "DONE"       from              [2018-10-24 Wed 15:14]
+   :END:
+
+Improve parser so you can write read methods for all keys that get called for
+target=nil. They get called when target is a remote, which helps in modifying
+the query. But we also might want to return custom data when that key is asked
+to return data. Currently the om/db->tree fn resolves queries against the db.
+Bypassing our read methods. So plough through that fn, copy and modify it.
+
+When we control what to return, for remote and value for all keys then we can
+parse the query for more info such as what keys to load:
+[({:user [:id :name :*email :*tent-id]}
+{:offset 20 limit 20 :calc :count :where [:name :like "foo"})]
+
+We can add following params, and omit the starred props when loading the list. When
+loading a record we can set params to:
+{:where [:id := 10]}, and add starred props.
+
+We just need to make sure we always return the list data, not whatever backend
+has returned for that query. So we need to cache the return values for list like
+we do for item-batch. So when we set selected-id for that list we need to cache
+the list we already have. Or append whatever the case might be. Quite similar to item-batch.
+
+If we catch all keys when target is nil we can also replace the rest of the
+set-params with a read method that grabs some specific params from the app state
+to determine what to return to the remote and as value, like for autocomplete
+
+So we can this way have paginated lists within paginated lists for instance.
+
+We can also for instance add a param like {:calc :count} and have backend return
+something like this:
+
+{:items [{:id 1 :name "foo"} {:id 2 :name "bar"}]
+ :count 42}
+
+for this query:
+
+[{:bla [:id :name]} {:where [:limit 2] :calc :count}
+
+On read we need to return vector under items key. And maybe set a first item
+with the meta data such as count, or set as meta data to the vector (but doesn't
+work if count changes but data doesn't), or return count when asked for it in a
+client key.
+We could write another query such as:
+
+[{:calc/count {:table :bla :where [...]}]
+
+but we need to set the where clause twice in frontend, and calculate sqlvec
+twice in backend. Better would be to just have backend call the same query again
+but without the where limit clause.
+
+But being able to catch all keys with a custom read method for all targets
+(including nil) would enable on demand loading. You just set flags in app state,
+or page state by table,whatever, and adjust remote and what you return as value
+accordingly.
 ** Issues and bug, sort out
 *** Write/refactor tests for process-mutation-symbol now we're using hook :priority_2:
 *** Enforce max length of 255 for translations
@@ -159,7 +437,7 @@ users, or dossier types etc.
 
 
 
-* TODO get app-path to frontend!!!!!
+* DONE get app-path to frontend!!!!!
 * Aum modules
 ** add db migration lib
 ** integrations
@@ -1426,281 +1704,3 @@ http://marianoguerra.org/posts/omnext-end-to-end-part-ii-frontend.html
 https://speakerdeck.com/anmonteiro
 
 
-* Aum
-** image upload resize in browser
-    https://stackoverflow.com/questions/19262141/resize-image-with-javascript-canvas-smoothly
-    https://stackoverflow.com/questions/2434458/image-resizing-client-side-with-javascript-before-upload-to-the-server
-    https://gist.github.com/dcollien/312bce1270a5f511bf4a
-    https://hacks.mozilla.org/2011/01/how-to-develop-a-html5-image-uploader/
-    https://github.com/rossturner/HTML5-ImageUploader/blob/master/src/main/webapp/js/ImageUploader.js
-    https://github.com/sidraval/image-crop
-    https://github.com/nodeca/pica
-    https://github.com/mikera/imagez
-    https://github.com/josephwilk/image-resize r
-
-** ?? When record is not saved because all props are not allowed backend returns warning
-   But this is not shown in frontend. This is because dossier types can be empty,
-   but the joined fields not. So no msg is appropriate then. But for records with
-   no joins we would like some feedback. On the other hand this should be not
-   allowed in the first place, saving a record with disallowed fields.
-   But resurrect the little black box popup perhaps
-
-** Set/edit color logo scheme
-**** Add help text
-**** Set maximum sizes!
-**** Multiple sizes for normal and iphone!!!
-**** DONE Have dc app respond to theme images
-**** Add custom avatar image
-**** Grab these images on backend and get to frontend via a macro.
-  And calculate sizes there from them.
-**** In rails put logo and brand data-urls somewhere more sane.
-  Not in group model perhaps.
-  Also grab from images on disk. So create data uri from brand and logo png/jpeg
-**** Only show preview checkbox if anything's different!!
-**** BUG Set color not to nil for default color, don't use merge-themes
-    On save if color is the same as default then mod it to nil.
-
-
-** Better data explorer, including vcr
-    see explorer namespace
-
-
-** user management for billing purposes
-** implement state in url.
- And history etc, back/forward button.
- https://github.com/juxt/bidi
- https://github.com/venantius/accountant
- https://github.com/kibu-australia/pushy
- https://lispcast.com/mastering-client-side-routing-with-secretary-and-goog-history/
-
-
-** Feedback/bug report form a la chrome
- So with screenshot, text, url, file upload, system info
-
-
-** more per group translations options
-
-*** In dc app fetch shadow translations scoped to group_id for efficiency
-    Added note about it in translations.rb model
-*** when switching between groups have same translation open!!
-*** What if supergroup wants -its- translations as the root translation???
-    That's easy in dc app, we just filter the shadow translation on the group id
-    of the super group.
-
-    For the regular translations in aum we currenlty get the shadow translations
-    filtered by user group id. We would need to get the shadow translations of
-    the users group's group-id, as well as the shadow translations for group.
-
-    In aum in the translation editor we need to get and show the shadow
-    translation of super group as well as the shadow translation of the group it self.
-
-    But all this only if the option on the supergroup is to fall back to -its-
-    translations before falling back to the root translation
-
-*** use (:locales config) whenever listing/enumerating locales
-     so for example on page-config and translations admin page
-
-*** DONE have option on translation page for dc admin to see what translation keys in app are -not- in translatiion table!!
-    and have option to import them
-
-*** Translations are not fetched when not logged in!!!!
-**** Make sure that current group translations are used when logged out. Same as theme
-
-
-** Extract undo-redo to mutate helpers
-
-** Underline red any form errors, so -> reeval invalidate on input and is invalidated
-
-** reconciler.core Network level success status, not response status :success? cb-success?
-   What do we do with this in mock mode or e2e test modes?
-
-
-
-** Saving of joined data!, and undo/redo/revert/is-dirty!!!
-*** Solution:
-**** 1a. Generic undo/redo/revert
-**** 1b. Generic is-dirty
-**** 2. Calc-mods
-- unsaved-records should be called unsynced-records or out-of-sync-records
-- Make a new mutation: save-records (plural: "records").
-- We have a list of tables that are edited on a page, or we pass in a list of
-  tables we like to save in one hit.
-- And a list of all 'unsaved' records. So all out of sync records. All records
-  with 'mods'. We create a table-data map with all mods per table and id. Which
-  we send to the backend.
-- Every time we do a modify record 'unsaved-records' gets updated. Might as well
-  add the actual mods to it actually
-- When we receive our mods back from backend we update unsaved-records. If a mod
-  of a record doesn't have the _error or _out-of-sync or _unable-to-sync or
-  _sync_failed key set it will be removed from unsaved-records.
-- Undo/redo updates unsaved-records
-- When deleting a new record update unsaved-records
-- When deleting a records remove all unsaved joins from unsaved-records
-**** 3. Saving data
-
-1. Save mods as table-data. So like
-    #+BEGIN_SRC clojure
-      {:mods {:dossier-type {1 {:name "changed-name"
-                                :group-id 1 ;;belongs to group
-                                :company-id "C1-tempid"} ;;belongs to company
-                             "D2-tempid" {:name "new dossier-type"}} ;;has-many fields, belongs-to group, company
-              :group {"1" {:name "modified group name"}} ;;has-many dossier-type
-              :company {"C1-tempid" {:name "new company"}} ;;has-many dossier-type
-
-              ;;:dossier-type-id 1 -> we rename the status all dossier of that dossier
-              ;;type with that status. So all dossier with status "1".
-              :status {1 {:label "changed-label-name"} ;;add a multimethod hook for table/prop
-                       ;;we soft delete, so just save prop as normal or:
-                       ;;in hook on table we check for :deleted prop delete the row if we want
-                       2 {:deleted true ;;or
-                          :client-prop/deleted true}
-                       }
-              :field {5 {:label "changed-label"} ;;dossier-type-id 1
-                      "F1-tempid" {:label "bla"
-                                   :more :props
-                                   :dossier-type-id "D2-tempid"}} ;;belongs-to dossier-type, has-many options
-              :option {1 {:text "changed-text"} ;;belongs-to field
-                       "O1-tempid" {:text "bla"
-                                    :order 2
-                                    :field-id "F1-tempid"}
-                       }}}
-    #+END_SRC
-2.We use our db-config to work out the graph of our mods
-   a. Find the roots in the graph of the mods (So the roots are company and group in the mods above)
-   b. Take the first root
-   c. Save the record (it either succeeds or fails)
-   d. If it fails we return original record table-data (empty map if new) with error data added to
-   record map and then if:
-       1. it's a new record we do not save any children but for all children,
-          recursively we return original record data (empty map) with error data
-          added (parent couldn't be updated!) and with rest of roots go to b
-       2.it's an existing record we continue saving children and for every child
-       we start at c. again
-   e. If it succeeds then for every child of the record go to c.
-   f. Once we're out of children for the root go to b. with rest of roots
-
-If a save succeeds we add an empty :_error key to the record to clear the key
-and indicate that the save was successful.
-
-We save from has-many's graph root down so we know the ids to fill in to the
-children when parent is a new record.
-
-NOTES:
-- If a parent that exists already fails to update children will get saved. If
-their validation depends on the parent at all then it will succeed when
-otherwise it might not have if parent hadn't failed to save. But parent should
-be set back to the original value in the frontend. And frontend should be more
-careful with saving invalid records.
-- We could have a 'soft' validate. Where it doesn't throw an exception but
-  returns a 'cleaned' or correct record to save. Which would be handy to
-  'correct' a deleted flag for instance. And other props would still be saved
-  then, instead of the whole record not getting saved. So you remove the props
-  with 'illegal' values from the record to save..
-
-**** 4. Error reporting
-For a mutation we record the error under the save-record mutation key in the
-result. However better is just to put the errors in table-data under the
-relevant record. And just merge that. The component then gets the error itself.
-If some application wide error reporting is needed we can set app-state in the
-reconciler's pre-merge hooks. So we can set :client/warning. So component
-localized error reporting.
-**** 5. Duplicate normalized data.
-    Like for statuses and options. Just add a hook on table and do your thing.
-    If in the hook you see that the label is updated for a status you update all
-    dossiers that have status-id set to the id of the status.
-**** 6. Reversing a delete
-1. soft delete (setting a delete flag)
-    Validation will fail, record will not save at all and original table-data
-    will be returned.
-2. hard delete
- Validation will fail, record will be deleted and original table-data
-    will be returned. However these hard deletes are not part of saving a
-   record. And have their own mutation. Which will fail and should return
-   original table-data then.
-   In general avoid hard deletes as much as possible. We want to mutate data,
-   record the change and move on. Not remove any data ever really. If a record
-   is deleted that's its last state, not to be modified anymore and should be in
-   the db as such.
-
-**** 7. Moving an item to a different parent wich backend doesn't accept
-    So parent-id ref is not accepted, cause new parent is not allowed to have
-    it, or old parent is not allowed to let go of it. Whatever the case,
-    parent-id ref is not going to be updated.
-    So we have a problem in the frontend cause we moved a ref from a list of
-    idents from one parent to another. And this needs to be moved back. Which is
-    purely a frontend concern. So tackle this in a pre-merge-hook I think, for
-    the particular situation.
-
-** Write recursive self join tests
-Including returning props of the join by adding qbucket-qbucket/order prop
-Perhaps aum-next should prefix them again properly on returning to frontend??
-
-
-** Clean up post-remote
-Move fns from aum-reconciler to some generic ns where we call the fns from
-post-remote as appropriate.
-
-** Sort out multipe remote situation.
-Like calling lawcat or tent (rails) in the middle of query. At least document
-it on how it works now. Which might be pretty ok.We can probably use om-path a
-bit more and/or add some data to the tree in our db->tree
-
-** DONE Better idea for on demand loading
-  Implemented as db->tree with hooks
-   CLOSED: [2018-10-24 Wed 15:14]
-   :LOGBOOK:
-   - State "DONE"       from              [2018-10-24 Wed 15:14]
-   :END:
-
-Improve parser so you can write read methods for all keys that get called for
-target=nil. They get called when target is a remote, which helps in modifying
-the query. But we also might want to return custom data when that key is asked
-to return data. Currently the om/db->tree fn resolves queries against the db.
-Bypassing our read methods. So plough through that fn, copy and modify it.
-
-When we control what to return, for remote and value for all keys then we can
-parse the query for more info such as what keys to load:
-[({:user [:id :name :*email :*tent-id]}
-{:offset 20 limit 20 :calc :count :where [:name :like "foo"})]
-
-We can add following params, and omit the starred props when loading the list. When
-loading a record we can set params to:
-{:where [:id := 10]}, and add starred props.
-
-We just need to make sure we always return the list data, not whatever backend
-has returned for that query. So we need to cache the return values for list like
-we do for item-batch. So when we set selected-id for that list we need to cache
-the list we already have. Or append whatever the case might be. Quite similar to item-batch.
-
-If we catch all keys when target is nil we can also replace the rest of the
-set-params with a read method that grabs some specific params from the app state
-to determine what to return to the remote and as value, like for autocomplete
-
-So we can this way have paginated lists within paginated lists for instance.
-
-We can also for instance add a param like {:calc :count} and have backend return
-something like this:
-
-{:items [{:id 1 :name "foo"} {:id 2 :name "bar"}]
- :count 42}
-
-for this query:
-
-[{:bla [:id :name]} {:where [:limit 2] :calc :count}
-
-On read we need to return vector under items key. And maybe set a first item
-with the meta data such as count, or set as meta data to the vector (but doesn't
-work if count changes but data doesn't), or return count when asked for it in a
-client key.
-We could write another query such as:
-
-[{:calc/count {:table :bla :where [...]}]
-
-but we need to set the where clause twice in frontend, and calculate sqlvec
-twice in backend. Better would be to just have backend call the same query again
-but without the where limit clause.
-
-But being able to catch all keys with a custom read method for all targets
-(including nil) would enable on demand loading. You just set flags in app state,
-or page state by table,whatever, and adjust remote and what you return as value
-accordingly.
