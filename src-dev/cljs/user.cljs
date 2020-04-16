@@ -1,6 +1,5 @@
 (ns cljs.user
   (:require
-   [pagora.aum.om.next :as om]
    [app.frontend.core]
    [weasel.repl :as repl]
    [taoensso.timbre :as timbre]))

@@ -1,0 +1,41 @@
+#+TITLE: Slate
+
+git clone https://github.com/michieljoris/slate.git
+# git checkout v2.4.0
+
+rbenv install
+rbenv local
+gem install bundler --version '2.0.2'
+bundle install
+
+Any problems with bundle:
+https://github.com/rbenv/rbenv/issues/1138
+
+
+Write doc.org
+
+Wrap all source code like this:
+
+ #+BEGIN_SRC clojure
+```clojure
+ (def a 1)
+```
+#+END_SRC
+
+Export doc.org to doc.md (org-md-export-to-markdown)
+
+Replace all (C-x h) in doc.md (M-C-%) \s`*/`
+
+In slates source dir:
+
+    ln -s ../../clojure/aum-starter-app/docs/aum/doc.md index.html.md
+
+Set logo in source/layouts/layout.erb
+<%#= image_tag "logo.png", class: 'logo' %>
+    <div class="logo" style="min-height:30px;color:white;font-size:30px;padding:10px 0 0px 50px">Aum</div>
+
+bundle exec middleman build --clean
+
+
+not working:
+bundle exec middleman server

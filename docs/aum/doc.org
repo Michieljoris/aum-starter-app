@@ -37,9 +37,11 @@
 To pull in all the tools and libs to build an aum app add
 
  #+BEGIN_SRC clojure
+`````clojure
 aum {:git/url "https://github.com/michieljoris/aum.git",
      :sha "577daf362c3f81e08d43f654ef0bbf3ddc93e015"
      :tag "master"},
+````
 #+END_SRC
 
 to your dependencies.
@@ -87,7 +89,6 @@ For development also do this:
 TODO-aum: get this working properly!!!
     This is so that tools.deps can resolve the dependencies locally. If you
     want deps from github replace local-deps with git-deps in the bin/dev-backend script
-
 
 *** Run in development mode
 
@@ -180,11 +181,6 @@ See app at http://localhost:8090
 
 Entry point of backend in production is at app.core (the -main fn).
 
-* Build system
-TODO: revolt
-webpack and foreign-libs
-bin scripts
-dev-backend: revolt rebel task loads the user namespace
 * Core concepts
 ** It's om-next.
 The idea is to stay as close as possible to the original idea of om-next as just
@@ -206,34 +202,20 @@ optimistic updates etc.
 Aum has its own thin layers over the reconciler and parser but still uses defui,
 om/transact! etc
 
-* Start app
-** dev
-*** clj
-When calling bin/dev-backend the last plugin (rebel) is configured in
-resources/revold.edn under the :revolt.plugin/rebel.init-ns to load the clj.user
-ns.
-In clj.user a restart fn is defined that inits aum, inits a integrant system
-with it and then calls (dev/go) on it. This kicks of all the init-key fns in the
-various namespaces (db, server etc).
-*** cljs
-When starting figwheel (by either bin/dev-figwheel or space-m-" in Emacs) the
-complier options in dev.cljs.edn get used to produce the js from cljs. The :main
-options is set to cljs.user. This is the first file loaded in the frontend by
-goog.require and all the dependent files are loaded after that. So cljs.user
-should require app.frontend.core. This is enough to get the app going.
-
-* environment
-Require pagora.aum.environment in both front and backend. The current evironment
-is in the environment var or call functions like is-development? from that
+* Build system
+TODO-doc: revolt
+webpack and foreign-libs
+bin scripts
+* Environment
+You can require pagora.aum.environment in both front and backend. The current evironment
+is in the pagora.aum.environment/environment var or call functions like is-development? from that
 namespace. The default environment is :dev. Start the app with
-CLJ_ENV=production/staging/testing to change the environment.
+CLJ_ENV=[production|staging|testing] to change the environment.
 * Config
 Config is defined in multimethods like this:
 
-  Config keys need to be assigned scalar values (so no maps or vectors) so we
- can set them in env vars on the command line
-
 #+BEGIN_SRC clojure
+```clojure
 (ns app.config)
 
 (defmethod aum/config :common [_]
@@ -243,17 +225,39 @@ Config is defined in multimethods like this:
 (defmethod aum/config :dev [_]
   {:timbre-level :info
    :frontend-config-keys [:app-path :timbre-level]})
+```
 #+END_SRC
 
-You pass the namespace these methods are defined in to aum (app.config). Any
+Config keys need to be assigned scalar values (so no maps or vectors) so we can
+set them in env vars on the command line.
+
+You pass the namespaces these methods are defined to aum (app.config). Any
 config defined in :common will be merged with config for the current environment
 with the latter overriding keys in the former. This config is then used in aum
 and can be requested from aum (aum.core/get-config).
 
 Frontend config works the same way. Keys listed in the backend under
 :frontend-config-keys will be sent to the frontend and merged into the frontend
-config before the app starts
+config before the app starts.
 
+* App starting process
+** dev
+*** Backend
+When calling bin/dev-backend the last plugin (rebel) is configured in
+resources/revold.edn under the :revolt.plugin/rebel.init-ns to load the clj.user
+ns.
+In clj.user a restart fn is defined that inits aum, inits a integrant system
+with it and then calls (dev/go) on it. This kicks of all the init-key fns in the
+various namespaces (db, server etc).
+*** Frontend
+When starting figwheel (by either bin/dev-figwheel or space-m-" in Emacs) the
+compiler options in dev.cljs.edn get used to produce the js from cljs. The :main
+options is set to cljs.user. This is the first file loaded in the frontend by
+goog.require and all the dependent files are loaded after that. So cljs.user
+should require app.frontend.core. This is enough to get the app going.
+
+** prod
+TODO-doc: explain how app starts in production
 * Generic save records
 When you have a page with records including their joins recursively you might
 want to save the whole lot in one hit. aum calculates the actual
@@ -360,18 +364,41 @@ stays in sync with the backend.
 Use om-next queries to do crud on any mysql database, where the read can
 use one or more joins from and to any table, constrained only by the
 (db-)configuration of the parser.
-* Security
+* Modules
+** icons
+Icon classes like icon-cached, icon-undo, icon-redo etc are  defined in
+mui-icons.css
+
+This is a generated file on
+https://icomoon.io/app/#/select
+
+Click "Import icons" and select icomoon.svg in the
+aum/resources/admin_new/fonts directory. This adds currently used icons in the
+app to the selectable icons. Select all imported icons.
+
+Select any extra icons you want and then click "Generate Font". It exports a zip
+file which includes currently used icons in app, plus any other you've addded..
+
+Put the files in the fonts directory in aum/resources/admin_new/fonts,
+replacing the files that are already there.
+
+Replace the contents of mui-icons.css with the css in style.css.
+
+** Security
+There's login/logout methods in app/security.cljc. Disabled in production.
+
 Aum comes with login and logout fns for both front and backend. However in
 production this is disabled and users are directed to the rails app.
 The remember token as set by the rails app is used to authenticate the session
 similar to how it's done in the rails app. One complication is that because how
 sente/websockets work is that to renew the session and any attached remember
 token the connection has to be renewed.
-* Internationalization
+** Internationalization
 There is a common.i18n.cljc namespace which provides the translate fn which
 takes the current locale and a key.
 * Websockets
-* Write validation
+* Database
+** Write validation
 A generic sql query fn that garantuees validation (doesn't work if not
 implemented) of the query with hooks for pre processing the params of the query
 and post processing of the result of the query.
@@ -685,9 +712,6 @@ Use of that is simple:
 })
 #+END_SRC
 
-
-** Security
-There's login/logout methods in app/security.cljc. Disabled in production.
 ** Garbage collection
 There is currently no garbage collecting implemented. As with any garbage
 collection the criteria for this are rather app and platform specific. But in
@@ -800,485 +824,9 @@ Options:
 * Misc
 ** Querying other sources than a mysql database
 *** Using more than one remote in the frontend
-Example: lawcat
-*** Returning data fetched from another source
-Example: tent
-*** Integrating pathom
-** Trying queries
-In the dev source folder there are namespaces to try out various queries:
-*** try-om-query
-You can call the backend parser with any om-next query. These are resolved
-against the database as defined in app.config and using database.config as
-defined for the whole app.
-
-There is a second version where you can build your own parser environment and
-your own parser with that again.
-*** Try sql query
-To try out any sql query. Make sure to define process-params, validate-sql-fn
-and process-result methods, and the equivalent sql fun in build-sql if you want
-it to be used in mock mode or tests.
-*** Try/test frontend parser.
-Frontend parser is a cljc file so you can eval this in a clojure repl. You can
-test here what the parser returns for queries for the nil and various remote
-targets, which is much harder to test/inspect if you have to use the ui to pass
-queries to the parser.
-** Fixtures per test
-    It's possible to set up a context for one more tests to run in. Inside the
-    macro call `in-context` you'll have access to tu/*env* which will be set
-    properly according to the context you're in. The *env* has db-conn which you
-    can use directly or you can use the a parser or aum.database.query/sql and
-    pass in *env*. For your convenience two more dynamic variables, tu/*parser*
-    and tu/*state* are bound while 'in-context' using the parser-config and
-    db-config passed in when creating a context using tu/make-context.
-
-#+BEGIN_SRC clojure
-  (require
-   '[aum.app-config :refer [config]]
-   '[clojure.test :refer [deftest is]]
-   '[aum.test.util :as tu :refer [debug-tests unload-all-tests unmap-all-interns in-context truthy?
-                                    make-context query]]
-   )
-
-
-  ;;This will create just the one table, foos, with just one row.
-  (def fixtures {:foos {:rows [{:id 1 :title "bar"}]
-                        :options {:id-primary-key? true}
-                        :schema {:id :int :title :text
-                                 :updated-at :date-time :created-at :date-time}
-                        }})
-
-  (def my-db-config
-    {:root true
-     ;;by default you can refer to a table by its singular name (the end s is
-     ;;removed from the table-name).
-     ;; :table-name :foo :columns
-     (keys (get-in fixtures [:foos :schema]))
-     ;; :joins {:bar {:t1-foreign-key :bla-id}}
-     :read {:role {"super-admin" {:blacklist []}}}
-     ;;NOTE: For update, create, delete mutations you'll might have to create the
-     ;;appropriate validations as well.
-     :update {:role {"super-admin" {:blacklist [:id :updated-at :created-at :creator-id]}}}
-     :create {:role {"super-admin" {:blacklist [:id :updated-at :created-at]}}}}
-    )
-
-  (def context-foo
-    (make-context
-     {:db-config {:foo my-db-config}
-      ;;Or use config from your app:
-      ;;:db-config (select-keys database.config/db-config [:user])
-      :parser-config (merge (config) {:allow-root true :print-exceptions true
-                                      :sql-log true :query-log true
-                                      :event-store-disabled true})
-      :fixtures fixtures}))
-
-  (def user {:id 1 :some-user "a-user" :role "super-admin" :group-id 10 :subgroup-ids [-1]})
-
-  (in-context context-foo
-    (tu/*parser* (assoc tu/*env*
-                        :user user)
-                 [{:foo [:id]}]))
-
-#+END_SRC
-
-* TODO: Snippets
-
-#### Server parser
-
-    (def parser-env (aum/parser-env {:parser-config {
-                                        :normalize true}
-                                    :db-conn some-db-conn}))
-
-    (def parser (aum/parser {:parser-env parser-env}))
-
-    (def state (atom nil))  ;;will contain table if :normalize is true, and/or error data
-
-    (def user {:id 1 :name "foo"}) ;;or nil.
-
-    (aum/parser {:state state :user user} om-next-query)
-
-For more options to pass to aum/parser-env see the aum.parser namespace.
-
-This parser will translate the om-next-query into a sql query and return the
-result with the table data in the state atom if :normalize is true.
-
-By default the user in env is checked to be truthy. If falsey {:value
-:not-authorized} is returned by the aum parser. To bypass this use the read
-and mutate multimethods in aum.parser-read and blby.parser.mutate namespaces:
-
-Require
-
-    [aum.parser.read :refer [read]]
-    [aum.parser.mutate :refer [mutate]]
-
-And define parser thusly:
-
-    (def parser (aum/parser {:parser-env parser-env
-                               :read read
-                               :mutate mutate}))
-
-Or use your own mutate and/or read fns. The env will be populated with the keys
-from the parser-env, as long as they are not overwritten by om-next env keys.
-Optionally, the schema of the db will be under the :schema key
-
-If using aum read/mutate fns parser will still use the user map to check for
-permissions and validations in db-config, and will still substitue namespaced
-keywords in queries with values from the user map if possible.
-
-By default the aum parser will inspect the schema of the database given in the
-db-conn and infer and check table and column names, and table joins. These can
-also be explicitly described in db-config (TODO for table names and columns I think).
-
-#### Client reconciler and parser
-
-TODO: Add docs..
-
-#### Test runner
-
-TODO: Add docs..
-
-### Result format
-
-    {:value {...}
-     :status :ok/:error
-     :table-data {...}
-     :original-table-data {...}}
-
-- :status
-can be :ok or :error. In the case of error one of the keys queried for
-threw an error. Value of the key will be the error data.
-
-- :table-data
-will always have data as stored in the database, in other words it's
-a subset of data in the database, this can be data as linked in to in a
-(normalized) query result, data as queried for in save-record post-save
-
-- :original-table-data
-server table data after a failed mutation, potentially useful to repair frontend version of data
-
-- :value
-is the result of the query/mutation
-
-In the case of a mutation :value will have this format:
-
-    {mutation-symbol {:error {:stacktrace :not-returned
-                            :context {...}
-                            :message "..." }
-                    :keys [..] }
-                    :tempids [..]}
-
-Any of tempids, keys and error is optional.
-
-keys is a hint of the server for rerender, for affected table data.
-
-In the case of error, for a mutation, the error message will the in the map for
-the mutation symbol. For an error in reading a key, the error
-
-* Translations
-
-Keys given to common.i18n/translate can be a string or keyword. When capitalized
-translation will be capitalized as well. These can, but don't need to be
-prefixed with admin/. When looking up a key, key will be prefixed with admin/ if it's not
-already. Keyword keys will be changed into strings (without leading keyword colon).
-
-Examples:
-
-    :foo lookup keyword in src code will require admin/foo key in translation database
-    :admin/foo => admin/foo
-    foo => admin/foo
-    foo bar box => admin/foo bar box
-
-The admin/ prefix allowes to fetch admin relevant translations only.
-
-Set :mark-untranslated-keys to true in local storage and/or app.config.clj(s) to
-show untranslated keys as the full key in brackets.
-
-
-* Integrations
-
-** Bugsnag
-See integrations.clj and integrations.cljs.
-
-Bugsnag is added to both front and backend. In app/config.clj both keys are set.
-Bugsnag ring wrapper is added in webserver.handler.clj. See integrations.clj for
-example of calling bugsnag-notify directly. See integrations.cljs for wrapper
-fns to call bugsnag notify, breadcrumb and refresh in frontend.
-
-To test bugsnag in development add valid keys to :dev config in app/config.clj.
-If the key for the frontend is nil bugsnag script is not added to admin.html
-
-** New relic
-
-To test new relic in development:
-
-Copy newrelic-agent.jar to repo dir, this uses jar version as specified in build.boot:
-
-    boot copy-newrelic-jar
-
-    NEW_RELIC_LICENSE_KEY="<some newrelic key>" bin/boot-with-jvm-options
-
-See .boot-jvm-options for actual jvm options used. They include among other
-options the -javaagent option. You should see some data popup in your newrelic.
-
-To run new relic in production:
-
-boot build task includes the copy-newrelic-jar task, so newrelic-agent.jar
-should be in the projects root dir. Incantation below to run production jar
-includes new relic api key env variable and jvm options to run new relic agent.
-Logging is set to the cwd, as set in new relic config file at ./newrelic.yml.
-
-If new relic license key env variable is not set new relic agent is not loaded.
-
-** Logstash
-
-Set logstash host, port, level and enabled in app.config.clj. Alternatively set
-env variables logstash_host, logstash_port, logstash_level and logstash_enabled
-before starting aum. See dev.clj for trying logstash in development.
-
-
-* HOW TO
-
-### Modify url path of app
-- End path with slash
-- Modify path var at top of build.boot
-- Modify path var at top of app/config.clj
-- Move content of resources/<path> and src/cljs/<path> to the new path.
-- Edit resources/<new path>/admin.html and set new path for css and js files
-
-### Cursive
-
-### Tips
-See for graph of dependencies ns-hierarchy.png. Produced with medusa. Might be outdated.
-
-Enable/disable various debugging settings in cljs/app/config.cljs. Very handy to
-work out what om-next is actually doing.
-
-### Mobile debugging:
-
-- Set vorlon-script to true in config.clj or set env var.
-- Install vorlon: http://vorlonjs.com/
-- Run vorlon on commandline
-- Open mobile device at your lan interface:port
-- Open vorlorn dashboard at localhost:1337
-
-### Add npm modules
-
-- Add to package.json
-- Import package in index.js, set a global to imports
-- Create index.bundle.js by running npx webpack
-- Create externs file or add externs to foreign-libs.externs.ext.js
-- Edit resources/revolt.edn (and/or main.cljs.edn for figwheel):
-- Add any new externs file to the externs keys
-- Add entries for the exported packages to foreign-libs under the
-- foreign-libs/index.bundle.js entry:
-- -> The global created in index.js should be added to the global-exports subkey
-  where the js global var name can be referred to by a clojure symbol ns
-- -> Add that symbol ns to to the provides key as a string.
-
-### Analyze size of webpack bundle
-
-    npx webpack --config webpack.prod.js --json > stats.json
-
-Upload stat.json to https://chrisbateman.github.io/webpack-visualizer/
-
-Or:
-
-    bin/analyze-webpackold-app-readme
-
-
-* superaccounts
-Groups get a flag whether they're a supergroup or not.
-A group admin gets the role of supergroup-admin if his group has the supergroup
-flag set. This is used for validation/permissions purposes
-front and back end, and also for ui concerns/behaviour in front end.
-At the moment a AUM user (group 10) gets automatically super-admin role, and
-based on that allowable props to read/update/create, and scope for read are set and
-validations performed.
-A group admin has different crud props and validations applied to him. Scope is
-for instance [:where [:group_id := u/group-id]]. Where u/group-id is the
-group-id of the current user, the group admin. Frontend asks for the same data,
-however only gets groups, or dossier types, or users belonging to the current
-user's group.
-So everything is in place for supergroup-admins as well. We just need to
-determine whether a group-admin is a supergroup-admin (we look at the supergroup
-flag on the group he's from), and what other groups he's got access to (any
-group created by a supergroup-admin automatically get their group-id set the
-supergroup's id).
-
-Before we do anything in the parser we add the current user to the environment.
-Here we add for instance the role prop to a user. Here is also where I fetch all
-the subgroup ids of the user's group, and add that to the user's prop if he's a
-group-admin.
-
-Then for supergroup-admin I adjust the scope to [:where [:group-id :in
-:u/subgroup-ids]] for the various tables like dossier types, users, etc.
-
-And that's basically it. If you look at a supergroup's data in the ui you'll see
-a list of subgroups. If you look at a subgroup you see what supergroup it
-belongs to.
-
-If a group-admin of a supergroup logs in they will see what service desk sees,
-and can do what they do, limited to the supergroup and the subgroups.
-
-It becomes then a matter of finetuning permissions and validations. And making
-sure everything is robust enough.
-
-This does not affect AUM app at all. It works as it did before. You just give a
-supergroup-admin to administer some more groups instead of having to go through
-AUM's service desk.
-
-* backend response format
-{:value {...}
- :status :ok/:error
- :table-data {...}
- :original-table-data {...}}
-
-:status
-can be :ok or :error. In the case of error one of the keys queried for
-threw an error. Value of the key will be the error data.
-
-:table-data
-will always have data as stored in the database, in other words it's
-a subset of data in the database, this can be data as linked in to in a
-(normalized) query result, data as queried for in save-record post-save
-
-:original-table-data
-server table data after a failed mutation, potentially useful to repair frontend version of data
-
-:value
-is whatever the query/mutation returned in the backend
-
-In the case of a mutation :value will have this format:
-{mutation-symbol {:error {:stacktrace :not-returned
-                          :context {...}
-                          :message "..." }
-                 :keys [..]}
-                 :tempids [..]}
-
-Any of tempids, keys and error is optional.
-
-keys is a hint of the server for rerender, for affected table data.
-
-In the case of error, for a mutation, the error message will the in the map for
-the mutation symbol. For an error in reading a key, the error will be under the
-key. However reading is pretty forgiving in general.
-
-If there's an error in either reading or mutating for any key status will set to :error
-
-* post-remote
-Every mutation can return in the response map, besides entries for :action and
-any remote keys, also an entry for :post-remote. This should be a function and
-it will be called with the result of the specific mutation on the backend. Usually this
-will be just a map with possibly :keys and :tempids entries. However in case of
-an error backend can add (which it usually does) an entry for :error. This is
-the place to do any cleanup or post remote action.
-
-The post-remote function should return a map looking like:
-
-{:keys keys ;;hints for om-next to rerender certain components
- :value value ;;You can any map here you want to, gets merged with app-state
- :table-data ;;gets merged-with app-state
- :records-to-process [] ;;a vector of maps with instructions on processing individual records
-}
-
-The result of the post remote gets deep merged with the complete response from the server
-for the complete query.
-
-The records-to-process vector doesn't get processed till _after_ value and
-table-data are merged with app-state
-
-records-to-process maps should look like this:
-
-{:table :some-table :id <some-record-id>
- :reset-history? <boolean> ;;wipes history in meta of record (:next-uuid :uuid :uuid-trail)
- :synced? <boolean> ;;whether to wipe :record key in meta of record
- :dissoc-key :some-key ;;dissoc's key from record
- :recalc-is-dirty? <boolean> ;;whether to recalcuate is dirty for the record
-}
-
-Keys returned from mutations are all queued for rerender.
-
-TODO:
-- Just use one key to merge with app-state, not value AND table-data
-- The records-to-process is a leftover from before there was post-remote, this
-  functionality should be pulled out of the reconciler and just made into util
-  fns, to be called and used in the post-remote fn for the mutation.
-
-NOTE:
-Reconciler does some nifty thing where it reapplies user edits to records after
-response is merged. Since response and the post remote could be clobbering these
-edits we take note of them, and then reapply them when all merging is done.
-
-* run tests in frontend in the app itself on src change:
-In dev mode you can run frontend tests on change of src. In debug drawer there's
-also a button to run the tests. You can turn this running of tests on src change
-on and off with a checkbox in the debug drawer.
-App bar will be red if tests don't pass.
-
-
-
-* shadow-translations
-  The query for the translation form contains a key :translation (join to shadow translation).
-  This join has {:set-params :selected-group} as params. See app-state. In
-  effect the joins params are altered so that the shadow-translation for the group is queried for.
-  Problem is to only sent this query to the backend if we haven't loaded the
-  shadow translation for the group yet for the root translation.
-
-  In reconciler.core we've added a pre-merge hook which picks up any
- translations just loaded, and if they have a translation prop (so we queried
- for shadow translation for the translation) we add the shadow translation to
- the :client/shadow-translation prop of the translation.
- If the :translation prop exists but it's not populated (empty vector) we create
- a new client side shadow translation and add that instead to the
- :client/shadow-translations prop.
-
-In app-state the read hook :selected-remote-keys fn is set. Here we override the
-default aum read for a selected item. As normal, we add a key to the remote
-for the translation if it doesn't exist in the translation we have already. But
-we only send the :translation key (the shadow translation) to the remote if we
-haven't got a shadow translation yet for the current group.
-
-For local reading purposes we also define the :update-selected-value hook where
-we denormalize the ;client/shadow-translations prop.
-
-Then in the template we pick the shadow translation for the current group. Or
-none if no group is selected.
-
-This way we can freely switch between translations and groups and still only do
-minimal querying of the backend.
-
-Since both the app and the translation page can get translations, including
-their shadow translations we have a pre-merge-hook in reconciler.core where we
-gather up any (shadow) translation joins and add them to a
-:client/shadow-translations key on the root translation. Normally this only has
-the translations for the user's group. However when we edit the shadow
-translations for various groups (as super-admin or supergroup-admin) this vector
-will contain more than one shadow translation (for the various groups). When we
-build the translation-map in reconciler.parser.read we pick the right one by
-group. Same when we render the translation page. If we have a group selected and
-we need to know what shadow translation we should display we pick the right one
-from the shadow translations (as parsed and read into props of the component
-because we got a client only query :client/shadow-translations on the list and
-form queries).
-
-* icons
-Icon classes like icon-cached, icon-undo, icon-redo etc are  defined in
-mui-icons.css
-
-This is a generated file on
-https://icomoon.io/app/#/select
-
-Click "Import icons" and select icomoon.svg in the
-aum/resources/admin_new/fonts directory. This adds currently used icons in the
-app to the selectable icons. Select all imported icons.
-
-Select any extra icons you want and then click "Generate Font". It exports a zip
-file which includes currently used icons in app, plus any other you've addded..
-
-Put the files in the fonts directory in aum/resources/admin_new/fonts,
-replacing the files that are already there.
-
-Replace the contents of mui-icons.css with the css in style.css.
-
+*** Returning data fetched from another source asynchronously
+If a backend query can't be resolved and returned synchronously it's possible to
+push the result to the frontend when it's available.
 * config
 - when running bin/dev or boot dev in the dev-task there is
    (environ :env {:clj-env "dev"})
