@@ -1,3 +1,18 @@
+---
+title: Aum
+
+language_tabs: # must be one of https://git.io/vQNgJ
+  - clojure
+
+toc_footers:
+  - <a href='https://github.com/lord/slate'>Documentation Powered by Slate</a>
+
+includes:
+  - errors
+
+search: true
+---
+
 
 # Table of Contents
 
@@ -155,11 +170,11 @@ graphql and falcor in a less cumbersome and more flexible manner.&rdquo;
 
 To pull in all the tools and libs to build an aum app add
 
-    `````clojure
+`````clojure
     aum {:git/url "https://github.com/michieljoris/aum.git",
          :sha "577daf362c3f81e08d43f654ef0bbf3ddc93e015"
          :tag "master"},
-    ````
+````
 
 to your dependencies.
 
@@ -361,7 +376,7 @@ CLJ<sub>ENV</sub>=[production|staging|testing] to change the environment.
 
 Config is defined in multimethods like this:
 
-    ```clojure
+```clojure
     (ns app.config)
     
     (defmethod aum/config :common [_]
@@ -371,7 +386,7 @@ Config is defined in multimethods like this:
     (defmethod aum/config :dev [_]
       {:timbre-level :info
        :frontend-config-keys [:app-path :timbre-level]})
-    ```
+```
 
 Config keys need to be assigned scalar values (so no maps or vectors) so we can
 set them in env vars on the command line.
