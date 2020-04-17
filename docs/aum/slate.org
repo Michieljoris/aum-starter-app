@@ -44,3 +44,10 @@ npm install bb-server -g
 
 not working:
 bundle exec middleman server
+
+Inline code:
+https://github.com/slatedocs/slate/issues/855
+https://github.com/Mermade/shins/issues/88
+Examples:
+https://smartsheet-platform.github.io/api-docs/#rows
+https://www.blockcypher.com/dev/bitcoin/#create-wallet-endpoint
