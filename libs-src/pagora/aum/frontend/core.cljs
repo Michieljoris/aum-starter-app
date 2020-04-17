@@ -34,8 +34,8 @@
 
 (defonce aum-state (atom nil))
 
-;; ;; This handler is triggered when websocket is ready to send and receive msgs.
-;; ;; When this is the case we mount our om app.
+;; This handler is triggered when websocket is ready to send and receive msgs.
+;; When this is the case we mount our om app.
 (defmethod channel-msg-handler :ws-first-open
   [{:keys [aum-config] :as msg}]
   (timbre/info :#b "Websocket opened: " msg)

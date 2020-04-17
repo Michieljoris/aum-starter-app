@@ -556,448 +556,7 @@ multimethods so you can add methods to deal with any extra hugsql fns.
 
 process-params (and process-result) is handy for adding hooks. For instance for
 the event-store. For more detail see also doc string of database.query/sql fn.
-* Frontend read methods
- Adding hooks for keys and joins in the root query for returning values and building remote query:
-
-*** Principles
-The standard read method of aum is db->tree of om-next. This will return a
-tree of data by applying the root query over the app-state. The stock om-next
-db->tree fn has been extended in the following ways:
-
-1. It's possible to define read methods for any key anywhere in the query. If
-   you do you can then return anything you want for that key. You will get in
-   the env the ast for the om-next expression (join or prop), the query if it's
-   a join, context-data and (app-)state. Context data is the data relevant for
-   the prop or join, which depends on where in the root query the key for the
-   join or prop is. For instance the default way to resolve a prop is just to do
-   (get context-data key). Default way to resolve a join is db->tree on the
-   query and context-data (see aum.reconciler.parser.key.route and the read
-   method for [:value :route/*]).
-
-2. The db->tree fn has been modified so that it instead of returning data it'll
-   return the query again, but 'sparsified' when :sparsify-query? flag is set.
-   By default if any data is found that part of the query is elided. But again
-   you can add read methods to determine yourself if and what should be included
-   for any key in the root query. In standard om you need to return a (possibly
-   modified) ast. For these aum read methods to work you return a (modified)
-   query instead. Whatever you return will be included in the remote query. If
-   you want to process and modify the ast you can you just do a (om/ast->query
-   ast) when you're done editing it. You can also return true which will then
-   result in the query being parsed further the standard db->tree way. Note that
-   currently if the key is a prop only the truthiness of the return value is
-   used. If truthy the return key is included, otherwise it isn't. Return the
-   full query in case of a join. So for a read method for [:aum :foo] you
-   return {:foo [:some :query]}. If query had params you can add them again,
-   possibly modified.
-
-3. Read method is dispatched on key, or on [target key]. Second one takes
-   preference over first. In the first instance you need to return a map such as
-   {:value :some-value :aum {:some-key [:some :query]}} similar to standard
-   om-next read methods.
-
-*** Examples
-**** VALUE example
-The method (note the :value in the dispatch vector):
-
-#+BEGIN_SRC clojure
-(defmethod aum/read [:value :bar] [{:keys [query context-data] :as env} key params] ...)
-#+END_SRC
-
-for a app state structure like this:
-
-#+BEGIN_SRC clojure
-{:foo {:bar {:k1 1 :k2 2}}}
-#+END_SRC
-
-and a root query of:
-
-#+BEGIN_SRC clojure
-[{:foo [{:bar [:k1 :k2 :k3]}]}]
-#+END_SRC
-
-receives env like this:
-
-#+BEGIN_SRC clojure
-{:query [:k1 :2]
- :context-data {:k1 1 :k2 2}
- :ast {:type :join, :dispatch-key :bar, :key :bar, :query [:k1 :k2],
-       :children [{:type :prop, :dispatch-key :k1, :key :k1} {:type :prop, :dispatch-key :k2, :key :k2}]}
- ...
-}
-#+END_SRC
-
-and should return for example this:
-
-#+BEGIN_SRC clojure
-{:k1 1 :k2 2}
-#+END_SRC
-
-**** REMOTE example
-The method (note the :aum in the dispatch vector):
-
-#+BEGIN_SRC clojure
-(defmethod aum/read [:aum :bar] [{:keys [query context-data] :as env} key params] ...)
-#+END_SRC
-
-for a app state structure like this:
-
-#+BEGIN_SRC clojure
-{:foo {:bar {:k1 1 :k2 2}}}
-#+END_SRC
-
-and a root query of:
-
-#+BEGIN_SRC clojure
-[{:foo [{:bar [:k1 :k2 :k3]}]}]
-#+END_SRC
-
-receives env like this:
-
-#+BEGIN_SRC clojure
-{:query [:k1 :k2 :k3]
- :context-data {:k1 1 :k2 2}
- :ast {:type :join, :dispatch-key :bar, :key :bar, :query [:k1 :k2],
-       :children [{:type :prop, :dispatch-key :k1, :key :k1} {:type :prop, :dispatch-key :k2, :key :k2}]}
- ...
-}
-#+END_SRC
-
-and should return for example this:
-
-#+BEGIN_SRC clojure
-{:bar [:k3]}
-#+END_SRC
-
-to create a remote query like this:
-
-#+BEGIN_SRC clojure
-[{:foo [{:bar [:k3]}]}]
-#+END_SRC
-
-If you want to keep the params (or add, or modify) return something like this:
-
-#+BEGIN_SRC clojure
-(cond-> {:bar [:k3]}
-  (some? params (list params)
-#+END_SRC
-
-*** Notes
-- If you set ignore-hooks? to true db->tree will function as the standard om-next
-db->tree, but by setting :sparsify-query? to true you can still also calculate
-the remote query.
-
-- In aum.reconciler.parser.denormalize there's a comment block where you can
-play around with db->tree. There's also the try-frontend-read ns.
-
-- To see the whole process in all its glory set timbre-level to :debug in
-app.config.cljs and set the chrome dev console to verbose output.
-
-_ For read methods the parser is not available in the env, but db->tree is.
-
-Use of that is simple:
-
-#+BEGIN_SRC clojure
-     (db->tree env {:query query ;;Apply this query
-                    :data  data ;;to this data
-                    :refs  app-data ;;looking up idents (refs) here.
-                    :sparsify-query? false ;;Return the data, not a sparsified query
-                    :ignore-hooks? false
-})
-#+END_SRC
-
-
-
-* Backend parser
-** Have backend return calculated data
-
-There are three ways to do this:
-
-*** Calculate something over a (sub)query
- Sometimes you want something to be calculated over a query and return not only
- the rows themselves, but also the extra data, such as total count. This is
- particularly tricky if you want to calculate something over a join. You want
- the joined rows, but also some more data over that particular subset of rows
- (joined as they are to the parent record).
-
- To do this add a :with-meta param key to the params of the query. Set this to a
- single keyword or map or a vector of them. If it's a map it should have at
- least a key :type, but you can then add more params for the calculation if you
- want.
-
- You can then extend the calc-meta-data multimethod from
- aum.parser.calc-meta-data in the backend which is dispatched on those
- :with-meta keys, or the :type value if it's a map. The method is called after
- the original sql query has been done. The sql-fn called, its args and
- calc-params as passed fromt the frontend.
-
- #+BEGIN_SRC clojure
-[{:group [({:user [:id :name]} {:with-meta [:count {:type :calc2 :some :params}]})]}]
-#+END_SRC
-
-#+BEGIN_SRC clojure
-(defmethod calc-meta-data :count
-  [env rows {:keys [sql-fn sql-fn-args return-empty-vector? join-type calculation-params]}]
-  ;;Do your calculation here
-   )
-#+END_SRC
-
-One thing to take note of is that the return value for this query will be now of
-the form:
-
-#+BEGIN_SRC clojure
-{:rows [[:id 1 :name "foo"]] :meta {:count 123}}
-#+END_SRC
-
-Which means you will have to take this into account when this data arrives at
-your component, and/or when you implement the read method for the join with the
-:with-meta param.
-
-*** Define a read key in the backend
-
-Such as:
-
-#+BEGIN_SRC clojure
-(defmethod aum/read :calc/count
-  [{:keys [user state parser query parser-config] :as env} _
-   {:keys [table where] :as params}]
-  ;;You can use the query to decide on what to calculate perhaps
-  (timbre/info query) ;;=> [:count]
-  {:value {:count (count-records env params)}})
-#+END_SRC
-
-Then add a query to a component:
-
-#+BEGIN_SRC clojure
-({:calc/count [:count]} {:table :user
-                         :where [:id :< 5]})
-#+END_SRC
-
-Disadvantage of this method is that you can only use this query as a root query
-or quasi root query. Also you have to possibly duplicate the params of this query in the
-frontend from another query. And this isn't useful for a joined query.
-
-*** Redirect a read to a custom-read
-Used search translations. Idea is to set a :custom-read key in the params of a
-query. Backend will use the read method as set to the :custom-read key and pass
-in the rest of params as well.
-
-Advantage of this is that you can redirect a query for a join to your own read
-method. Where you can then return a calculated value, any rows queried for
-and/or any other data you like.
-
-#+BEGIN_SRC clojure
-(defmethod aum/read :count-records
-  [{:keys [user state parser query parser-config] :as env} _
-   {:keys [table where] :as params}]
-  {:value (count-records env params)})
-#+END_SRC
-
-With this query:
-
-#+BEGIN_SRC clojure
-'({:user-count [:count]} {:custom-read :count-records
-                          :table :user
-                          :where [:id :< 5]})
-#+END_SRC
-
-* Testing
-** Backend testing
-TODO-doc:
-** Frontend testing
-*** Install
-    nvm install
-    nvm use
-    npm install
-    npm install -g karma-cli
-
-*** Test runner
-Standalone client-side om-next test-runner app to be used with the
-alternative test macros that add and remove tests to the lists of tests. Several
-ways to display diffs. Rerun test on click. Use snapshots for any test instead
-of writing the required result into the test. Helpers to click and compare html
-output for acceptance ui tests. Replay/rewind/step through (ui) tests by using
-pause macro.
-*** Snapshots
-There are facilities to create a test by putting it together step by step and
-instead inserting expected results take snapshots and use them instead. This is
-particularly handy for testing states of the ui. It's also then possible to step
-through the test in the test runner. If any intermediate snapshot fails the test
-but (because we updated the code for example) is what we do expect we can update
-the snapshot by clicking a button.
-** Run backend in frontend (for testing for example)
-It is possible to run the whole backend in the frontend where the mysql database
-is 'mocked' in the frontend. This is ideal for writing integration tests
-covering the whole stack
-
-TODO-doc: add examples and working starter branch
-NOTES:
-Browser in memory sql options:
-https://github.com/kripken/sql.js
-https://github.com/agershun/alasql/wiki/Getting%20started
-
-** Whole stack testing
-By combining test runner, snapshot testing and running backend in frontend it's
-possible to do whole stack testing.
-
-* Debugging
-** Dev-cards
-    Switch to dev cards page from app itself.
-First install nvm (node version manager).
-
-** Frontend om inspector
-Search, filter and drill into app and om state.
-** It's possible to set some flags in local storage to get some output in console etc:
-
-Set log level:
-
-    :timbre-level :info
-
-Click on AUM logo and some debug buttons will show up:
-
-    :debug-drawer true
-
-Show what query is sent and what is returned:
-
-    :send true
-
-Show item id in lists:
-
-    :display-item-id true
-
-Show debug buttons in page bar:
-
-    :debug-buttons true
-
-*** Trying queries
-In the dev source folder there are namespaces to try out various queries:
-**** try-om-query
-You can call the backend parser with any om-next query. These are resolved
-against the database as defined in app.config and using database.config as
-defined for the whole app.
-
-There is a second version where you can build your own parser environment and
-your own parser with that again.
-**** Try sql query
-To try out any sql query. Make sure to define process-params, validate-sql-fn
-and process-result methods, and the equivalent sql fun in build-sql if you want
-it to be used in mock mode or tests.
-**** Try/test frontend parser.
-Frontend parser is a cljc file so you can eval this in a clojure repl. You can
-test here what the parser returns for queries for the nil and various remote
-targets, which is much harder to test/inspect if you have to use the ui to pass
-queries to the parser.
-
-** In boot-scripts there's tail.boot to inspect logstash output:
-
-    boot boot-scripts/tail.boot -h
-
-Options:
-  -h, --help        Print this help info.
-  -f, --follow      follow
-  -s, --start VAL   VAL sets start (line number or time (hh:mm) such as "11:10").
-  -n, --length VAL  VAL sets number of lines or length of time such as "10h", "5m" "50s" If start is given then last so many lines or within last so much time.
-  -t, --http-log    print http output lines
-  -i, --timestamp   print timestamps
-  -r, --regex VAL   VAL sets regex to filter lines.
-  -l, --level VAL   VAL sets level to filter such as info or error.
-
-* How to
-** Add npm modules
-
-- Add to package.json
-- Import package in index.js, set a global to imports
-- Create index.bundle.js by running npx webpack
-- Create externs file or add externs to foreign-libs.externs.ext.js
-- Edit resources/revolt.edn (and/or main.cljs.edn for figwheel):
-- Add any new externs file to the externs keys
-- Add entries for the exported packages to foreign-libs under the
-- foreign-libs/index.bundle.js entry:
-- -> The global created in index.js should be added to the global-exports subkey
-  where the js global var name can be referred to by a clojure symbol ns
-- -> Add that symbol ns to to the provides key as a string.
-
-### Analyze size of webpack bundle
-
-    npx webpack --config webpack.prod.js --json > stats.json
-
-Upload stat.json to https://chrisbateman.github.io/webpack-visualizer/
-
-Or:
-
-    bin/analyze-webpackold-app-readme
-** Querying other sources than a mysql database
-*** Using more than one remote in the frontend
-TODO-doc: add examples to starter app and document here
-*** Returning data fetched from another source asynchronously
-TODO-doc: add examples to starter app and document here
-If a backend query can't be resolved and returned synchronously it's possible to
-push the result to the frontend when it's available.
-** Optimize frontend
-*** pathopt
-  https://awkay.github.io/om-tutorial/#!/om_tutorial.I_Path_Optimization
-  Path Optimization
-As your UI grows you may see warnings in the Javascript Console about slowness.
-If you do, you can leverage path optimization to minimize the amount of work the
-parser has to do in order to update a sub-portion of the UI.
-
-If you pass :pathopt true to the reconciler, then when re-rendering a component
-that has an Ident Om will attempt to run the query starting from that component
-(using it's Ident as the root of the query). If your parser returns a result, it
-will use it. If your parser returns nil then it will focus the root query to
-that component and run it from root.
-
-When it attempts this kind of read it will call your read function with
-:query-root set to the ident of the component that is needing re-render, and you
-will need to follow the query down from there. Fortunately, db->tree still works
-for the default database format with a little care.
-
-So om-next calls the parser, but the query will be a (focussed on the cmp) query
-against the root of app-data. If you set pathopt to true and a cmp has an ident
-and a query it will call the parser with the :query-root key of env to the
-ident, and query to the query of the cmp, so the parser can work a bit faster.
-Which I do in my parser read* fn
-
-** Start app with different ports and db:
-DB_NAME=my_db SERVER_PORT=9080 NREPL_PORT=38401 bin/dev-backend
-* Frontend
-** make-cmp and om-data
-** Use pages to organize your ui
-There are some basic fns for this. See app.pages for how to add a page.
-** Client only keys
-Any key with a namespace that starts with :client will never be sent to the
-backend. The value for any key with the namespace :client will be looked up in
-the root of app state.
-** Validation of form values
-When doing a save of a record on a particular page aum looks in the app
-config for that page a validation function for every prop of the record. If any
-prop is not 'valid' it's added to the client/invalidated-fields map of the state
-for that page (under the table key for that record). This can be queried for in
-the relevant component and used to set any ui flags and/or messages for that
-field.
-
-TODO:
-Currently this happens when a record gets saved, but it's possible to add a
-mutation that does this on demand, for instance on onBlur..
-** Syncing of front and backend
-All records have as their meta data something like this:
-#+BEGIN_SRC clojure
-  {:record {:id 1 :type :foo :name "bar"} ;;record as it came from the servr
-   :uuids [] ;;history keeping
-   :prev-uuid nil}
-#+END_SRC
-The meta record map is nil unless something has been modified in the record
-itself. The various uuid keys are used for undo/redo functionality. They are
-references to a particular state in the history of states for the app as kept by
-om-next.
-
-Reverting a record is as easy as replacing with its meta record. Calculating
-what has changed to a record for purposes of sending modification to the backend
-is doing a diff. And to decide whether its 'dirty' aum in essence just
-does a comparison.
-
-It's possible for example to reset just the one prop of a record as a result of
-clicking a 'reset' button in the component for that field. The original value
-can always be fetched from the meta record.
+* Frontend matters
 ** Generic recursive read with hooks
 *** Intro
 **** Combining queries
@@ -1230,6 +789,60 @@ Use of that is simple:
 })
 #+END_SRC
 
+** Client only keys
+Any key with a namespace that starts with :client will never be sent to the
+backend. The value for any key with the namespace :client will be looked up in
+the root of app state. So for instance the key :client-prop/name will not be
+sent to the backend either. But will still be looked up in the context data for
+that key.
+** make-cmp and om-data
+Use pagora.aum.frontend.util/make-cmp function to create a function that you can
+use in your render function in other components:
+
+#+BEGIN_SRC clojure
+```clojure
+(defui ^:once Foo
+  static om/IQuery
+  (query [this]
+    [:client/foo])
+  Object
+  (render [this]
+    (html [:div "in foo"])))
+
+(def foo-cmp (make-cmp Foo)) ;;instead of (def foo (om/factory Foo))
+```
+#+END_SRC
+
+#+begin_quote
+make-cmp:
+  Returns a fn[parent-cmp props-or-kw & computed-arg] that when called will
+  create a React element. Options can be map with :validator, :keyfn
+  and :instrument? keys. If props-or-kw is a keyword its value will be retrieved
+  from the parent-cmp props. Any reload-key from the parent-cmp will be added to
+  the computed props of this cmp. This will only happen in development.
+#+end_quote
+
+So call this foo function with the =this= of the parent component and the
+key you set the query of Foo to:
+#+BEGIN_SRC clojure
+```clojure
+(defui ^:once RootQbucketList
+  static om/IQuery
+  (query [this]
+    {:foo (om/get-query Foo)})
+ (render [this]
+   (let [{:keys [props computed state]} (om/data this)]
+     (foo-cmp this :foo (assoc computed :some-key some-value)))))
+```
+#+END_SRC
+
+It's first of all a bit more straightforward get a handle on the props, computed
+and state values. But also the proper value is passed on to foo-cmp, less error
+prone. Last benefit is that if you defined a :client/reload-key in your root
+component's query and you make sure that the value of that key is modified on
+every reload in dev mode (as a result of modifying source code) then the gui is
+updated as a whole (since the reload-key is passed on to child components in the
+computed value by aum).
 ** Garbage collection
 There is currently no garbage collecting implemented. As with any garbage
 collection the criteria for this are rather app and platform specific. But in
@@ -1246,7 +859,7 @@ takes the current locale as passed into components as a computed property and a
 key.
 ** Pre-merge hooks
 These hooks allow you to take action before _any_ value gets merged with
-app-state, including responses to read queries.
+frontend app-state, including responses to read queries.
 ** Merging pushed data
 Backend can use websockets for resolving queries from the frontend, but this
 means it's also possible to 'push' data. The frontend can  respond to this and
@@ -1259,7 +872,357 @@ Every mutation on a record adjust some metadata on the record that enables
 undo/redo/revert for that record. This also includes any data joined to that
 record, they will also get undone/redone/reverted.
 
+* Backend parser
+** Table aliases
+TODO-doc
+** Virtual tables
+TODO-doc
+** Have backend return calculated data
+
+There are three ways to do this:
+
+*** Calculate something over a (sub)query
+ Sometimes you want something to be calculated over a query and return not only
+ the rows themselves, but also the extra data, such as total count. This is
+ particularly tricky if you want to calculate something over a join. You want
+ the joined rows, but also some more data over that particular subset of rows
+ (joined as they are to the parent record).
+
+ To do this add a :with-meta param key to the params of the query. Set this to a
+ single keyword or map or a vector of them. If it's a map it should have at
+ least a key :type, but you can then add more params for the calculation if you
+ want.
+
+ You can then extend the calc-meta-data multimethod from
+ aum.parser.calc-meta-data in the backend which is dispatched on those
+ :with-meta keys, or the :type value if it's a map. The method is called after
+ the original sql query has been done. The sql-fn called, its args and
+ calc-params as passed fromt the frontend.
+
+ #+BEGIN_SRC clojure
+[{:group [({:user [:id :name]} {:with-meta [:count {:type :calc2 :some :params}]})]}]
+#+END_SRC
+
+#+BEGIN_SRC clojure
+(defmethod calc-meta-data :count
+  [env rows {:keys [sql-fn sql-fn-args return-empty-vector? join-type calculation-params]}]
+  ;;Do your calculation here
+   )
+#+END_SRC
+
+One thing to take note of is that the return value for this query will be now of
+the form:
+
+#+BEGIN_SRC clojure
+{:rows [[:id 1 :name "foo"]] :meta {:count 123}}
+#+END_SRC
+
+Which means you will have to take this into account when this data arrives at
+your component, and/or when you implement the read method for the join with the
+:with-meta param.
+
+*** Define a read key in the backend
+
+Such as:
+
+#+BEGIN_SRC clojure
+(defmethod aum/read :calc/count
+  [{:keys [user state parser query parser-config] :as env} _
+   {:keys [table where] :as params}]
+  ;;You can use the query to decide on what to calculate perhaps
+  (timbre/info query) ;;=> [:count]
+  {:value {:count (count-records env params)}})
+#+END_SRC
+
+Then add a query to a component:
+
+#+BEGIN_SRC clojure
+({:calc/count [:count]} {:table :user
+                         :where [:id :< 5]})
+#+END_SRC
+
+Disadvantage of this method is that you can only use this query as a root query
+or quasi root query. Also you have to possibly duplicate the params of this query in the
+frontend from another query. And this isn't useful for a joined query.
+
+*** Redirect a read to a custom-read
+Used search translations. Idea is to set a :custom-read key in the params of a
+query. Backend will use the read method as set to the :custom-read key and pass
+in the rest of params as well.
+
+Advantage of this is that you can redirect a query for a join to your own read
+method. Where you can then return a calculated value, any rows queried for
+and/or any other data you like.
+
+#+BEGIN_SRC clojure
+(defmethod aum/read :count-records
+  [{:keys [user state parser query parser-config] :as env} _
+   {:keys [table where] :as params}]
+  {:value (count-records env params)})
+#+END_SRC
+
+With this query:
+
+#+BEGIN_SRC clojure
+'({:user-count [:count]} {:custom-read :count-records
+                          :table :user
+                          :where [:id :< 5]})
+#+END_SRC
+
+* Testing
+** Backend testing
+TODO-doc:
+** Frontend testing
+*** Install
+    nvm install
+    nvm use
+    npm install
+    npm install -g karma-cli
+
+*** Test runner
+Standalone client-side om-next test-runner app to be used with the
+alternative test macros that add and remove tests to the lists of tests. Several
+ways to display diffs. Rerun test on click. Use snapshots for any test instead
+of writing the required result into the test. Helpers to click and compare html
+output for acceptance ui tests. Replay/rewind/step through (ui) tests by using
+pause macro.
+*** Snapshots
+There are facilities to create a test by putting it together step by step and
+instead inserting expected results take snapshots and use them instead. This is
+particularly handy for testing states of the ui. It's also then possible to step
+through the test in the test runner. If any intermediate snapshot fails the test
+but (because we updated the code for example) is what we do expect we can update
+the snapshot by clicking a button.
+** Run backend in frontend (for testing for example)
+It is possible to run the whole backend in the frontend where the mysql database
+is 'mocked' in the frontend. This is ideal for writing integration tests
+covering the whole stack
+
+TODO-doc: add examples and working starter branch
+NOTES:
+Browser in memory sql options:
+https://github.com/kripken/sql.js
+https://github.com/agershun/alasql/wiki/Getting%20started
+
+** Whole stack testing
+By combining test runner, snapshot testing and running backend in frontend it's
+possible to do whole stack testing.
+
+* Debugging
+** Dev-cards
+    Switch to dev cards page from app itself.
+First install nvm (node version manager).
+
+** Frontend om inspector
+Search, filter and drill into app and om state.
+** It's possible to set some flags in local storage to get some output in console etc:
+
+Set log level:
+
+    :timbre-level :info
+
+Click on AUM logo and some debug buttons will show up:
+
+    :debug-drawer true
+
+Show what query is sent and what is returned:
+
+    :send true
+
+Show item id in lists:
+
+    :display-item-id true
+
+Show debug buttons in page bar:
+
+    :debug-buttons true
+
+*** Trying queries
+In the dev source folder there are namespaces to try out various queries:
+**** try-om-query
+You can call the backend parser with any om-next query. These are resolved
+against the database as defined in app.config and using database.config as
+defined for the whole app.
+
+There is a second version where you can build your own parser environment and
+your own parser with that again.
+**** Try sql query
+To try out any sql query. Make sure to define process-params, validate-sql-fn
+and process-result methods, and the equivalent sql fun in build-sql if you want
+it to be used in mock mode or tests.
+**** Try/test frontend parser.
+Frontend parser is a cljc file so you can eval this in a clojure repl. You can
+test here what the parser returns for queries for the nil and various remote
+targets, which is much harder to test/inspect if you have to use the ui to pass
+queries to the parser.
+
+** In boot-scripts there's tail.boot to inspect logstash output:
+
+    boot boot-scripts/tail.boot -h
+
+Options:
+  -h, --help        Print this help info.
+  -f, --follow      follow
+  -s, --start VAL   VAL sets start (line number or time (hh:mm) such as "11:10").
+  -n, --length VAL  VAL sets number of lines or length of time such as "10h", "5m" "50s" If start is given then last so many lines or within last so much time.
+  -t, --http-log    print http output lines
+  -i, --timestamp   print timestamps
+  -r, --regex VAL   VAL sets regex to filter lines.
+  -l, --level VAL   VAL sets level to filter such as info or error.
+
+* How to
+** Add npm modules
+
+- Add to package.json
+- Import package in index.js, set a global to imports
+- Create index.bundle.js by running npx webpack
+- Create externs file or add externs to foreign-libs.externs.ext.js
+- Edit resources/revolt.edn (and/or main.cljs.edn for figwheel):
+- Add any new externs file to the externs keys
+- Add entries for the exported packages to foreign-libs under the
+- foreign-libs/index.bundle.js entry:
+- -> The global created in index.js should be added to the global-exports subkey
+  where the js global var name can be referred to by a clojure symbol ns
+- -> Add that symbol ns to to the provides key as a string.
+
+### Analyze size of webpack bundle
+
+    npx webpack --config webpack.prod.js --json > stats.json
+
+Upload stat.json to https://chrisbateman.github.io/webpack-visualizer/
+
+Or:
+
+    bin/analyze-webpackold-app-readme
+** Querying other sources than a mysql database
+*** Using more than one remote in the frontend
+In =pagora.aum.frontend.reconciler.start= this function is defined:
+#+BEGIN_SRC clojure
+```clojure
+(defn make-aum-remote [app-config]
+  (fn [query response-cb]
+    (let [chsk-send! (websocket/get-chsk-send!-fn app-config)]
+      (chsk-send! [:aum/query query] (:websocket-timeout app-config 8000)
+                  response-cb))))
+```
+#+END_SRC
+
+You can add remotes like this:
+#+BEGIN_SRC clojure
+```clojure
+{:my-remote (fn [app-config]
+              (fn [query response-cb]
+                ;;Call on the network with the query, call response-cb when response is received.
+                ))}
+```
+#+END_SRC
+
+Add this map to app config under the :remotes key.
+
+TODO-doc: add examples to starter app and document here
+*** Returning data fetched from another source asynchronously
+TODO-doc: add examples to starter app and document here
+If a backend query can't be resolved and returned synchronously it's possible to
+push the result to the frontend when it's available.
+** Optimize frontend
+*** pathopt
+  https://awkay.github.io/om-tutorial/#!/om_tutorial.I_Path_Optimization
+  Path Optimization
+As your UI grows you may see warnings in the Javascript Console about slowness.
+If you do, you can leverage path optimization to minimize the amount of work the
+parser has to do in order to update a sub-portion of the UI.
+
+If you pass :pathopt true to the reconciler, then when re-rendering a component
+that has an Ident Om will attempt to run the query starting from that component
+(using it's Ident as the root of the query). If your parser returns a result, it
+will use it. If your parser returns nil then it will focus the root query to
+that component and run it from root.
+
+When it attempts this kind of read it will call your read function with
+:query-root set to the ident of the component that is needing re-render, and you
+will need to follow the query down from there. Fortunately, db->tree still works
+for the default database format with a little care.
+
+So om-next calls the parser, but the query will be a (focussed on the cmp) query
+against the root of app-data. If you set pathopt to true and a cmp has an ident
+and a query it will call the parser with the :query-root key of env to the
+ident, and query to the query of the cmp, so the parser can work a bit faster.
+Which I do in my parser read* fn
+
+** Start app with different ports and db:
+DB_NAME=my_db SERVER_PORT=9080 NREPL_PORT=38401 bin/dev-backend
+** throw catch exceptions
+#+BEGIN_SRC clojure
+```clojure
+(try (throw (ex-info "ex-info msg string" {:type :my-exception :bla :foo}))
+    (catch #?(:clj Throwable :cljs :default) e
+    (let [msg (.getMessage e)
+            data (ex-data e)]
+        (info "Msg:" msg)
+        (info "Data:" data))))
+```
+#+END_SRC
+
+* Good to know
+** Function and method signatures
+*** read and mutate: [env key params] TODO-doc: update for aum
+     So, the read function you write:
+
+     Will receive three arguments:
+     An environment containing:
+     :parser:   The query parser
+     :state:    The application state (atom)
+     :query:    if the query had one E.g. {:people [:user/name]} has :query [:user/name]
+     A key whose form may vary based on the grammar form used (e.g. :user/name).
+     Parameters (which are nil if not supplied in the query)
+     Must return a value that has the shape implied by the grammar element being read.
+
+     The signature of a read function is:
+
+     (read [env dispatch-key params])
+
+     where the env contains the state of your application, a reference to your parser (so you can call it recursively, if you wish), a query root marker, an AST node describing the exact details of the element's meaning, a path, and anything else you want to put in there if you call the parser recursively.
+
+     The parse will create the output map.
+     (keys env) in mutation=>
+     (:query-root :path :pathopt :reconciler :ast :state :component :parser :logger :shared :target)
+     (keys env) in read =>
+     (:query-root :path :pathopt :ast :state :parser :logger :shared :target :query)
+** Syncing of front and backend
+All records have as their meta data something like this:
+#+BEGIN_SRC clojure
+  {:record {:id 1 :type :foo :name "bar"} ;;record as it came from the servr
+   :uuids [] ;;history keeping
+   :prev-uuid nil}
+#+END_SRC
+The meta record map is nil unless something has been modified in the record
+itself. The various uuid keys are used for undo/redo functionality. They are
+references to a particular state in the history of states for the app as kept by
+om-next.
+
+Reverting a record is as easy as replacing with its meta record. Calculating
+what has changed to a record for purposes of sending modification to the backend
+is doing a diff. And to decide whether its 'dirty' aum in essence just
+does a comparison.
+
+It's possible for example to reset just the one prop of a record as a result of
+clicking a 'reset' button in the component for that field. The original value
+can always be fetched from the meta record.
 * Modules
+** Validation of form values
+When doing a save of a record on a particular page aum looks in the app
+config for that page a validation function for every prop of the record. If any
+prop is not 'valid' it's added to the client/invalidated-fields map of the state
+for that page (under the table key for that record). This can be queried for in
+the relevant component and used to set any ui flags and/or messages for that
+field.
+
+TODO:
+Currently this happens when a record gets saved, but it's possible to add a
+mutation that does this on demand, for instance on onBlur..
+** Use pages to organize your ui
+TODO-aum:-
+There are some basic fns for this. See app.pages for how to add a page.
 ** invalidation
 On save of eg a dossier type:
 (bu/get-key-in-page-state @state :dossier-type :validate)
@@ -1309,12 +1272,10 @@ takes the current locale and a key.
 *** smarter translations
 - use params in translation keys, so interpolation
 - load translations zipped!!!???!!!!
-** Testrunner
 ** Files download and upload
 ** Event store
 Also see script in modules/events/experimental
 ** Calc active users
-** Data inspector
 ** Icons
 Icon classes like icon-cached, icon-undo, icon-redo etc are  defined in
 mui-icons.css

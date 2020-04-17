@@ -127,6 +127,9 @@
    :enable-cors true
 
    :vorlon-script false       ;whether to add vorlon.js script tag to app.html
+   :websocket-timeout 8000
+   :default-remote :aum
+   :remotes nil
    })
 
 (defn get-env-var-or-v [k v]

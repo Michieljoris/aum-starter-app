@@ -37,6 +37,14 @@ https://stackoverflow.com/questions/1810356/how-to-implement-tag-system
 ** steal from repos, mainly untangled
     http://untangled-web.github.io/untangled/reference/reference.html#_overall_network_plumbing
 
+** implement state in url.
+Also see branch deep-links
+ And history etc, back/forward button.
+ https://github.com/juxt/bidi
+ https://github.com/venantius/accountant
+ https://github.com/kibu-australia/pushy
+ https://lispcast.com/mastering-client-side-routing-with-secretary-and-goog-history/
+
 * Issues and Bugs
 ** Aum
 *** image upload resize in browser
@@ -78,13 +86,6 @@ https://stackoverflow.com/questions/1810356/how-to-implement-tag-system
 
 
 *** user management for billing purposes
-*** implement state in url.
- And history etc, back/forward button.
- https://github.com/juxt/bidi
- https://github.com/venantius/accountant
- https://github.com/kibu-australia/pushy
- https://lispcast.com/mastering-client-side-routing-with-secretary-and-goog-history/
-
 
 *** Feedback/bug report form a la chrome
  So with screenshot, text, url, file upload, system info
