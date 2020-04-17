@@ -12,6 +12,28 @@
 ** Put libs-src in github repos
 
 * New features
+** tagging
+Why not tag table, with ids in the 'tags' column?
+And adjust parser somewhat to retrieve not just belongs-to-one, but belongs-to-many?
+Or use many-to-many, so join table. But search will be a pain, unless we
+normalize tags into tags column in elasticsearch or something?
+Or just inline tags. Problem is renaming a tag then, also adding description etc
+to tag becomes hard..
+
+All tags for an item
+All items for: one tag, t1 AND t2, t1 OR t2, t1 AND not t2
+Tag cloud: how many items per tag
+Change tag? Possibly add and change meta data of tag?
+
+A tag (text) field on question
+Plus tags table: [tag, question-id]
+http://howto.philippkeller.com/2005/04/24/Tags-Database-schemas/
+http://howto.philippkeller.com/2005/05/05/Tags-with-MySQL-fulltext/
+http://howto.philippkeller.com/2005/06/19/Tagsystems-performance-tests/
+
+https://stackoverflow.com/questions/20856/recommended-sql-database-design-for-tags-or-tagging
+https://stackoverflow.com/questions/2885564/ways-to-implement-tags-pros-and-cons-of-each
+https://stackoverflow.com/questions/1810356/how-to-implement-tag-system
 ** steal from repos, mainly untangled
     http://untangled-web.github.io/untangled/reference/reference.html#_overall_network_plumbing
 
@@ -1704,3 +1726,46 @@ http://marianoguerra.org/posts/omnext-end-to-end-part-ii-frontend.html
 https://speakerdeck.com/anmonteiro
 
 
+
+* Deciding on selected group
+The app can be in a state where a group is 'selected'. In this state certain
+pages (like users, translations) will manage records only from/for the selected
+group. Some pages are immuun ie, they behave the same regardless of selected
+group, like groups page itself, or job offers, or support questions. Other pages
+only can only edit records of a particular group, like dossier types, pdf
+options.
+
+By default a selected group is the current user's group. But it can also be
+set/derived from local/session storage (or from any state in the url
+(unimplemented as of 7/18)). The app can be in a state of 'all groups' by
+setting selected group-id to -1 or nil.
+
+Complication is that on refresh, while we're logged in, we don't know what the
+current user's group is since we don't have that info yet. One
+massive query goes to the backend asking for the current user's data, and any other
+data required for the current page. Solution for this is not to ask for any
+specific group-id number, but for a property on the current user, so for
+u/group-id in this case.
+
+The backend resolves what user is actually making the massive initial query
+before parsing the actual query itself. (This enables role based access, scoping
+etc) The user is passed into the query parser, and any params that are
+namespaced keywords are resolved against the user's map first.
+
+We need to weave this variable group-id into the queries that go to the backend.
+We're not using om-next dynamic queries at all, but instead give parameters to
+query keys that are picked by the cljs query parser. These parameters are like
+{:params :selected-group} for instance. The parser goes and looks for the
+:selected-group entry in the :params value of the config for the current page.
+This can be a map, in which case this is used as the params map for the key in
+the query, or a fn. This fn is called with app-state and the result is used as
+the params for query key.
+
+All this is not very standardized actually, and there's parallel mechanisms
+currently. We have one for batch queries: :batch-params and one for single
+record queries: :params. Under a table entry for a page-config we have similar
+entries for deciding on what remote keys to send (:selected-remote-keys and :batch-remote-keys).
+
+In any case, initial group-id is set in reconciler.app-state, per page, where
+it's usually set to whatever is :selected-group in storage, or if that's
+desirable, u/group-id, meaning the user's group-id.

@@ -1,9 +1,8 @@
 (ns app.database.table.user
-  #?(:cljs (:require-macros [aum.database.validate.Rule :refer [rule]]))
+  #?(:cljs (:require-macros [pagora.aum.database.validate.Rule :refer [rule]]))
   (:require [pagora.aum.database.validate.core :as bv :refer [Rules]]
             [pagora.aum.database.validate.rules :as rule :refer [require-keys]]
             #?(:clj [pagora.aum.database.validate.Rule :refer [rule]])
-            [app.database.util :refer [not-deleted-scope]]
             [pagora.aum.database.query :refer [sql]]
             [taoensso.timbre :as timbre]
             ))
