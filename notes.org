@@ -1,3 +1,4 @@
+OBSOLETE, moved to sparkleshare aum-docs repo
 #+TITLE: notes-aum
 
 * Minimal aum functionality
@@ -11,7 +12,68 @@
 *** Load revolt.edn from base dir of repo
 ** Put libs-src in github repos
 
+
+* Aum Migrate over:
+-- icons
+-- Get template editor working?
+->>> data entry design!!!
+-- testrunner
+-- Download
+-- event store
+-- data inspector
+-- calc active users
+-- paging and routing
+-- aum tests
+-- import branches:
+-old-aum master branch!!!!! look at commits
+-admin-misc-fixes
+-user-on-off-switch ??
+-calc-active-users-implementation (includes event-store and export-active-accounts)
+
+
 * New features
+** syncing, push changed server data
+
+Keep track of all current queries of connected clients
+When a mutation happens, run all queries over result of mutation.
+The result is just a partial db, but only the modified bits, so that should work.
+Notify all clients that have a query that gives a result over the mutated data.
+Send them that query result to merge with their data.
+Their current query is kind of their subscription to data.
+
+Decoupling of read and write would be cool.
+Let all reads just happen, but a mutation can get stored in a mutation
+queue/db/table.
+Since reads are many, mutations few, you could build delay the mutations. Then
+pause the query processing, take the current batch of mutations, keep queuing
+any further mutations, lock database, process the mutations one by one, in the order they came
+in, bundle up the results, run every current query over it, broadcast result to
+their connected client., then go back to processing queries,
+
+Something like that?
+
+Problem is async and latency in updating and querying.
+
+Also is latency problem
+This is a writing problem
+Server needs to be single threaded for write operations, to make writes
+sequential.
+Every entity on the client is stored with a sequential index
+When writing an attribute of the entity increase the seq.
+Client sends entity id, seq and one or more attributes to save.
+Server only updates attr when seq is same.
+
+Also, how does http-kit work? Single threaded? Do all requests get processed one
+by one, or in parallel at all?
+
+https://hashrocket.com/blog/posts/websocket-shootout The Clojure server is built
+on the HTTP Kit web server. The interesting parts are in server.clj.
+
+When a client connects they are stored in an atom of channels. This gives us
+concurrency safety, which is important since Clojure will handle requests in
+parallel.
+
+** iftt
 ** tagging
 Why not tag table, with ids in the 'tags' column?
 And adjust parser somewhat to retrieve not just belongs-to-one, but belongs-to-many?
@@ -613,64 +675,6 @@ You can write these actions/jobs in clojure . Like (set-location-from ip record)
 ** Calc active users
 ** Data inspector
 
-* Aum Migrate over:
--- icons
--- Get template editor working?
-->>> data entry design!!!
--- testrunner
--- Download
--- event store
--- data inspector
--- calc active users
--- paging and routing
--- aum tests
--- import branches:
--old-aum master branch!!!!! look at commits
--admin-misc-fixes
--user-on-off-switch ??
--calc-active-users-implementation (includes event-store and export-active-accounts)
-
-
-* syncing, push changed server data
-
-Keep track of all current queries of connected clients
-When a mutation happens, run all queries over result of mutation.
-The result is just a partial db, but only the modified bits, so that should work.
-Notify all clients that have a query that gives a result over the mutated data.
-Send them that query result to merge with their data.
-Their current query is kind of their subscription to data.
-
-Decoupling of read and write would be cool.
-Let all reads just happen, but a mutation can get stored in a mutation
-queue/db/table.
-Since reads are many, mutations few, you could build delay the mutations. Then
-pause the query processing, take the current batch of mutations, keep queuing
-any further mutations, lock database, process the mutations one by one, in the order they came
-in, bundle up the results, run every current query over it, broadcast result to
-their connected client., then go back to processing queries,
-
-Something like that?
-
-Problem is async and latency in updating and querying.
-
-Also is latency problem
-This is a writing problem
-Server needs to be single threaded for write operations, to make writes
-sequential.
-Every entity on the client is stored with a sequential index
-When writing an attribute of the entity increase the seq.
-Client sends entity id, seq and one or more attributes to save.
-Server only updates attr when seq is same.
-
-Also, how does http-kit work? Single threaded? Do all requests get processed one
-by one, or in parallel at all?
-
-https://hashrocket.com/blog/posts/websocket-shootout The Clojure server is built
-on the HTTP Kit web server. The interesting parts are in server.clj.
-
-When a client connects they are stored in an atom of channels. This gives us
-concurrency safety, which is important since Clojure will handle requests in
-parallel.
 
 
 * Scaling!!
@@ -1453,7 +1457,7 @@ Cool, it’s clear for me. Thank you!
 ** how to
 *** record screen
 simplescreenrecorder
-***  use react refs
+*** use react refs
 https://medium.com/@roman01la/om-next-for-react-devs-application-state-53af3ec7c42a#.6bgkqbwmg
 *** throw catch exceptions
     https://stackoverflow.com/questions/3835331/custom-exceptions-in-clojure
@@ -1475,7 +1479,8 @@ For production builds set closure-defines goog.DEBUG false
 *** server side rendering  0
     https://crossclj.info/ns/com.ladderlife/cellophane/0.3.4/project.clj.html
 *** remotes
-    For each remote that you list in the reconciler (default is just :remote), the parser will run with :target set in the env to that remote.
+For each remote that you list in the reconciler (default is just :remote), the parser will run with :target set in the env to that remote.
+
    Http-caching
 You declare remotes:
 #+BEGIN_SRC clojure

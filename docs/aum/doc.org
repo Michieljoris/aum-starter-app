@@ -1,3 +1,4 @@
+OBSOLETE, moved to sparkleshare aum-docs repo
 #+TITLE: #+OPTIONS: toc:4
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="stylesheet.css" />
 
@@ -37,11 +38,12 @@
 To pull in all the tools and libs to build an aum app add
 
  #+BEGIN_SRC clojure
-`````clojure
+<div class="center-column"></div>
+```clojure
 aum {:git/url "https://github.com/michieljoris/aum.git",
      :sha "577daf362c3f81e08d43f654ef0bbf3ddc93e015"
      :tag "master"},
-````
+```
 #+END_SRC
 
 to your dependencies.

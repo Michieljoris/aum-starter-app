@@ -1,121 +1,121 @@
 
 # Table of Contents
 
-1.  [Getting started](#orga1e590a)
-    1.  [Useful docs to read first](#orgbd8b51c)
-        1.  [React](#org4ef27e6)
-        2.  [Om-next](#org19636a5)
-        3.  [Fulcro handbook](#org0f9be43)
-        4.  [See om-next docs for more useful links](#org4fe3b4f)
-    2.  [Install](#org94c4356)
-    3.  [Starter app](#org9f75741)
-        1.  [Install](#orgb25b220)
-        2.  [Run in development mode](#org46f086a)
-        3.  [Run in production mode](#org26ca3f6)
-2.  [Core concepts](#org4f481bc)
-    1.  [It&rsquo;s om-next.](#orgd8a8149)
-    2.  [It&rsquo;s a loop](#orgff4a0ba)
-    3.  [It&rsquo;s just a sql query](#org3c1bdeb)
-    4.  [Communication between front and backend is through websockets](#org5c1e553)
-    5.  [We pretend we have all data already in the frontend](#org9a337b4)
-    6.  [Mutating queries, so transactions mostly work the same as in om-next](#org87e8d89)
-    7.  [Backend state management is handled by integrant.](#org11b1d19)
-3.  [Build system](#orge698fcc)
-4.  [App starting process](#orgedc5958)
-    1.  [dev](#org28b3998)
-        1.  [Backend](#org8456364)
-        2.  [Frontend](#orgdfb9b98)
-    2.  [prod](#org54a02e0)
-        1.  [Backend](#orga58b08b)
-        2.  [Frontend](#org09d75a0)
-5.  [Environment](#orgc8ce92a)
-6.  [Config](#orge054027)
-7.  [Websockets](#org996acea)
-8.  [Database](#org622856b)
-    1.  [(sql) validation](#orgd823420)
-    2.  [sql process-params, process-result](#orge6e27b7)
-    3.  [Write validation](#org846eb33)
-    4.  [Sql validation](#orgd802bf1)
-    5.  [Sql process-params, process-result](#org52629ca)
-9.  [Frontend matters](#org7a621e8)
-    1.  [Generic recursive read with hooks](#org9a8cfeb)
-        1.  [Intro](#org21b376e)
-        2.  [Adding hooks for keys and joins in the root query for returning values and building remote query](#org37a3fa1)
-    2.  [Client only keys](#org5fd188c)
-    3.  [make-cmp and om-data](#orge0bef36)
-    4.  [Garbage collection](#orge7d5b9f)
-    5.  [Internationalization](#org6e3ff8d)
-    6.  [Pre-merge hooks](#org8e39709)
-    7.  [Merging pushed data](#orgba68ddf)
-    8.  [Generic undo/redo/revert.](#org6630f81)
-10. [Backend parser](#orge6ceab0)
-    1.  [Table aliases](#org99c69f0)
-    2.  [Virtual tables](#org22279c0)
-    3.  [Have backend return calculated data](#orgb24b400)
-        1.  [Calculate something over a (sub)query](#org28e7033)
-        2.  [Define a read key in the backend](#orgcf4d9f4)
-        3.  [Redirect a read to a custom-read](#org1b2c53a)
-11. [Testing](#org035eb12)
-    1.  [Backend testing](#orgc33fea3)
-    2.  [Frontend testing](#org570cee0)
-        1.  [Install](#org7f60b6c)
-        2.  [Test runner](#org5d9d9e8)
-        3.  [Snapshots](#orge8f7f7e)
-    3.  [Run backend in frontend (for testing for example)](#org19b4e76)
-    4.  [Whole stack testing](#org67c92ff)
-12. [Debugging](#org31a1f9b)
-    1.  [Dev-cards](#org9a9f6ce)
-    2.  [Frontend om inspector](#org0c33a66)
-    3.  [It&rsquo;s possible to set some flags in local storage to get some output in console etc:](#org0311a87)
-        1.  [Trying queries](#orgba793a1)
-    4.  [In boot-scripts there&rsquo;s tail.boot to inspect logstash output:](#org848ff6a)
-13. [How to](#org7b42686)
-    1.  [Add npm modules](#org443a558)
-    2.  [Querying other sources than a mysql database](#org2e6473c)
-        1.  [Using more than one remote in the frontend](#orgf983c80)
-        2.  [Returning data fetched from another source asynchronously](#org8bed30a)
-    3.  [Optimize frontend](#orgde4a83f)
-        1.  [pathopt](#orgc33b1dc)
-    4.  [Start app with different ports and db:](#orgc4b2ee3)
-    5.  [throw catch exceptions](#orgd777c4d)
-14. [Good to know](#org7038fd4)
-    1.  [Function and method signatures](#org307b698)
-        1.  [read and mutate: [env key params] TODO-doc: update for aum](#org71e20f5)
-    2.  [Syncing of front and backend](#orge7c215b)
-15. [Modules](#orgd57b6f8)
-    1.  [Validation of form values](#orgc61e3a5)
-    2.  [Use pages to organize your ui](#orgeb13bad)
-    3.  [invalidation](#org876fa99)
-    4.  [Generic save records](#org1d72507)
-    5.  [Database migration](#orge696e44)
-    6.  [Integrations](#orgeb08a74)
-    7.  [Paging](#orge265a4c)
-    8.  [Routing](#org2717ea5)
-    9.  [Internationalization](#orgcf57f82)
-        1.  [There is a common.i18n.cljc namespace which provides the translate fn which](#orgbc1e143)
-        2.  [smarter translations](#org870f004)
-    10. [Files download and upload](#org594d022)
-    11. [Event store](#orgdb3795b)
-    12. [Calc active users](#org112d053)
-    13. [Icons](#orgf1ff652)
-    14. [Security](#org895e359)
-        1.  [login/logout](#org3e9915b)
-        2.  [bugsnag, authorization, login, logout etc](#org93d6c8e)
-        3.  [Process-user and calc-role snippets](#org9f212b2)
+1.  [Getting started](#org1f0f52d)
+    1.  [Useful docs to read first](#org2fa6ee6)
+        1.  [React](#orgadda168)
+        2.  [Om-next](#orgf6221f0)
+        3.  [Fulcro handbook](#org5fd3a30)
+        4.  [See om-next docs for more useful links](#org533d643)
+    2.  [Install](#org708e56a)
+    3.  [Starter app](#orgdcce52a)
+        1.  [Install](#org09ac522)
+        2.  [Run in development mode](#orga4dddb6)
+        3.  [Run in production mode](#orge7d9048)
+2.  [Core concepts](#orgfe9a098)
+    1.  [It&rsquo;s om-next.](#orgf5097cf)
+    2.  [It&rsquo;s a loop](#org91ec03c)
+    3.  [It&rsquo;s just a sql query](#org49ed247)
+    4.  [Communication between front and backend is through websockets](#org32180a5)
+    5.  [We pretend we have all data already in the frontend](#org17fc873)
+    6.  [Mutating queries, so transactions mostly work the same as in om-next](#org4dfaeaf)
+    7.  [Backend state management is handled by integrant.](#org453df14)
+3.  [Build system](#org9319d15)
+4.  [App starting process](#org62fa1ab)
+    1.  [dev](#org25a82ba)
+        1.  [Backend](#orgf60048c)
+        2.  [Frontend](#orga80ad6f)
+    2.  [prod](#orgd0c838d)
+        1.  [Backend](#org7106ed1)
+        2.  [Frontend](#orgd2f01f6)
+5.  [Environment](#org02947ac)
+6.  [Config](#org7eb551b)
+7.  [Websockets](#orgb9307fe)
+8.  [Database](#org9a35ebd)
+    1.  [(sql) validation](#orged2e7c4)
+    2.  [sql process-params, process-result](#orga76926a)
+    3.  [Write validation](#orgc2a7706)
+    4.  [Sql validation](#org015fa3f)
+    5.  [Sql process-params, process-result](#org268fa06)
+9.  [Frontend matters](#orgfd4d6e0)
+    1.  [Generic recursive read with hooks](#orgc23d96b)
+        1.  [Intro](#org5db25a7)
+        2.  [Adding hooks for keys and joins in the root query for returning values and building remote query](#orgd110c48)
+    2.  [Client only keys](#org407b039)
+    3.  [make-cmp and om-data](#orgb5d1611)
+    4.  [Garbage collection](#org9472fa0)
+    5.  [Internationalization](#orgd1965ed)
+    6.  [Pre-merge hooks](#orga133902)
+    7.  [Merging pushed data](#orgb886835)
+    8.  [Generic undo/redo/revert.](#orgf1d5bac)
+10. [Backend parser](#orgc13b88e)
+    1.  [Table aliases](#orgc30910c)
+    2.  [Virtual tables](#org043f90c)
+    3.  [Have backend return calculated data](#org38a0369)
+        1.  [Calculate something over a (sub)query](#org9c01444)
+        2.  [Define a read key in the backend](#orgcc756c5)
+        3.  [Redirect a read to a custom-read](#org4b20fa4)
+11. [Testing](#org61d2c55)
+    1.  [Backend testing](#org7acbaec)
+    2.  [Frontend testing](#orgb78f0a5)
+        1.  [Install](#org5deb589)
+        2.  [Test runner](#org92c6822)
+        3.  [Snapshots](#org73a4eef)
+    3.  [Run backend in frontend (for testing for example)](#orgef3316e)
+    4.  [Whole stack testing](#org04f6bb6)
+12. [Debugging](#org6313c2c)
+    1.  [Dev-cards](#org2ae15c4)
+    2.  [Frontend om inspector](#org0456b7d)
+    3.  [It&rsquo;s possible to set some flags in local storage to get some output in console etc:](#orgf4364a5)
+        1.  [Trying queries](#org2ceb406)
+    4.  [In boot-scripts there&rsquo;s tail.boot to inspect logstash output:](#org8be04f8)
+13. [How to](#org8b859e9)
+    1.  [Add npm modules](#org1a9f653)
+    2.  [Querying other sources than a mysql database](#org26ce28f)
+        1.  [Using more than one remote in the frontend](#orgff77073)
+        2.  [Returning data fetched from another source asynchronously](#orgaf5cb11)
+    3.  [Optimize frontend](#org9d25606)
+        1.  [pathopt](#org51eb643)
+    4.  [Start app with different ports and db:](#org2dac1e5)
+    5.  [throw catch exceptions](#org51b3ba4)
+14. [Good to know](#orgcda28d4)
+    1.  [Function and method signatures](#org504d54b)
+        1.  [read and mutate: [env key params] TODO-doc: update for aum](#orgc10c223)
+    2.  [Syncing of front and backend](#orgdaa4947)
+15. [Modules](#orgb0485c3)
+    1.  [Validation of form values](#orgd4f13b1)
+    2.  [Use pages to organize your ui](#orgeee8992)
+    3.  [invalidation](#org598e25c)
+    4.  [Generic save records](#org5744549)
+    5.  [Database migration](#orga11ed9a)
+    6.  [Integrations](#org3e8b7eb)
+    7.  [Paging](#org0a3bb49)
+    8.  [Routing](#orgac3d7d7)
+    9.  [Internationalization](#orge920e05)
+        1.  [There is a common.i18n.cljc namespace which provides the translate fn which](#org00c3941)
+        2.  [smarter translations](#orgbf118ab)
+    10. [Files download and upload](#org05b5e46)
+    11. [Event store](#org50cec08)
+    12. [Calc active users](#org6317f39)
+    13. [Icons](#org83cfc57)
+    14. [Security](#org23a8ac6)
+        1.  [login/logout](#org98459fc)
+        2.  [bugsnag, authorization, login, logout etc](#org72528e8)
+        3.  [Process-user and calc-role snippets](#orgc995b14)
 
 
 
-<a id="orga1e590a"></a>
+<a id="org1f0f52d"></a>
 
 # Getting started
 
 
-<a id="orgbd8b51c"></a>
+<a id="org2fa6ee6"></a>
 
 ## Useful docs to read first
 
 
-<a id="org4ef27e6"></a>
+<a id="orgadda168"></a>
 
 ### React
 
@@ -137,14 +137,14 @@ ask React to re-render a component if it decides that the props that are passed
 to it haven&rsquo;t changed from the last time it was rendered.
 
 
-<a id="org19636a5"></a>
+<a id="orgf6221f0"></a>
 
 ### Om-next
 
 [https://github.com/omcljs/om/wiki/Documentation-(om.next)](https://github.com/omcljs/om/wiki/Documentation-(om.next))
 
 
-<a id="org0f9be43"></a>
+<a id="org5fd3a30"></a>
 
 ### Fulcro handbook
 
@@ -154,7 +154,7 @@ om-next are a bit different, and in some ways diverge somewhat from the &rsquo;o
 way&rsquo; of doing things.
 
 
-<a id="org4fe3b4f"></a>
+<a id="org533d643"></a>
 
 ### See om-next docs for more useful links
 
@@ -164,14 +164,13 @@ Such as for graphql, falcor, datomic etc.
 graphql and falcor in a less cumbersome and more flexible manner.&rdquo;
 
 
-<a id="org94c4356"></a>
+<a id="org708e56a"></a>
 
 ## Install
 
 To pull in all the tools and libs to build an aum app add
 
 <div class="center-column"></div>
-
 ```clojure
     aum {:git/url "https://github.com/michieljoris/aum.git",
          :sha "577daf362c3f81e08d43f654ef0bbf3ddc93e015"
@@ -184,7 +183,7 @@ To actually build an app it&rsquo;s a good idea to start with a minimal setup, s
 following section.
 
 
-<a id="org9f75741"></a>
+<a id="orgdcce52a"></a>
 
 ## Starter app
 
@@ -196,7 +195,7 @@ be used to try out building features/pages.
 Clone it and follow the following instructions.
 
 
-<a id="orgb25b220"></a>
+<a id="org09ac522"></a>
 
 ### Install
 
@@ -232,7 +231,7 @@ TODO-aum: get this working properly!!!
     want deps from github replace local-deps with git-deps in the bin/dev-backend script
 
 
-<a id="org46f086a"></a>
+<a id="orga4dddb6"></a>
 
 ### Run in development mode
 
@@ -284,7 +283,7 @@ need to be built again. Or try modify a scss file and a cljs file to
 kickstart recompile.
 
 
-<a id="org26ca3f6"></a>
+<a id="orge7d9048"></a>
 
 ### Run in production mode
 
@@ -321,12 +320,12 @@ See app at <http://localhost:8090>
 Entry point of backend in production is at app.core (the -main fn).
 
 
-<a id="org4f481bc"></a>
+<a id="orgfe9a098"></a>
 
 # Core concepts
 
 
-<a id="orgd8a8149"></a>
+<a id="orgf5097cf"></a>
 
 ## It&rsquo;s om-next.
 
@@ -351,7 +350,7 @@ Aum has its own thin layers over the reconciler and parser but still uses defui,
 om/transact! etc
 
 
-<a id="orgff4a0ba"></a>
+<a id="org91ec03c"></a>
 
 ## It&rsquo;s a loop
 
@@ -384,7 +383,7 @@ This is a very broad outline with many details, optimizations and nuances left o
 is the basic concept to hold in mind when designing and debugging a gui.
 
 
-<a id="org3c1bdeb"></a>
+<a id="org49ed247"></a>
 
 ## It&rsquo;s just a sql query
 
@@ -400,7 +399,7 @@ table used needs to be defined and passed to aum before a query will return any
 data. Access is role based.
 
 
-<a id="org5c1e553"></a>
+<a id="org32180a5"></a>
 
 ## Communication between front and backend is through websockets
 
@@ -412,7 +411,7 @@ for notifications, or even to update frontend in response to backend database
 updates by other clients.
 
 
-<a id="org9a337b4"></a>
+<a id="org17fc873"></a>
 
 ## We pretend we have all data already in the frontend
 
@@ -430,8 +429,7 @@ key :app/page in app state.
 We write multimethods that dispatch on target (value or a remote) and keyword.
 For instance:
 
-<div class="center-column"></div>
-```clojure
+    ```clojure
     (doseq [page [:page/some-page :page/some-other-page]]
       (aum/derive-om-query-key! page :page/*))
     
@@ -447,7 +445,7 @@ For instance:
       [{:keys [state default-remote context-data query ast] :as env} page params]
       (let [current-page (:app/page @state)]
         (= current-page page)))
-```
+    ```
 
 In standard om-next you write read methods to resolve the root keys or the root
 query. In aum you write methods that allow custom resolving of keys *anywhere*
@@ -459,12 +457,11 @@ db->tree fn actually behaves the same way as the standard om-next db->tree fn.
 
 The actual read function passed to the om parser basically does this:
 
-<div class="center-column"></div>
-```clojure
+    ```clojure
     (db->tree env {:query root-component-query
                    :data  app-state
                    :refs  app-state})
-```
+    ```
 
 In practice this allows us to have total control over what we return as data to
 the gui component tree and what queries we send to our remotes for any key
@@ -476,36 +473,33 @@ keys in our root key we can wrap our query expressions with parameters (when we
 define them in components).
 
 
-<a id="org87e8d89"></a>
+<a id="org4dfaeaf"></a>
 
 ## Mutating queries, so transactions mostly work the same as in om-next
 
 You either mutate frontend app-state:
 
-<div class="center-column"></div>
-```clojure
+    ```clojure
     (defmethod mutate 'admin/set-key
       [{:keys [state] :as env} _ {:keys [key value]}]
       {:action (fn []
                  (swap! state assoc key value))})
     
-```
+    ```
 
 So just return a map with an action. In that action fn you have access to the
 app state as an atom.
 
 And/or you set a key that&rsquo;s a defined remote in the returned map to true:
 
-<div class="center-column"></div>
-
-```clojure
+    ```clojure
     (defmethod mutate 'app/test
       [{:keys [state]} _ {:keys [p1 p2] :as params}]
       {:my-remote true
        :post-remote {:param-keys [p1 p2]
                      :params {:p3 123}}
        :action (fn [] '...)})
-```
+    ```
 
 You&rsquo;ll have to handle this mutation in the backend.
 
@@ -515,8 +509,7 @@ you can define a same name post-remote method. This is called with the value as
 returned from the backend. Here you can do error handling for instance or &rsquo;clean
 up&rsquo; the response *before* it get merged with app state.
 
-<div class="center-column"></div>
-```clojure
+    ```clojure
     (defmethod post-remote 'app/test
       [_ state
        {:keys [error keys]
@@ -524,7 +517,7 @@ up&rsquo; the response *before* it get merged with app state.
         :as value}]
       ;;Do something!!
       )
-```
+    ```
 
 The :post-remote key in the mutation is a mechanism to pass data to the post
 remote method from the mutation. TODO-aum: there might be a better mechanism for
@@ -532,7 +525,7 @@ this. At the moment this involves the backend, but it is purely a frontend
 concern.
 
 
-<a id="org11b1d19"></a>
+<a id="org453df14"></a>
 
 ## Backend state management is handled by integrant.
 
@@ -541,7 +534,7 @@ TODO-aum: add a way so an app can add it&rsquo;s own state-full components.
 TODO-aum: add a hook for when app is done initializing
 
 
-<a id="orge698fcc"></a>
+<a id="org9319d15"></a>
 
 # Build system
 
@@ -567,17 +560,17 @@ repo. Trickiest might be to create an extern file, however there&rsquo;s tools t
 automate that (TODO-doc links?). See later section for more details.
 
 
-<a id="orgedc5958"></a>
+<a id="org62fa1ab"></a>
 
 # App starting process
 
 
-<a id="org28b3998"></a>
+<a id="org25a82ba"></a>
 
 ## dev
 
 
-<a id="org8456364"></a>
+<a id="orgf60048c"></a>
 
 ### Backend
 
@@ -589,7 +582,7 @@ with it and then calls (dev/go) on it. This kicks of all the init-key fns in the
 various namespaces (db, server etc).
 
 
-<a id="orgdfb9b98"></a>
+<a id="orga80ad6f"></a>
 
 ### Frontend
 
@@ -602,12 +595,12 @@ component and the initial app state. The returned aum config is then passed to
 pagora.aum.frontend.core/go fn.
 
 
-<a id="org54a02e0"></a>
+<a id="orgd0c838d"></a>
 
 ## prod
 
 
-<a id="orga58b08b"></a>
+<a id="org7106ed1"></a>
 
 ### Backend
 
@@ -616,7 +609,7 @@ configuration for that task specifies the app.core namespace as the main
 namespace.
 
 
-<a id="org09d75a0"></a>
+<a id="orgd2f01f6"></a>
 
 ### Frontend
 
@@ -627,7 +620,7 @@ dev mode. See the bin/prod-run script for an example how to actually run the
 production jar.
 
 
-<a id="orgc8ce92a"></a>
+<a id="org02947ac"></a>
 
 # Environment
 
@@ -637,14 +630,13 @@ like is-development? from that namespace. The default environment is :dev. Start
 the app with CLJ<sub>ENV</sub>=[production|staging|testing|dev] to change the environment.
 
 
-<a id="orge054027"></a>
+<a id="org7eb551b"></a>
 
 # Config
 
 Config is defined in multimethods like this, for instance in app.config:
 
-<div class="center-column"></div>
-```clojure
+    ```clojure
     (ns app.config)
     
     (defmethod aum/config :common [_]
@@ -654,7 +646,7 @@ Config is defined in multimethods like this, for instance in app.config:
     (defmethod aum/config :dev [_]
       {:timbre-level :info
        :frontend-config-keys [:app-path :timbre-level]})
-```
+    ```
 
 Any env variable set on command line will override any hardcoded setting in
 app.config. For this reason any keys in any config map will have to be scalar
@@ -688,7 +680,7 @@ settings that can be overridden/set on the commandline, besides the ones as set
 in app.config.
 
 
-<a id="org996acea"></a>
+<a id="orgb9307fe"></a>
 
 # Websockets
 
@@ -696,12 +688,12 @@ TODO-doc: more info on how to use websockets for any custom communication
 between front and backend
 
 
-<a id="org622856b"></a>
+<a id="org9a35ebd"></a>
 
 # Database
 
 
-<a id="orgd823420"></a>
+<a id="orged2e7c4"></a>
 
 ## (sql) validation
 
@@ -723,7 +715,7 @@ Idea is that for every hugsql fn added you will have to write a validate-sql-fun
  thrown by default.
 
 
-<a id="orge6e27b7"></a>
+<a id="orga76926a"></a>
 
 ## sql process-params, process-result
 
@@ -749,7 +741,7 @@ process-params (and process-result) is handy for adding hooks. For instance for
 the event-store. For more detail see also doc string of database.query/sql fn.
 
 
-<a id="org846eb33"></a>
+<a id="orgc2a7706"></a>
 
 ## Write validation
 
@@ -758,7 +750,7 @@ implemented) of the query with hooks for pre processing the params of the query
 and post processing of the result of the query.
 
 
-<a id="orgd802bf1"></a>
+<a id="org015fa3f"></a>
 
 ## Sql validation
 
@@ -780,7 +772,7 @@ Idea is that for every hugsql fn added you will have to write a validate-sql-fun
  thrown by default.
 
 
-<a id="org52629ca"></a>
+<a id="org268fa06"></a>
 
 ## Sql process-params, process-result
 
@@ -806,17 +798,17 @@ process-params (and process-result) is handy for adding hooks. For instance for
 the event-store. For more detail see also doc string of database.query/sql fn.
 
 
-<a id="org7a621e8"></a>
+<a id="orgfd4d6e0"></a>
 
 # Frontend matters
 
 
-<a id="org9a8cfeb"></a>
+<a id="orgc23d96b"></a>
 
 ## Generic recursive read with hooks
 
 
-<a id="org21b376e"></a>
+<a id="org5db25a7"></a>
 
 ### Intro
 
@@ -858,7 +850,7 @@ the event-store. For more detail see also doc string of database.query/sql fn.
     batches of items can be implemented similarly.
 
 
-<a id="org37a3fa1"></a>
+<a id="orgd110c48"></a>
 
 ### Adding hooks for keys and joins in the root query for returning values and building remote query
 
@@ -1043,7 +1035,7 @@ the event-store. For more detail see also doc string of database.query/sql fn.
         })
 
 
-<a id="org5fd188c"></a>
+<a id="org407b039"></a>
 
 ## Client only keys
 
@@ -1054,14 +1046,14 @@ sent to the backend either. But will still be looked up in the context data for
 that key.
 
 
-<a id="orge0bef36"></a>
+<a id="orgb5d1611"></a>
 
 ## make-cmp and om-data
 
 Use pagora.aum.frontend.util/make-cmp function to create a function that you can
 use in your render function in other components:
 
-```clojure
+    ```clojure
     (defui ^:once Foo
       static om/IQuery
       (query [this]
@@ -1071,7 +1063,7 @@ use in your render function in other components:
         (html [:div "in foo"])))
     
     (def foo-cmp (make-cmp Foo)) ;;instead of (def foo (om/factory Foo))
-```
+    ```
 
 > make-cmp:
 >   Returns a fn[parent-cmp props-or-kw & computed-arg] that when called will
@@ -1083,7 +1075,7 @@ use in your render function in other components:
 So call this foo function with the `this` of the parent component and the
 key you set the query of Foo to:
 
-```clojure
+    ```clojure
     (defui ^:once RootQbucketList
       static om/IQuery
       (query [this]
@@ -1091,7 +1083,7 @@ key you set the query of Foo to:
      (render [this]
        (let [{:keys [props computed state]} (om/data this)]
          (foo-cmp this :foo (assoc computed :some-key some-value)))))
-```
+    ```
 
 It&rsquo;s first of all a bit more straightforward get a handle on the props, computed
 and state values. But also the proper value is passed on to foo-cmp, less error
@@ -1102,7 +1094,7 @@ updated as a whole (since the reload-key is passed on to child components in the
 computed value by aum).
 
 
-<a id="orge7d5b9f"></a>
+<a id="org9472fa0"></a>
 
 ## Garbage collection
 
@@ -1117,7 +1109,7 @@ could be reduced. On page change you could just wipe any idents referred to
 by that page.
 
 
-<a id="org6e3ff8d"></a>
+<a id="orgd1965ed"></a>
 
 ## Internationalization
 
@@ -1126,7 +1118,7 @@ takes the current locale as passed into components as a computed property and a
 key.
 
 
-<a id="org8e39709"></a>
+<a id="orga133902"></a>
 
 ## Pre-merge hooks
 
@@ -1134,7 +1126,7 @@ These hooks allow you to take action before <span class="underline">any</span> v
 frontend app-state, including responses to read queries.
 
 
-<a id="orgba68ddf"></a>
+<a id="orgb886835"></a>
 
 ## Merging pushed data
 
@@ -1146,7 +1138,7 @@ query in an async manner. It can be sent to the frontend if and whenever the
 required data is available.
 
 
-<a id="org6630f81"></a>
+<a id="orgf1d5bac"></a>
 
 ## Generic undo/redo/revert.
 
@@ -1155,33 +1147,33 @@ undo/redo/revert for that record. This also includes any data joined to that
 record, they will also get undone/redone/reverted.
 
 
-<a id="orge6ceab0"></a>
+<a id="orgc13b88e"></a>
 
 # Backend parser
 
 
-<a id="org99c69f0"></a>
+<a id="orgc30910c"></a>
 
 ## Table aliases
 
 TODO-doc
 
 
-<a id="org22279c0"></a>
+<a id="org043f90c"></a>
 
 ## Virtual tables
 
 TODO-doc
 
 
-<a id="orgb24b400"></a>
+<a id="org38a0369"></a>
 
 ## Have backend return calculated data
 
 There are three ways to do this:
 
 
-<a id="org28e7033"></a>
+<a id="org9c01444"></a>
 
 ### Calculate something over a (sub)query
 
@@ -1219,7 +1211,7 @@ your component, and/or when you implement the read method for the join with the
 :with-meta param.
 
 
-<a id="orgcf4d9f4"></a>
+<a id="orgcc756c5"></a>
 
 ### Define a read key in the backend
 
@@ -1242,7 +1234,7 @@ or quasi root query. Also you have to possibly duplicate the params of this quer
 frontend from another query. And this isn&rsquo;t useful for a joined query.
 
 
-<a id="org1b2c53a"></a>
+<a id="org4b20fa4"></a>
 
 ### Redirect a read to a custom-read
 
@@ -1266,24 +1258,24 @@ With this query:
                               :where [:id :< 5]})
 
 
-<a id="org035eb12"></a>
+<a id="org61d2c55"></a>
 
 # Testing
 
 
-<a id="orgc33fea3"></a>
+<a id="org7acbaec"></a>
 
 ## Backend testing
 
 TODO-doc:
 
 
-<a id="org570cee0"></a>
+<a id="orgb78f0a5"></a>
 
 ## Frontend testing
 
 
-<a id="org7f60b6c"></a>
+<a id="org5deb589"></a>
 
 ### Install
 
@@ -1293,7 +1285,7 @@ npm install
 npm install -g karma-cli
 
 
-<a id="org5d9d9e8"></a>
+<a id="org92c6822"></a>
 
 ### Test runner
 
@@ -1305,7 +1297,7 @@ output for acceptance ui tests. Replay/rewind/step through (ui) tests by using
 pause macro.
 
 
-<a id="orge8f7f7e"></a>
+<a id="org73a4eef"></a>
 
 ### Snapshots
 
@@ -1317,7 +1309,7 @@ but (because we updated the code for example) is what we do expect we can update
 the snapshot by clicking a button.
 
 
-<a id="org19b4e76"></a>
+<a id="orgef3316e"></a>
 
 ## Run backend in frontend (for testing for example)
 
@@ -1332,7 +1324,7 @@ Browser in memory sql options:
 <https://github.com/agershun/alasql/wiki/Getting%20started>
 
 
-<a id="org67c92ff"></a>
+<a id="org04f6bb6"></a>
 
 ## Whole stack testing
 
@@ -1340,12 +1332,12 @@ By combining test runner, snapshot testing and running backend in frontend it&rs
 possible to do whole stack testing.
 
 
-<a id="org31a1f9b"></a>
+<a id="org6313c2c"></a>
 
 # Debugging
 
 
-<a id="org9a9f6ce"></a>
+<a id="org2ae15c4"></a>
 
 ## Dev-cards
 
@@ -1353,14 +1345,14 @@ possible to do whole stack testing.
 First install nvm (node version manager).
 
 
-<a id="org0c33a66"></a>
+<a id="org0456b7d"></a>
 
 ## Frontend om inspector
 
 Search, filter and drill into app and om state.
 
 
-<a id="org0311a87"></a>
+<a id="orgf4364a5"></a>
 
 ## It&rsquo;s possible to set some flags in local storage to get some output in console etc:
 
@@ -1385,7 +1377,7 @@ Show debug buttons in page bar:
 :debug-buttons true
 
 
-<a id="orgba793a1"></a>
+<a id="org2ceb406"></a>
 
 ### Trying queries
 
@@ -1414,7 +1406,7 @@ In the dev source folder there are namespaces to try out various queries:
     queries to the parser.
 
 
-<a id="org848ff6a"></a>
+<a id="org8be04f8"></a>
 
 ## In boot-scripts there&rsquo;s tail.boot to inspect logstash output:
 
@@ -1431,12 +1423,12 @@ Options:
   -l, &#x2013;level VAL   VAL sets level to filter such as info or error.
 
 
-<a id="org7b42686"></a>
+<a id="org8b859e9"></a>
 
 # How to
 
 
-<a id="org443a558"></a>
+<a id="org1a9f653"></a>
 
 ## Add npm modules
 
@@ -1463,40 +1455,40 @@ Or:
 bin/analyze-webpackold-app-readme
 
 
-<a id="org2e6473c"></a>
+<a id="org26ce28f"></a>
 
 ## Querying other sources than a mysql database
 
 
-<a id="orgf983c80"></a>
+<a id="orgff77073"></a>
 
 ### Using more than one remote in the frontend
 
 In `pagora.aum.frontend.reconciler.start` this function is defined:
 
-```clojure
+    ```clojure
     (defn make-aum-remote [app-config]
       (fn [query response-cb]
         (let [chsk-send! (websocket/get-chsk-send!-fn app-config)]
           (chsk-send! [:aum/query query] (:websocket-timeout app-config 8000)
                       response-cb))))
-```
+    ```
 
 You can add remotes like this:
 
-```clojure
+    ```clojure
     {:my-remote (fn [app-config]
                   (fn [query response-cb]
                     ;;Call on the network with the query, call response-cb when response is received.
                     ))}
-```
+    ```
 
 Add this map to app config under the :remotes key.
 
 TODO-doc: add examples to starter app and document here
 
 
-<a id="org8bed30a"></a>
+<a id="orgaf5cb11"></a>
 
 ### Returning data fetched from another source asynchronously
 
@@ -1505,12 +1497,12 @@ If a backend query can&rsquo;t be resolved and returned synchronously it&rsquo;s
 push the result to the frontend when it&rsquo;s available.
 
 
-<a id="orgde4a83f"></a>
+<a id="org9d25606"></a>
 
 ## Optimize frontend
 
 
-<a id="orgc33b1dc"></a>
+<a id="org51eb643"></a>
 
 ### pathopt
 
@@ -1538,38 +1530,38 @@ ident, and query to the query of the cmp, so the parser can work a bit faster.
 Which I do in my parser read\* fn
 
 
-<a id="orgc4b2ee3"></a>
+<a id="org2dac1e5"></a>
 
 ## Start app with different ports and db:
 
 DB<sub>NAME</sub>=my<sub>db</sub> SERVER<sub>PORT</sub>=9080 NREPL<sub>PORT</sub>=38401 bin/dev-backend
 
 
-<a id="orgd777c4d"></a>
+<a id="org51b3ba4"></a>
 
 ## throw catch exceptions
 
-```clojure
+    ```clojure
     (try (throw (ex-info "ex-info msg string" {:type :my-exception :bla :foo}))
         (catch #?(:clj Throwable :cljs :default) e
         (let [msg (.getMessage e)
                 data (ex-data e)]
             (info "Msg:" msg)
             (info "Data:" data))))
-```
+    ```
 
 
-<a id="org7038fd4"></a>
+<a id="orgcda28d4"></a>
 
 # Good to know
 
 
-<a id="org307b698"></a>
+<a id="org504d54b"></a>
 
 ## Function and method signatures
 
 
-<a id="org71e20f5"></a>
+<a id="orgc10c223"></a>
 
 ### read and mutate: [env key params] TODO-doc: update for aum
 
@@ -1597,7 +1589,7 @@ The parse will create the output map.
 (:query-root :path :pathopt :ast :state :parser :logger :shared :target :query)
 
 
-<a id="orge7c215b"></a>
+<a id="orgdaa4947"></a>
 
 ## Syncing of front and backend
 
@@ -1622,12 +1614,12 @@ clicking a &rsquo;reset&rsquo; button in the component for that field. The origi
 can always be fetched from the meta record.
 
 
-<a id="orgd57b6f8"></a>
+<a id="orgb0485c3"></a>
 
 # Modules
 
 
-<a id="orgc61e3a5"></a>
+<a id="orgd4f13b1"></a>
 
 ## Validation of form values
 
@@ -1643,7 +1635,7 @@ Currently this happens when a record gets saved, but it&rsquo;s possible to add 
 mutation that does this on demand, for instance on onBlur..
 
 
-<a id="orgeb13bad"></a>
+<a id="orgeee8992"></a>
 
 ## Use pages to organize your ui
 
@@ -1651,7 +1643,7 @@ TODO-aum:-
 There are some basic fns for this. See app.pages for how to add a page.
 
 
-<a id="org876fa99"></a>
+<a id="org598e25c"></a>
 
 ## invalidation
 
@@ -1681,7 +1673,7 @@ map. Which you can pick up in your components and use it to modify the ui if
 needed (show in red, show error message etc)
 
 
-<a id="org1d72507"></a>
+<a id="org5744549"></a>
 
 ## Generic save records
 
@@ -1696,39 +1688,39 @@ can correct any optimistically updates to its own app state and make sure it&rsq
 stays in sync with the backend.
 
 
-<a id="orge696e44"></a>
+<a id="orga11ed9a"></a>
 
 ## Database migration
 
 
-<a id="orgeb08a74"></a>
+<a id="org3e8b7eb"></a>
 
 ## Integrations
 
 
-<a id="orge265a4c"></a>
+<a id="org0a3bb49"></a>
 
 ## Paging
 
 
-<a id="org2717ea5"></a>
+<a id="orgac3d7d7"></a>
 
 ## Routing
 
 
-<a id="orgcf57f82"></a>
+<a id="orge920e05"></a>
 
 ## Internationalization
 
 
-<a id="orgbc1e143"></a>
+<a id="org00c3941"></a>
 
 ### There is a common.i18n.cljc namespace which provides the translate fn which
 
 takes the current locale and a key.
 
 
-<a id="org870f004"></a>
+<a id="orgbf118ab"></a>
 
 ### smarter translations
 
@@ -1736,24 +1728,24 @@ takes the current locale and a key.
 -   load translations zipped!!!???!!!!
 
 
-<a id="org594d022"></a>
+<a id="org05b5e46"></a>
 
 ## Files download and upload
 
 
-<a id="orgdb3795b"></a>
+<a id="org50cec08"></a>
 
 ## Event store
 
 Also see script in modules/events/experimental
 
 
-<a id="org112d053"></a>
+<a id="org6317f39"></a>
 
 ## Calc active users
 
 
-<a id="orgf1ff652"></a>
+<a id="org83cfc57"></a>
 
 ## Icons
 
@@ -1776,12 +1768,12 @@ replacing the files that are already there.
 Replace the contents of mui-icons.css with the css in style.css.
 
 
-<a id="org895e359"></a>
+<a id="org23a8ac6"></a>
 
 ## Security
 
 
-<a id="org3e9915b"></a>
+<a id="org98459fc"></a>
 
 ### login/logout
 
@@ -1795,14 +1787,14 @@ sente/websockets work is that to renew the session and any attached remember
 token the connection has to be renewed.
 
 
-<a id="org93d6c8e"></a>
+<a id="org72528e8"></a>
 
 ### bugsnag, authorization, login, logout etc
 
 -   Load bugsnag api keys from gitignored .env file in update-html-string
 
 
-<a id="org9f212b2"></a>
+<a id="orgc995b14"></a>
 
 ### Process-user and calc-role snippets
 
