@@ -38,7 +38,7 @@
 ;; (dev/halt)
 ;; (dev/reset)
 ;; (aum/get-parser-env)
-(timbre/info (keys (identity aum/aum-state)))
+;; (timbre/info (keys (identity aum/aum-state)))
 
 ;; (let [{:keys [chsk-send!]} (:websocket (:pagora.aum.websockets.core/websocket-listener (dev/ig-system)))]
 ;;   (pprint chsk-send!)

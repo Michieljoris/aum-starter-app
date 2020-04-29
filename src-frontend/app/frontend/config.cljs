@@ -6,12 +6,11 @@
 
 (defmethod aum/config :common [_]
   {
-
+   :timbre-log-level :info
    })
 
 (defmethod aum/config :dev [_]
   {
-   :debug {:timbre-level :info}
    })
 
 (defmethod aum/config :staging [_]

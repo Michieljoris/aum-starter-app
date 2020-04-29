@@ -1,7 +1,9 @@
 {
  :watch-dirs [;; "src"
               "src-frontend"
-              "libs-src"
+              ;; "libs-src"
+              "src-aum"
+              "src-clj-utils"
               "src-dev"
               ]
  :css-dirs ["target/assets/public/app"]

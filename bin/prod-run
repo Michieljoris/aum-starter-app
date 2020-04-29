@@ -1,11 +1,14 @@
 #!/bin/bash
 
 cmd="CLJ_ENV=prod\
-    DB_USER=root DB_PASSWORD="" DB_URL="//localhost:3306/" DB_NAME=chin_dev\
+    DB_USER=root DB_PASSWORD="irma" DB_URL="//localhost:3306/" DB_NAME=aum_minimal\
     SERVER_PORT=8090 SERVER_IP=0.0.0.0 \
     LOGSTASH_HOST=0.0.0.0 LOGSTASH_PORT=23456 LOGSTASH_ENABLED=true\
     REDIS_HOST="127.0.0.1" REDIS_PORT="6379"\
     QUERY_LOG=true SQL_LOG=true HTTP_LOG=true\
-    java -javaagent:./newrelic-agent.jar -Dnewrelic.config.file=./newrelic.yml -Dnewrelic.environment=development -jar dist/app.jar"
+    java -jar dist/app.jar"
 echo "$(tput setaf 7)$cmd$(tput sgr0)"
 eval $cmd
+
+
+    # java -javaagent:./newrelic-agent.jar -Dnewrelic.config.file=./newrelic.yml -Dnewrelic.environment=development -jar dist/app.jar"

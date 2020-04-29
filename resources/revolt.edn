@@ -33,12 +33,12 @@
  :revolt.task/test   {:report :pretty}
 
  :pagora.revolt.task/sass   {:source-path "src-styling/scss"
-                             :output-dir "public/app"}
+                             :output-path "public/app"}
 
  :pagora.revolt.task/assets {:assets-paths ["assets"]
                              :exclude-paths ["assets/app"]
                              :public-path "public/"
-                             :gzip true
+                             :gzip false
                              :update-with-exts ["html"]}
 
  :revolt.task/codox  {:source-paths ["src"]
@@ -104,8 +104,11 @@
                       :builds [{:id "main"
                                 :source-paths ["src" "src-frontend"]}]}
 
- :pagora.revolt.task/capsule {:exclude-paths #{"test" "src-frontend"}
+ :pagora.revolt.task/capsule {:exclude-paths #{"test" "src-frontend" "src-aum" "src-clj-utils" "src-revolt"}
                               ;; :aliases [:git-deps]
+                              :name "app"
+                              :package "pagora"
+                              :version "0.1.0"
                               :output-jar "dist/app.jar"
                               :capsule-type :fat
                               :main "app.core"

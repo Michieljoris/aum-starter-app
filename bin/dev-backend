@@ -1,9 +1,9 @@
 #!/bin/bash
 
 cmd="CLJ_ENV=dev clj "`
-    `"-A:revolt:dev "`
-    `"-A:local-deps:nrepl:slf4j "`
-    `"-t info,pagora.revolt.task/write-info,pagora.revolt.task/sass,"`
+    `"-A:revolt "`
+    `"-t info,pagora.revolt.task/write-info,"`
+    `"pagora.revolt.task/sass,"`
     `"pagora.revolt.task/update-html "`
     `"-p watch,pagora.revolt.plugin/nrepl-piggieback,rebel"
 echo "$(tput setaf 7)$cmd$(tput sgr0)"

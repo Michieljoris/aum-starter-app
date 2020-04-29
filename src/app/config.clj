@@ -12,7 +12,7 @@
 
 (defmethod aum/config :dev [_]
   {
-   :debug {:timbre-level :info}
+   :db-password "irma"
    })
 
 (defmethod aum/config :staging [_]
