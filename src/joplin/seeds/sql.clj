@@ -14,9 +14,8 @@
 (def seeds
   {:seed1
    (-> (insert-into :accounts)
-       (values [{:name "Billy" :email "a@b.com"}
-                {:name "Far" :email "far@b.com"}
-                ]))})
+       (values [{:name "Billy" :email "foo@b.com"}
+                {:name "Far" :email "bar@b.com"}]))})
 
 (defn run [target & [seed]]
   (let [seed (or seed :seed1)
