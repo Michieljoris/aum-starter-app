@@ -1,10 +1,9 @@
 {
- :watch-dirs [;; "src"
-              "src-frontend"
-              ;; "libs-src"
-              "src-aum"
-              "src-clj-utils"
-              "src-dev"
+ :watch-dirs [;; "src/main"
+              "src/frontend"
+              "src/aum"
+              "src/clj-utils"
+              "src/dev"
               ]
  :css-dirs ["target/assets/public/app"]
  :open-url false ;;"http://localhost:[[server-port]]/app.html"

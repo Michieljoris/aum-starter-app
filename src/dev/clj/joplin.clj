@@ -37,10 +37,12 @@
                   }
    })
 
-(def db-name "foo")
+(def db-name "aum_minimal2")
+(def password "irma")
 (def target {:db {:type :jdbc
-                  :url (str "jdbc:mysql://localhost:3306/" db-name "?user=root&password=&zeroDateTimeBehavior=convertToNull&useSSL=false&characterEncoding=UTF-8")}
-             :migrator "resources/joplin/migrators/sql"
+                  ;; :migrations-table "joplin_migrations"
+                  :url (str "jdbc:mysql://localhost:3306/" db-name "?user=root&password=" password "&serverTimezone=UTC&zeroDateTimeBehavior=convertToNull&useSSL=false&characterEncoding=UTF-8")}
+             :migrator "joplin/migrators/sql"
              ;; :seed "name of a var in a namespace on the classpath"
              })
 
@@ -51,7 +53,8 @@
 ;; (repl/create config :dev :sql-dev "foo2")
 
 (comment
-  (joplin/migrate-db target))
+  (joplin/migrate-db target)
+  )
 
 (comment
   (joplin/pending-migrations target)
@@ -59,3 +62,4 @@
 
 (comment
   (joplin/rollback-db target 1))
+

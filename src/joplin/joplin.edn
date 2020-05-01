@@ -1,0 +1,25 @@
+{:migrators {:sql-mig "joplin/migrators/sql"}  ;; A path for a folder with migration files
+
+ :seeds {:sql-seed "seeds.sql/run" ;; A clojure var (function) that applies the seed
+         ;; :es-seed "seeds.es/run"
+         }
+
+ :databases {:aum-minimal {:type :jdbc,
+                           :url "jdbc:mysql://localhost:3306/aum_minimal?user=root&password=irma&serverTimezone=UTC&zeroDateTimeBehavior=convertToNull&useSSL=false&characterEncoding=UTF-8"
+                           :migrations-table "joplin_migrations"}
+             :aum-dev {:type :jdbc,
+                       :url "jdbc:mysql://localhost:3306/aum_dev?user=root&password=irma&serverTimezone=UTC&zeroDateTimeBehavior=convertToNull&useSSL=false&characterEncoding=UTF-8"
+                       :migrations-table "joplin_migrations"}
+             ;; :es-prod {:type :es, :host "es-prod.local", :port "9300", :cluster "dev"}
+             ;; :sql-prod {:type :jdbc, :url "jdbc:h2:file:prod"}
+             }
+
+ ;; We combine the definitions above into different environments
+ :environments {:dev [{:db :aum-minimal, :migrator :sql-mig :seed :sql-seed}
+                      {:db :aum-dev :migrator :sql-mig :seed :sql-seed}
+                      ]
+                ;; :prod [{:db :sql-prod, :migrator :sql-mig}
+                ;;        {:db :es-prod}, ;; :seed :es-seed
+                ;;        ]
+                }
+ }

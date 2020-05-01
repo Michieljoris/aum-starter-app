@@ -1,5 +1,5 @@
 #!/bin/bash
 
-cmd="CLJ_ENV=dev clojure -A:slf4j -m figwheel.main --build dev --repl -t clean"
+cmd="CLJ_ENV=dev clojure -m figwheel.main --build dev --repl -t clean"
 echo "$(tput setaf 7)$cmd$(tput sgr0)"
 eval $cmd
