@@ -16,17 +16,18 @@
  ;; Paths
  ;;   Directories in the current project to include in the classpath
  :paths [
-         "src"
-         "src-styling"
+         "src/main"
+         "src/styling"
          "resources" ;;public dir for server and config files
 
          ;;Soft links to deps for local development
-         "src-aum"
-         "src-clj-utils"
-         "src-revolt"
+         "src/aum"
+         "src/clj-utils"
+         "src/revolt"
+         "src/joplin"
 
-         "src-dev"
-         "src-frontend"
+         "src/dev"
+         "src/frontend"
          "target/assets"
          ]
 
@@ -56,8 +57,10 @@
            ;; dependencies for packaging tasks
            :pack { :extra-deps {co.paralleluniverse/capsule {:mvn/version "1.0.3"}
                                 co.paralleluniverse/capsule-maven {:mvn/version "1.0.3"}}
-                  :main-opts   ["-m" "pagora.revolt.bootstrap"
-                                "-c" "revolt.edn"]}}
+                  ;; :main-opts   ["-m" "pagora.revolt.bootstrap"
+                  ;;               "-c" "revolt.edn"]
+                  }
+           :joplin {:main-opts ["-m" "pagora.aum.modules.db-migration.joplin.alias"]}}
 
  ;; Provider attributes
 
