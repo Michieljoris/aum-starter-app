@@ -38,14 +38,19 @@
 ;; DATABASE MIGRATIONS
 ;; See src/joplin for config, migrations and seeds
 (comment
-  (joplin-do :migrate {:config "joplin.edn" :env :dev})
+  (joplin-do :migrate {:config "joplin.edn" :env :dev :db :aum-minimal})
   (joplin-do :pending {:config "joplin.edn" :env :dev :db :aum-minimal})
-  (joplin-do :rollback-n {:config "joplin.edn" :env :dev :db :aum-dev :num "1"})
+  (joplin-do :rollback-n {:config "joplin.edn" :env :dev :db :aum-minimal :num "1"})
+  ;; (joplin-do :rollback-id {:config "joplin.edn" :env :dev :db :sql-minimal :id "20200330150018-create-accounts"})
+
   (joplin-do :seed {:config "joplin.edn" :env :dev :db :aum-dev} ["seed1"])
-  (joplin-do :reset {:config "joplin.edn" :env :dev :db :aum-minimal})
-  (joplin-do :create {:config "joplin.edn" :db :aum-minimal :id "my-new-migration"})
+  ;; (joplin-do :reset {:config "joplin.edn" :env :dev :db :aum-minimal})
+
+  (joplin-do :create {:config "joplin.edn" :env :dev :db :aum-minimal :id "create-users"})
+  (joplin-do :rebuild {:config "joplin.edn" :env :dev :db :aum-minimal} ["seed1"])
 
   )
+
 
 ;; (dev/go)
 ;; (dev/halt)
