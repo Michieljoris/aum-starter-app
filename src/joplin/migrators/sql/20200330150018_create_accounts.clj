@@ -1,8 +1,6 @@
 (ns migrators.sql.20200330150018-create-accounts
   (:require
-   [jdbc.core :as jdbc]
    [pagora.aum.modules.db-migration.joplin.core :refer [exec fetch]]
-   [clojure.pprint :refer [pprint]]
    [stch.sql.ddl :refer :all]))  ;;DDL
 
 ;; https://stch-library.github.io/sql/

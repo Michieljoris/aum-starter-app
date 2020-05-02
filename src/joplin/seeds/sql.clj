@@ -24,6 +24,5 @@
         conn (jdbc/connection url)
         sql-vec (sql/format (get seeds (keyword seed)))]
     ;; (println sql-vec)
-    (println {:seed seed})
     (with-open [conn (jdbc/connection url)]
       (jdbc/execute conn sql-vec))))
