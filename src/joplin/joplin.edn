@@ -1,4 +1,9 @@
-{:migrators {:sql-mig "joplin/migrators/sql"}  ;; A path for a folder with migration files
+{:migrators {:sql-mig "_/migrators/sql" ;; A classpath for a folder with
+                                        ;; migration files, first part (_/) is
+                                        ;; ignored by joplin.
+             }
+ :path "src/joplin" ;;Aum replaces _ with path when creating new migrations.
+
  :seeds {:sql-seed "seeds.sql/run"} ;; A clojure var (function) that applies the seed
  :databases {:aum-minimal {:type :jdbc,
                            :url "jdbc:mysql://localhost:3306/aum_minimal?user=root&password=irma&serverTimezone=UTC&zeroDateTimeBehavior=convertToNull&useSSL=false&characterEncoding=UTF-8"

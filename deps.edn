@@ -47,7 +47,7 @@
 
         }
 
- :aliases {:dev {:extra-paths ["src/dev"]}
+ :aliases {:dev {:extra-paths ["src/dev" "src/joplin"]}
            :revolt {:extra-paths ["src/revolt"]
                     :main-opts   ["-m" "pagora.revolt.bootstrap"
                                   "-c" "revolt.edn"]

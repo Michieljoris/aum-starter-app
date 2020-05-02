@@ -12,7 +12,7 @@
    ;; [clojure.pprint :refer [pprint]]
    [clojure.tools.namespace.repl :as n]
    [taoensso.timbre :as timbre]
-   [pagora.aum.modules.db-migration.joplin.alias :as joplin]
+   [pagora.aum.modules.db-migration.joplin.alias :refer [joplin-do]]
 
    [expound.alpha :as expound]
    [clojure.spec.alpha :as s]
@@ -43,6 +43,8 @@
   (joplin-do :rollback-n {:config "joplin.edn" :env :dev :db :aum-dev :num "1"})
   (joplin-do :seed {:config "joplin.edn" :env :dev :db :aum-dev} ["seed1"])
   (joplin-do :reset {:config "joplin.edn" :env :dev :db :aum-minimal})
+  (joplin-do :create {:config "joplin.edn" :db :aum-minimal :id "my-new-migration"})
+
   )
 
 ;; (dev/go)
