@@ -46,7 +46,7 @@
   (joplin-do :seed {:config "joplin.edn" :env :dev :db :aum-dev} ["seed1"])
   ;; (joplin-do :reset {:config "joplin.edn" :env :dev :db :aum-minimal})
 
-  (joplin-do :create {:config "joplin.edn" :env :dev :db :aum-minimal :id "create-users"})
+  (joplin-do :create {:config "joplin.edn" :env :dev :db :aum-minimal :id "create-subscriptions"})
   (joplin-do :rebuild {:config "joplin.edn" :env :dev :db :aum-minimal} ["seed1"])
 
   )

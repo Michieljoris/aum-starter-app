@@ -8,6 +8,7 @@
    :pagora-account-id 1
    :timbre-log-level :info
    :app-path "app/"
+   :event-store-disabled false
    })
 
 (defmethod aum/config :dev [_]
@@ -29,8 +30,7 @@
    :sql-log true ;print actual sql queries being made
    :query-log true
    :http-log false
-   :gz-mime-types true
-   :event-store-disabled false})
+   :gz-mime-types true})
 
 (defmethod aum/config :test [_]
   (def test-config
