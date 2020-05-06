@@ -28,7 +28,9 @@
 // @import "devcards";
 
 @import "../../../node_modules/ag-grid-community/dist/styles/ag-grid.scss";
-@import "../../../node_modules/ag-grid-community/dist/styles/ag-theme-balham/sass/_ag-theme-balham-mixin.scss";
+// @import "../../../node_modules/ag-grid-community/dist/styles/ag-theme-balham/sass/_ag-theme-balham-mixin.scss"; //not working
+// @import "../../../node_modules/ag-grid-community/dist/styles/ag-theme-balham/sass/ag-theme-balham.scss"; ;;deprec warning
+@import "../../../node_modules/ag-grid-community/dist/styles/ag-theme-balham/sass/legacy/ag-theme-balham-v22-compat.scss";
 
 // Custom scss
 @import "garden";

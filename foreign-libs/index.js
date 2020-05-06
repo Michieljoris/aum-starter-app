@@ -19,3 +19,6 @@ window.semanticUIReact = semanticUIReact;
 
 import { AgGridReact } from 'ag-grid-react';
 window.AgGridReact = AgGridReact;
+
+//Uncomment to use enterprise version
+import * as AgGridEnterprise from "ag-grid-enterprise";

@@ -7,38 +7,8 @@
    [js.semantic-ui-react :as semantic-ui]
    [goog.object :as goog]
    [js.react :as react]
-   [js.ag-grid-react :as ag-grid]
-   )
-  )
-
-
-;; class App extends Component {
-;;   constructor(props) {
-;;     super(props);
-;;     this.state = {
-;;       columnDefs: [
-;;         { headerName: "Make", field: "make" },
-;;         { headerName: "Model", field: "model" },
-;;         { headerName: "Price", field: "price" }],
-;;       rowData: [
-;;         { make: "Toyota", model: "Celica", price: 35000 },
-;;         { make: "Ford", model: "Mondeo", price: 32000 },
-;;         { make: "Porsche", model: "Boxter", price: 72000 }]
-;;     }
-;;   }
-
-;;   render() {
-;;     return (
-;;       <div className="ag-theme-alpine" style={ {height: '200px', width: '600px'} }>
-;;         <AgGridReact
-;;             columnDefs={this.state.columnDefs}
-;;             rowData={this.state.rowData}>
-;;         </AgGridReact>
-;;       </div>
-;;     );
-;;   }
-;; }
-(js/console.log ag-grid)
+   [js.ag-grid-react :as ag-grid-class]
+   ))
 
 (defn component
   "Get a component from sematic-ui-react:
@@ -68,8 +38,6 @@
 (def message        (component "Message"))
 (def message-header (component "Message" "Header"))
 
-(js/console.log button)
-
 (defui ^:once Foo
   static om/IQuery
   (query [this]
@@ -81,18 +49,19 @@
 (def foo (make-cmp Foo))
 
 
-(def column-defs [{:headerName "Make" :field "make" },
+(defn ag-grid [props]
+  (let [props (clj->js props)
+        create-element-fn (.-createElement react)]
+    (create-element-fn ag-grid-class props)))
+
+
+(def column-defs [{:headerName "Make" :field "make" :sortable true :filter true :checkboxSelection true},
                   {:headerName "Model" :field "model" },
                   {:headerName "Price"  :field "price" }])
 (def row-data [{:make "Toyota" :model "Celica" :price 35000 },
                {:make "Ford" :model "Mondeo" :price 32000 },
                {:make "Porsche" :model "Boxter" :price 72000 }])
 
-(defn ag-grid-cmp  [props]
-  ((.-createElement react) ag-grid (clj->js props) {}))
-
-(js/console.log "HJELLLLLLLLOOOOOOOOOOOOOOOOOOO")
-(js/console.log (clj->js {:columDefs column-defs :rowData row-data}))
 
 (defui ^:once RootComponent
   static om/IQuery
@@ -106,15 +75,28 @@
       (timbre/info :#pp {:data data})
       (html [:div {:class "level"}
              [:div {:class "level-item has-text-centered"}
-              "hello to"
-              [:div {:class "ag-theme-alpine"
-                     :style {:height 250
-                             :border "black solid 1px"
-                             :width 600}}
-               (ag-grid-cmp {:columDefs column-defs :rowData row-data})]
+             (container
+              (html
+               [:div {:class "ag-theme-balham"
+                      :style {:height 250
+                              :border "black solid 1px"
+                              :width 600}}
+                (button {:primary true :circular true
+                         :onClick (fn []
+                                    (println "Hello world")
+                                    (let [{:keys [grid-api]} state
+                                          selected-nodes (.getSelectedNodes grid-api)]
+                                      (println grid-api)
+                                      (js/console.log selected-nodes)
+                                      )
 
-;;             columnDefs={this.state.columnDefs}
-;;             rowData={this.state.rowData}>
+                                    )} "Click me!!!")
+                (ag-grid {:columnDefs column-defs :rowData row-data
+                          :onGridReady (fn [params]
+                                         (om/update-state! this assoc :grid-api (.-api params))
+                                         (js/console.log "grid api" (.-api params)))
+                          :rowSelection "multiple"})]))
+
               ;; (container
               ;;  (grid {:columns 3 :divided true}
               ;;    (row {}

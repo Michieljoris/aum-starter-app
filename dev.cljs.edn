@@ -54,8 +54,7 @@
                             "js.moment"
                             "js.react-datetime"
                             "js.semantic-ui-react"
-                            "js.ag-grid-react"
-                            ]
+                            "js.ag-grid-react"]
                  :global-exports {js.react React
                                   js.react-dom ReactDOM
                                   js.moment moment
