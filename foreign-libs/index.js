@@ -22,3 +22,6 @@ window.AgGridReact = AgGridReact;
 
 //Uncomment to use enterprise version
 import * as AgGridEnterprise from "ag-grid-enterprise";
+
+import ReactDataGrid from 'react-data-grid';
+window.ReactDataGrid = ReactDataGrid

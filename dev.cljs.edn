@@ -54,11 +54,13 @@
                             "js.moment"
                             "js.react-datetime"
                             "js.semantic-ui-react"
-                            "js.ag-grid-react"]
+                            "js.ag-grid-react"
+                            "js.react-data-grid"]
                  :global-exports {js.react React
                                   js.react-dom ReactDOM
                                   js.moment moment
                                   js.react.datetime ReactDatetime
                                   js.semantic-ui-react semanticUIReact
                                   js.ag-grid-react AgGridReact
+                                  js.react-data-grid ReactDataGrid
                                   }}]}
