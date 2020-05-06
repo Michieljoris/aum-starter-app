@@ -19,6 +19,7 @@
          "src/main"
          "src/styling"
          "resources" ;;public dir for server and config files
+         "src/externs"
 
          ;;Soft links to deps for local development
          "src/aum"

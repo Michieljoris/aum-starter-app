@@ -10,5 +10,12 @@ window.ReactDOM = ReactDOM;
 import Datetime from 'react-datetime';
 window.ReactDatetime = Datetime;
 
-import moment from "moment"
+import moment from "moment";
 window.moment = moment;
+
+import * as semanticUIReact from "semantic-ui-react";
+// import { Confirm } from 'semantic-ui-react'
+window.semanticUIReact = semanticUIReact;
+
+import { AgGridReact } from 'ag-grid-react';
+window.AgGridReact = AgGridReact;

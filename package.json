@@ -17,11 +17,16 @@
   },
   "dependencies": {
     "@cljs-oss/module-deps": "^1.1.1",
+    "ag-grid-community": "^23.1.0",
+    "ag-grid-react": "^23.1.0",
     "bulma": "0.7.4",
     "cryptojs": "^2.5.3",
     "moment": "^2.24.0",
     "react": "16.8.4",
+    "react-data-grid": "^7.0.0-canary.16",
     "react-datetime": "^2.16.3",
-    "react-dom": "16.8.4"
+    "react-dom": "16.8.4",
+    "semantic-ui-css": "^2.4.1",
+    "semantic-ui-react": "^0.88.2"
   }
 }
