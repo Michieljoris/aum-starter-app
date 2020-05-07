@@ -10,7 +10,6 @@
             (-> (table :users)
                 (integer :id :unsigned :not-null :auto-increment)
                 (tiny-int :active [1])
-                (integer :account-id)
                 (varchar :name [255])
                 (varchar :email [255])
                 (varchar :locale [255])
@@ -27,14 +26,14 @@
 (defn down [db]
   (exec db (drop-table :users)))
 
-(create
-            (-> (table :users)
-                (integer :id :unsigned :not-null :auto-increment)
-                (integer :account-id)
-                (foreign-key :account-id '(accounts account-id) :on-delete-cascade)
-                (primary-key :id)
-                (index [:id]))
-            (auto-inc 1)
-            (engine :InnoDB)
-            (collate :utf8-general-ci))
+;; (create
+;;  (-> (table :users)
+;;      (integer :id :unsigned :not-null :auto-increment)
+;;      (integer :account-id)
+;;      (foreign-key :account-id '(accounts account-id) :on-delete-cascade)
+;;      (primary-key :id)
+;;      (index [:id]))
+;;  (auto-inc 1)
+;;  (engine :InnoDB)
+;;  (collate :utf8-general-ci))
 ;; => "

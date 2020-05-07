@@ -182,9 +182,9 @@
      ])
   Object
   (componentDidMount [this]
-    (timbre/info :#pp (om/props this))
+    ;; (timbre/info :#pp (om/props this))
 
-    (isomorphic2)
+    ;; (isomorphic2)
     ;; (om/update-state! assoc :grid grid)
     )
   (render [this]
@@ -192,24 +192,22 @@
     (container
      (html
       [:div
-       [:div {:id "my-id"}
-        (button {:primary true :circular true  :onClick (fn [] (println "Hello world")
-                                                          (js/console.log @isc-grid)
-                                                          (.destroy @isc-grid)
-                                                          (isomorphic2)
-                                                          ;; (.setData @isc-grid (clj->js []))
-                                                          )} "Click me!!!")
-        ;; (js/console.log (om/get-state this))
-        ;; (.redraw (:grid (om/get-state this)))
+       ;; [:div {:id "my-id"}
+       ;;  (button {:primary true :circular true  :onClick (fn [] (println "Hello world")
+       ;;                                                    (js/console.log @isc-grid)
+       ;;                                                    (.destroy @isc-grid)
+       ;;                                                    (isomorphic2)
+       ;;                                                    ;; (.setData @isc-grid (clj->js []))
+       ;;                                                    )} "Click me!!!")
+       ;;  ;; (js/console.log (om/get-state this))
+       ;;  ;; (.redraw (:grid (om/get-state this)))
 
-        ]
+       ;;  ]
        (let [{:keys [props state computed] :as data} (om-data this)]
          (timbre/info :#pp {:data data})
          (html [:div {:class "level"}
                 [:div {:class "level-item has-text-centered"}
                  (container
-                  "hello"
-
                   (ag-grid-demo this state)
                   ;; (react-data-grid {:columns columns
                   ;;                   :rowsCount 3

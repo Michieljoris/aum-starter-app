@@ -5,13 +5,16 @@
 
 ;; https://stch-library.github.io/sql/
 
+(def tbl :subscriptions)
+
 (defn up [db]
   (exec db (create
-            (-> (table :subscriptions)
+            (-> (table tbl)
                 (integer :id :unsigned :not-null :auto-increment)
                 (date :entry-at)
                 (date :expired-at)
-                (integer :user-id :unsigned :not-null)
+                (integer :account-id [10] :unsigned :not-null)
+                (integer :user-id [10] :unsigned :not-null)
                 (tiny-int :deleted)
                 (tiny-int :invalidated)
                 (varchar :created_at [32])
@@ -23,4 +26,4 @@
             (collate :utf8-general-ci))))
 
 (defn down [db]
-  (exec db (drop-table :subscriptions)))
+  (exec db (drop-table tbl)))
