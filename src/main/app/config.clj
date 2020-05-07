@@ -13,7 +13,11 @@
 
 (defmethod aum/config :dev [_]
   {
+   :db-name "aum_minimal"
+   :db-user "root"
+   :db-options "&serverTimezone=UTC&zeroDateTimeBehavior=convertToNull&useSSL=false&characterEncoding=UTF-8"
    :db-password "irma"
+   :db-url "//localhost:3306/"
    })
 
 (defmethod aum/config :staging [_]

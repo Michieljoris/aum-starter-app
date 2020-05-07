@@ -13,7 +13,7 @@
                 (integer :id :unsigned :not-null :auto-increment)
                 (varchar :name [255])
                 (varchar :email [255])
-                (integer :accoun-id [10] :unsigned)
+                (integer :account-id [10] :unsigned)
                 ;; (varchar :created_at [32])
                 ;; (varchar :updated_at [32])
                 (primary-key :id)

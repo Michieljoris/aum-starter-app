@@ -1,5 +1,9 @@
 (ns debug.try-om-query
   (:require
+   [clojure.java.jdbc :as jdbc]
+   ;; [jdbc.core :as jdbc]
+   [pagora.aum.modules.db-migration.joplin.core :refer [exec fetch]]
+   [pagora.aum.core :as aum]
    [pagora.aum.dev.core :as dev]
    [pagora.clj-utils.core :as du]
    [pagora.aum.database.inspect :as db-inspect]
@@ -44,12 +48,15 @@
    )
   )
 
+(defn  make-url [{:keys [db-name db-user db-password db-options db-url]}]
+  (str "mysql:" db-url db-name "?user=" db-user "&password=" db-password db-options))
 
+(let [[[k b]] (seq {:a :b})] [k b])
 
 ;; Try out the parser as actually used for the app:
 (comment
   (let [
-        query [{:user [:id :name]}]
+        query [{:account [:id :name]}]
         ;; query '[(admin/save-user
         ;;          {:table :user,
         ;;           ;; :id 1,
@@ -59,38 +66,42 @@
 
         do-query (fn [query]
                    (println "++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-                   (let [db-conn (make-db-connection {:url "//localhost:3306/"
-                                                      :db-name "foo"
-                                                      :print-spec true
-                                                      :use-ssl false
-                                                      :user "root"
-                                                      :password ""})
+                   (let [;; db-conn (make-db-connection {:url "//localhost:3306/"
+                         ;;                              :db-name "aum_minimal"
+                         ;;                              :print-spec true
+                         ;;                              :use-ssl false
+                         ;;                              :user "root"
+                         ;;                              :password "irma"})
+                         db-conn (aum/get-db-conn)
                          raw-schema (schema/get-schema db-conn)
+                         ;; _ (pprint raw-schema)
                          schema     (schema/make-condensed-schema raw-schema)
                          ;; schema (security/secure-schema  schema db-config)
-                         ;; _ (pprint (get schema "users"))
                          state      (atom {:status :ok})
-                         user {:id 1990 :some-user "afoobar" :role "super-admin" :group-id 62 :subgroup-ids [154]}
+                         user {:id 1990 :some-user "afoobar" :role "master-admin" :group-id 62 :subgroup-ids [154]}
                          env        {:parser-config (merge parser-config {;; :allow-root true
                                                                           :print-exceptions true
                                                                           :normalize true})
                                      :db-conn       db-conn
                                      :db-config     db-config
-                                     :schema        (security/secure-schema schema db-config)
+                                     :schema        (security/secure-schema {}
+                                                                            schema db-config)
                                      :raw-schema    raw-schema
                                      :state         state
                                      :user          user}
-                         parser (:pagora.aum.parser.core/parser (dev/ig-system))
+                         parser (aum/get-parser)
                          result    (parser env query)]
+                     ;; (timbre/info :#pp schema)
+
                      (do
                        (info "State:")
                        (pprint @state)
                        (println "----------------------------------------")
                        (info "Result:")
-                       (fipp result))))]
+                       (fipp result))
+                     ))]
     (try (do-query query)
       (catch Exception e
         (throw e)
         (info (jansi/red "DEBUGGING STATEMENTS ARE STILL ENABLED IN READ.CLJ!!!!"))))))
-
 

@@ -1,11 +1,11 @@
-(ns migrators.sql.20200507022418-create-accounts-users-roles
+(ns migrators.sql.20200507022418-auth
 (:require
    [pagora.aum.modules.db-migration.joplin.core :refer [exec fetch]]
    [stch.sql.ddl :refer :all]))
 
 ;; https://stch-library.github.io/sql/
 
-(def table-kw :accounts-users-roles)
+(def table-kw :auth)
 
 (defn up [db]
   (exec db (create

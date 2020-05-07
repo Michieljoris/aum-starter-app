@@ -15,7 +15,7 @@
                 (varchar :locale [255])
                 (varchar :remember-token [255])
                 (varchar :confirmation-token [255])
-                (varchar :encryped-password [255])
+                (varchar :encrypted-password [255])
                 ;; (foreign-key :account-id '(accounts account-id) :on-delete-cascade)
                 (primary-key :id)
                 (index [:id]))

@@ -49,10 +49,11 @@
    :subscriptions (-> (insert-into :subscriptions)
                       (values (->> [{:account-id 1 :user-id 1 :entry-at "2000-10-10"}]
                                    pad-rows number-rows)))
-   :accounts-users-roles (-> (insert-into :accounts-users-roles)
-                             (values (->> [{:account-id 1 :user-id 1 :role-id 1}]
-                                          pad-rows number-rows)))
+   :auth (-> (insert-into :auth)
+             (values (->> [{:account-id 1 :user-id 1 :role-id 1}]
+                          pad-rows number-rows)))
    })
+
 (defn run [target & seed-kws]
   (let [{{:keys [url]} :db} target
         url (str/strip url "jdbc:")
