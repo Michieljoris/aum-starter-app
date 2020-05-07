@@ -44,19 +44,16 @@
    [fipp.edn :refer (pprint) :rename {pprint fipp}]
    [clojure.set :as set]
    [pagora.aum.database.inspect :as db-inspect]
-   [pagora.clj-utils.database.connection :refer [make-db-connection]]
-   )
-  )
-
-(defn  make-url [{:keys [db-name db-user db-password db-options db-url]}]
-  (str "mysql:" db-url db-name "?user=" db-user "&password=" db-password db-options))
-
-(let [[[k b]] (seq {:a :b})] [k b])
+   [pagora.clj-utils.database.connection :refer [make-db-connection]]))
 
 ;; Try out the parser as actually used for the app:
 (comment
   (let [
-        query [{:account [:id :name]}]
+        query [{:user [:id :name]}]
+        query [{:account [:id :name
+                          {:subscription [:id :entry-at :expired-at]}
+                          ;; {:auth [{:user [:id :name]} {:role [:id :name]}]}
+                          ]}]
         ;; query '[(admin/save-user
         ;;          {:table :user,
         ;;           ;; :id 1,
@@ -81,7 +78,7 @@
                          user {:id 1990 :some-user "afoobar" :role "master-admin" :group-id 62 :subgroup-ids [154]}
                          env        {:parser-config (merge parser-config {;; :allow-root true
                                                                           :print-exceptions true
-                                                                          :normalize true})
+                                                                          :normalize false})
                                      :db-conn       db-conn
                                      :db-config     db-config
                                      :schema        (security/secure-schema {}

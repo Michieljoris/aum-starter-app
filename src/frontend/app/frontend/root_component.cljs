@@ -178,6 +178,10 @@
   static om/IQuery
   (query [this]
     [:client/reload-key
+     {:account [:id :name
+                {:subscription [:id ;; :entry-at :expired-at
+                                ]}
+                {:auth [{:user [:id :name]} {:role [:id :name]}]}]}
      {:user [:id :name]}
      ])
   Object

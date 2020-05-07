@@ -41,4 +41,3 @@
 
 
 ;; (jdbc/execute conn ["insert into foo (name) values (?);" "Foo"])
-)

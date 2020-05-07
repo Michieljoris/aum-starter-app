@@ -18,7 +18,7 @@
    [clojure.spec.alpha :as s]
    ))
 
-(set! s/*explain-out* expound/printer)
+;; (set! s/*explain-out* expound/printer)
 
 (n/set-refresh-dirs "src" "libs-src" "src-frontend")
 ;; (n/disable-unload!)
