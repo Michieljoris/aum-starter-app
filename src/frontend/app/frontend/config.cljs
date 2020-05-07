@@ -11,8 +11,7 @@
 
 (defmethod aum/config :dev [_]
   {
-   :debug {:send true
-           }
+   :debug {:send true}
    })
 
 (defmethod aum/config :staging [_]

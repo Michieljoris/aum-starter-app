@@ -16,10 +16,8 @@
   (defn pad-rows [rows]
     (let [padded-row (->> rows
                           (reduce (fn [s row]
-                                    (println s)
                                     (apply conj s (keys row))) #{})
                           (reduce (fn [m kw]
-                                    (println kw)
                                     (assoc m kw nil)) {}))]
       (->> rows (map #(merge padded-row %)))))
 
@@ -36,10 +34,15 @@
 
 (def seeds
   {:accounts (-> (insert-into :accounts)
-                 (values (pad-rows [{:id 1 :name "Some account"}])))
+                 (values (pad-rows [{:id 1 :name "Account 1"}
+                                    {:id 2 :name "Account 2"}
+                                    {:id 3 :name "Account 3"}
+                                    ])))
    :users (-> (insert-into :users)
               (values (->> [{:name "Foo" :email "foo@b.com"}
-                            {:name "Bar" :email "bar@b.com"}]
+                            {:name "Bar" :email "bar@b.com"}
+                            {:name "Baz" :email "baz@b.com"}
+                            ]
                            pad-rows number-rows)))
    :roles (-> (insert-into :roles)
               (values (pad-rows [{:name "master-admin"}
@@ -50,7 +53,12 @@
                       (values (->> [{:account-id 1 :user-id 1 :entry-at "2000-10-10"}]
                                    pad-rows number-rows)))
    :auth (-> (insert-into :auth)
-             (values (->> [{:account-id 1 :user-id 1 :role-id 1}]
+             (values (->> [{:account-id 1 :user-id 1 :role-id 1}
+                           {:account-id 2 :user-id 1 :role-id 2}
+                           {:account-id 1 :user-id 2 :role-id 1}
+                           {:account-id 2 :user-id 3 :role-id 3}
+                           {:account-id 2 :user-id 3 :role-id 4}
+                           ]
                           pad-rows number-rows)))
    })
 

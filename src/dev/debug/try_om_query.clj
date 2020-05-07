@@ -46,6 +46,33 @@
    [pagora.aum.database.inspect :as db-inspect]
    [pagora.clj-utils.database.connection :refer [make-db-connection]]))
 
+(def constraints
+  {:account {:tables #{;; :user :role
+                       }
+             :id 1}
+   :user {:tables #{:account :role}
+          :id 1}
+   :role {:tables #{:account :user}
+          :id 1}
+   ;; :subscription {:input #{:account :user}
+   ;;                :id 2}
+   })
+
+(do
+  (defn make-auth-query [table query constraints]
+    (let [{:keys [tables]} (-> constraints table)
+          clauses (->> (select-keys constraints tables)
+                       (reduce (fn [result [table {:keys [id]}]]
+                                 (cond-> result
+                                   (number? id) (conj [(keyword (str (name table) "-id")) := id])))
+                               []))
+          query {:auth [{table query}]}]
+      (if (seq clauses)
+        [`(query {:where [:and ~clauses]})]
+        [query])))
+  (make-auth-query :account [:id :name] constraints))
+;; => [{:auth [{:account [:id :name]}]}]
+
 ;; Try out the parser as actually used for the app:
 (comment
   (let [
@@ -54,6 +81,9 @@
                           {:subscription [:id :entry-at :expired-at]}
                           ;; {:auth [{:user [:id :name]} {:role [:id :name]}]}
                           ]}]
+        query   (make-auth-query :account [:id :name] constraints)
+
+
         ;; query '[(admin/save-user
         ;;          {:table :user,
         ;;           ;; :id 1,

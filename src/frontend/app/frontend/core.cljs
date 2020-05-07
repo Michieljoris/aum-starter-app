@@ -1,7 +1,8 @@
 (ns app.frontend.core
   (:require
    [app.frontend.config] ;;needs to be loaded
-  
+   [app.frontend.read]
+   [app.frontend.mutate]
    [pagora.aum.frontend.core :as aum]
    [taoensso.timbre :as timbre]
    [app.frontend.root-component :refer [RootComponent]]))
