@@ -15,3 +15,9 @@
 
 (defn -main [& args]
   (start-app))
+
+(defn fahrenheit->celsius [fahrenheit]
+  (* (- fahrenheit 32) 5/9))
+
+(defn celsius->fahrenheit [celsius]
+  (+ (* celsius 9/5) 32))

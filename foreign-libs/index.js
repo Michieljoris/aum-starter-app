@@ -10,5 +10,8 @@ window.ReactDOM = ReactDOM;
 import Datetime from 'react-datetime';
 window.ReactDatetime = Datetime;
 
-import moment from "moment"
+import moment from "moment";
 window.moment = moment;
+
+import * as SemanticUIReact from 'semantic-ui-react';
+window.SemanticUIReact = SemanticUIReact;

@@ -13,42 +13,84 @@
    [frontend.app.frontend.semantic :as s]
    ))
 
-;; (js/console.log react-data-grid-class)
 
-(defn make-menu-item [this name selection i]
-  (s/menu-item {:name name :active (= selection i)
-                :onClick #(om/update-state! this assoc :menu-selection i)})
-  )
 
-(defui ^:once Counter
-  static om/IQuery
-  (query [this]
-    [:client/foo])
+(defn counter [this]
+  (let [{{:keys [counter]} :state} (om-data this)]
+    [:div (s/button {:basic true
+                     :style {:marginRight 10}
+                     :onClick #(om/update-state! this update :counter inc)}
+                    "Count")
+     counter]))
+
+
+(defn fahrenheit->celsius [fahrenheit]
+  (* (- fahrenheit 32) (/ 5 9)))
+
+(defn celsius->fahrenheit [celsius]
+  (+ (* celsius (/ 9 5)) 32))
+
+(defn temperature-input [this type other-type conversion-fn]
+  (let [{:keys [state]} (om-data this)
+        label (str/capital (name type))]
+    [:div {:class "ui right labeled input"}
+     [:input {:type "number" :placeholder (str "Enter " label)
+              :style {:width 60}
+              :value (or (js/Math.round (get state type)) "")
+              :onChange (fn [event]
+                          (let [value (goog/getValueByKeys event "target" "value")]
+                            (om/update-state! this assoc type value)
+                            (om/update-state! this assoc other-type (conversion-fn value))))}]
+     [:div {:class "ui basic label label"} label]]))
+
+(defn temperature-converter [this]
+  [:div
+   (temperature-input this :celsius :fahrenheit celsius->fahrenheit)
+   [:span {:class "pad-lef-5 pad-rig-5"} "="]
+   (temperature-input this :fahrenheit :celsius fahrenheit->celsius)])
+
+(defn make-menu-item [this selection name item]
+  (s/menu-item {:name name :active (= selection item)
+                :id item
+                :onClick #(om/update-state! this assoc :menu-selection item)}))
+
+(defn nop [this] "not implemented")
+
+(def menu-items
+  (partition 3 ["Counter" :counter counter 
+                "Temperature Converter" :temperature-converter temperature-converter 
+                "Flight Booker" :flight-booker nop
+                "Timer" :timer nop
+                "CRUD" :crud nop
+                "Circle Drawer" :circle-drawer nop
+                "Cells" :cells nop]))
+
+(def actions
+  (into {} (map (fn [[_ k f]] [k f]) menu-items)))
+
+(defui ^:once RootComponent
   Object
+  (initLocalState [this]
+    {:menu-selection :temperature-converter
+     :counter 0
+     ;; :celsius 0 :fahrenheit 0
+     })
   (render [this]
-    (let [{{:keys [counter menu-selection]} :state} (om-data this)]
+    (let [{{:keys [menu-selection]} :state} (om-data this)]
       (html
+       (s/container
+        {:style {:marginTop 30}}
+        (s/grid
+            (s/column {:width 3}
+                (apply s/menu {:fluid true :vertical true :tabular true}
+                       (map (fn [[name key _]]
+                              (make-menu-item this menu-selection name key))
+                            menu-items)))
+          (s/column {:width 12 :stretched false}
+              (html
+               ((actions menu-selection) this)))))))))
 
-       [:div
-        (s/container
-         {:style {:marginTop 30}}
-         (s/grid
-           (s/column {:width 4}
-               (s/menu {:fluid true :vertical true :tabular true}
-                      (make-menu-item this "Counter" menu-selection 0)
-                      (make-menu-item this "Foo" menu-selection 1)
-
-                )
-               )
-           (s/column {:width 12 :stretched true}
-               (s/segment
-                "content")
-               ;; (s/button {:primary true
-               ;;            :onClick #(om/update-state! this update :counter inc)}
-               ;;           "Count")
-               )))]))))
-
-(def counter (make-cmp Counter))
+;; (def menu (make-cmp Menu))
 
 ;; (defn ag-grid [props]
 ;;   (let [props (clj->js props)
@@ -104,78 +146,78 @@
 ;;                                                     :checked ~checked})
 ;;                         (keyword (str (name table) "-records"))])))
 
-(defui ^:once RootComponent
-  static om/IQuery
-  (query [this] [:client/reload-key]
-    ;; [:client/reload-key
-    ;;  {:account-records (get queries :account)}
-    ;;  {:user-records (get queries :user)}
-    ;;  {:role-records (get queries :role)}
-    ;;  {:subscription-records (get queries :subscription)}
-    ;;  :client/auth-tables-state
-    ;;  ]
-    )
-  Object
-  ;; (componentDidMount [this]
-  ;;   ;; (isomorphic2)
-  ;;   ;; (om/update-state! assoc :grid grid)
-  ;;   )
-  (render [this]
-    (html
-     [:div
-      (counter this {:foo 1})
-      ;; (let [{:keys [props state computed] :as data} (om-data this)
-      ;;       {:keys [:account-records :user-records :role-records :subscription-records
-      ;;               client/auth-tables-state]} props]
-      ;;   ;; (timbre/info :#pp {:data data ;; :query (om/get-query this)
-      ;;   ;;                    })
-      ;;   (timbre/info :#pp {:PROPS props})
+;; (defui ^:once RootComponent
+;;   static om/IQuery
+;;   (query [this] [:client/reload-key]
+;;     ;; [:client/reload-key
+;;     ;;  {:account-records (get queries :account)}
+;;     ;;  {:user-records (get queries :user)}
+;;     ;;  {:role-records (get queries :role)}
+;;     ;;  {:subscription-records (get queries :subscription)}
+;;     ;;  :client/auth-tables-state
+;;     ;;  ]
+;;     )
+;;   Object
+;;   ;; (componentDidMount [this]
+;;   ;;   ;; (isomorphic2)
+;;   ;;   ;; (om/update-state! assoc :grid grid)
+;;   ;;   )
+;;   (render [this]
+;;     (html
+;;      [:div
+;;       (menu this {:foo 1})
+;;       ;; (let [{:keys [props state computed] :as data} (om-data this)
+;;       ;;       {:keys [:account-records :user-records :role-records :subscription-records
+;;       ;;               client/auth-tables-state]} props]
+;;       ;;   ;; (timbre/info :#pp {:data data ;; :query (om/get-query this)
+;;       ;;   ;;                    })
+;;       ;;   (timbre/info :#pp {:PROPS props})
 
 
-      ;;   (html [:div {:class "level"}
-      ;;          [:div {:class "level-item has-text-centered"}
-      ;;           ;; s/container {:fluid false}
-      ;;           [:div {:style {:margin "10px 100px 10px 100px"}}
-      ;;            "Accounts"
-      ;;            (s/checkbox {:label "Selected user:"
-      ;;                         :onClick #(set-table-constraints this :account :user %2)})
-      ;;            (s/checkbox {:label "Selected role:"
-      ;;                         :onClick #(set-table-constraints this :account :role %2)})
-      ;;            (table this {:rows account-records  :table :account :auth-tables-state auth-tables-state})
-      ;;            "Users"
-      ;;            "   Filter on:"
-      ;;            (s/checkbox {:label "Selected account:"
-      ;;                         :onClick #(set-table-constraints this :user :account %2)})
-      ;;            (s/checkbox {:label "Selected role:"
-      ;;                         :onClick #(set-table-constraints this :user :role %2)})
-      ;;            (table this {:rows user-records :table :user :auth-tables-state auth-tables-state})
-      ;;            "Roles"
-      ;;            (s/checkbox {:label "Selected account:"
-      ;;                         :onClick #(set-table-constraints this :role :account %2)})
-      ;;            (s/checkbox {:label "Selected user:"
-      ;;                         :onClick #(set-table-constraints this :role :user %2)})
-      ;;            (table this {:rows role-records :table :role :auth-tables-state auth-tables-state})
-      ;;            "Subscriptions"
-      ;;            (s/checkbox {:label "Selected account:"})
-      ;;            (s/checkbox {:label "Selected user:"})
-      ;;            (table this {:rows subscription-records :table :subscription :auth-tables-state auth-tables-state})]
+;;       ;;   (html [:div {:class "level"}
+;;       ;;          [:div {:class "level-item has-text-centered"}
+;;       ;;           ;; s/container {:fluid false}
+;;       ;;           [:div {:style {:margin "10px 100px 10px 100px"}}
+;;       ;;            "Accounts"
+;;       ;;            (s/checkbox {:label "Selected user:"
+;;       ;;                         :onClick #(set-table-constraints this :account :user %2)})
+;;       ;;            (s/checkbox {:label "Selected role:"
+;;       ;;                         :onClick #(set-table-constraints this :account :role %2)})
+;;       ;;            (table this {:rows account-records  :table :account :auth-tables-state auth-tables-state})
+;;       ;;            "Users"
+;;       ;;            "   Filter on:"
+;;       ;;            (s/checkbox {:label "Selected account:"
+;;       ;;                         :onClick #(set-table-constraints this :user :account %2)})
+;;       ;;            (s/checkbox {:label "Selected role:"
+;;       ;;                         :onClick #(set-table-constraints this :user :role %2)})
+;;       ;;            (table this {:rows user-records :table :user :auth-tables-state auth-tables-state})
+;;       ;;            "Roles"
+;;       ;;            (s/checkbox {:label "Selected account:"
+;;       ;;                         :onClick #(set-table-constraints this :role :account %2)})
+;;       ;;            (s/checkbox {:label "Selected user:"
+;;       ;;                         :onClick #(set-table-constraints this :role :user %2)})
+;;       ;;            (table this {:rows role-records :table :role :auth-tables-state auth-tables-state})
+;;       ;;            "Subscriptions"
+;;       ;;            (s/checkbox {:label "Selected account:"})
+;;       ;;            (s/checkbox {:label "Selected user:"})
+;;       ;;            (table this {:rows subscription-records :table :subscription :auth-tables-state auth-tables-state})]
 
-      ;;            ;; (container
-      ;;            ;;  (grid {:columns 3 :divided true}
-      ;;            ;;    (row {}
-      ;;            ;;      (column {}
-      ;;            ;;        (str "Aum starter app " (-> props :user first :name)))
-      ;;            ;;      (column
-      ;;            ;;          (button {:primary true :circular true  :onClick #(println "Hello world")} "Click me!!!")))
-      ;;            ;;    (row
-      ;;            ;;        ;; (ag-grid)
-      ;;            ;;        (column (str "Aum starter app " (-> props :user first :name)))
-      ;;            ;;      (column
-      ;;            ;;          (checkbox ;; {:primary true :circular true  :onClick #(println "Hello world")}
-      ;;            ;;           "Click me!!!")))))
-      ;;            ]]))
-      ])
-    ))
+;;       ;;            ;; (container
+;;       ;;            ;;  (grid {:columns 3 :divided true}
+;;       ;;            ;;    (row {}
+;;       ;;            ;;      (column {}
+;;       ;;            ;;        (str "Aum starter app " (-> props :user first :name)))
+;;       ;;            ;;      (column
+;;       ;;            ;;          (button {:primary true :circular true  :onClick #(println "Hello world")} "Click me!!!")))
+;;       ;;            ;;    (row
+;;       ;;            ;;        ;; (ag-grid)
+;;       ;;            ;;        (column (str "Aum starter app " (-> props :user first :name)))
+;;       ;;            ;;      (column
+;;       ;;            ;;          (checkbox ;; {:primary true :circular true  :onClick #(println "Hello world")}
+;;       ;;            ;;           "Click me!!!")))))
+;;       ;;            ]]))
+;;       ])
+;;     ))
 
 
 ;; [:div {:id "my-id"}

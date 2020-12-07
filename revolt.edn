@@ -95,11 +95,13 @@
                                                  :provides ["js.react"
                                                             "js.react-dom"
                                                             "js.moment"
-                                                            "js.react-datetime"]
+                                                            "js.react-datetime"
+                                                            "js.semantic-ui-react"]
                                                  :global-exports {js.react React
                                                                   js.react-dom ReactDOM
                                                                   js.moment moment
-                                                                  js.react.datetime ReactDatetime}}]}
+                                                                  js.react.datetime ReactDatetime
+                                                                  js.semantic-ui-react SemanticUIReact}}]}
                       ;;Compiler config gets merged with each build
                       :builds [{:id "main"
                                 :source-paths ["src" "src-frontend"]}]}

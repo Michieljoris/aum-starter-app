@@ -4,6 +4,7 @@
    [goog.object :as goog]
    [js.react :as react]))
 
+
 (defn component
   "Get a component from sematic-ui-react:
     (component \"Button\")
