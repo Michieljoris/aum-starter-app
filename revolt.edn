@@ -32,7 +32,7 @@
 
  :revolt.task/test   {:report :pretty}
 
- :pagora.revolt.task/sass   {:source-path "src-styling/scss"
+ :pagora.revolt.task/sass   {:source-path "src/styling/scss"
                              :output-path "public/app"}
 
  :pagora.revolt.task/assets {:assets-paths ["assets"]
@@ -126,7 +126,7 @@
  :revolt.plugin/rebel {:init-ns "clj.user"
                        :init-banner "Welcome to the rebel.\n"}
 
- :revolt.plugin/watch {:on-change {:pagora.revolt.task/sass "glob:src-styling/scss/*.scss"
+ :revolt.plugin/watch {:on-change {:pagora.revolt.task/sass "glob:src/styling/scss/*.scss"
                                    ;; :revolt.task/test "glob:**/*.clj"
                                    }}
 
