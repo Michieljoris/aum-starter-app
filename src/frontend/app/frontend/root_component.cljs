@@ -13,6 +13,10 @@
    [frontend.app.frontend.semantic :as s]
    ))
 
+;;TODO:
+
+;; Temperature: When the user enters a non-numerical string into TC the value in
+;; TF is not updated and vice versa.
 
 
 (defn counter [this]
@@ -34,14 +38,14 @@
   (let [{:keys [state]} (om-data this)
         label (str/capital (name type))]
     [:div {:class "ui right labeled input"}
-     [:input {:type "number" :placeholder (str "Enter " label)
+     [:input {:type "number"
               :style {:width 60}
-              :value (or (js/Math.round (get state type)) "")
-              :onChange (fn [event]
-                          (let [value (goog/getValueByKeys event "target" "value")]
-                            (om/update-state! this assoc type value)
-                            (om/update-state! this assoc other-type (conversion-fn value))))}]
-     [:div {:class "ui basic label label"} label]]))
+              :value (if-let [v (get state type)]
+                       (js/Math.round v) "")
+              :onChange #(let [value (goog/getValueByKeys % "target" "value")]
+                          (om/update-state! this assoc type value)
+                          (om/update-state! this assoc other-type (conversion-fn value)))}]
+     [:div {:class "ui basic label"} label]]))
 
 (defn temperature-converter [this]
   [:div
@@ -49,18 +53,118 @@
    [:span {:class "pad-lef-5 pad-rig-5"} "="]
    (temperature-input this :fahrenheit :celsius fahrenheit->celsius)])
 
+
+
+(defn date? [m]
+  (.isValid m) )
+
+(def flight-options
+  [{:text "One way flight"
+     :value :one-way-flight}
+   {:text "Return flight"
+    :value :return-flight}])
+
+(defn enter-date [this date-type {:keys [error? disabled?]}]
+  (let [{:keys [state]} (om-data this)
+        date (state date-type)]
+    [:div {:class (cond-> "ui left labeled input mar-top-10"
+                    error? (str " error"))}
+     [:input {:type "text" :value (or date "")
+              :style {:width 110}
+              :disabled disabled?
+              :onChange #(let [value (goog/getValueByKeys % "target" "value")]
+                           (om/update-state! this assoc date-type value))} ]]))
+
+(defn flight-booker [this]
+  (let [{{:keys [flight-type leave-date return-date]} :state} (om-data this)
+        leave-moment (js/moment leave-date "DD.MM.YYYY" true)
+        return-moment (js/moment return-date "DD.MM.YYYY" true)
+        valid-leave-date? (date? leave-moment)
+        valid-return-date? (date? return-moment)]
+    [:div
+     ;; Select flight type
+     (s/dropdown {:inline true
+                  :options flight-options
+                  :onChange  #(om/update-state! this assoc
+                                                :flight-type (keyword (goog/getValueByKeys %2 "value")))
+                  :value flight-type}) [:br]
+
+     ;; Enter leave date
+     (enter-date this  :leave-date {:error? (not valid-leave-date?)
+                                    :disabled? false}) [:br]
+
+     ;; Enter return date
+     (enter-date this  :return-date {:error? (not valid-return-date?)
+                                     :disabled? (= flight-type :one-way-flight)}) [:br]
+
+     ;; Book flight
+     (s/button {:basic true
+                :style {:marginTop 10}
+                :disabled (case flight-type
+                            :one-way-flight (not valid-leave-date?)
+                            :return-flight (or (not valid-leave-date?) (not valid-return-date?)
+                                               (.isSameOrAfter leave-moment return-moment)))
+                :onClick #(om/update-state! this assoc :flight-booker-modal-open? true)}
+               "Book")
+    
+     ;; Dialog
+     (s/modal
+      {:onClose #(om/update-state! this assoc :flight-booker-modal-open? false)
+       :size "tiny"
+       :open (:flight-booker-modal-open? (om/get-state this))
+       :content (case flight-type
+                  :one-way-flight (str "You booked a one-way flight on " leave-date)
+                  :return-flight (str "You booked a return flight on " leave-date " and " return-date))
+       :actions [{:key "ok", :content "OK", :positive true }]})]))
+
+(defn timer [this]
+  (let [{{:keys [tick ticker max-tick]} :state} (om-data this)]
+    ;;TODO: turn off ticker in other guis
+    (when (not ticker)
+      (om/update-state! this assoc :ticker
+                        (js/setInterval #(let [{{:keys [tick max-tick]} :state} (om-data this)]
+                                          (when (< tick max-tick)
+                                            (om/update-state! this update :tick inc))) 100)))
+    
+    [:div
+     [:div "Elapsed time:"]
+     (s/progress {:style {:marginBottom 20 :minWidth 0}
+                  :value tick
+                  :total max-tick})
+     (str (/ tick 10) "s")
+     [:br]
+
+     [:div {:class "ui input mar-top-10"
+            :style {:width "100%"}}
+      [:span {:class "mar-rig-10"} "Duration: "]
+      [:input {:type "range"
+               :min 1
+               :max 400
+               :value max-tick
+               :style {:padding 0}
+               :onChange #(let [value (goog/getValueByKeys % "target" "value")]
+                            (om/update-state! this assoc :max-tick value))} ]]
+     [:br]
+     (s/button {:style {:marginTop "10px"}
+                :basic true
+                :onClick #(om/update-state! this assoc :tick 0)}
+               "Reset")])
+)
+
+(defn nop [this] "not implemented")
+
 (defn make-menu-item [this selection name item]
   (s/menu-item {:name name :active (= selection item)
                 :id item
-                :onClick #(om/update-state! this assoc :menu-selection item)}))
-
-(defn nop [this] "not implemented")
+                :onClick #(do
+                           (js/clearInterval (:ticker (om/get-state this)))
+                           (om/update-state! this assoc :menu-selection item :ticker nil))}))
 
 (def menu-items
   (partition 3 ["Counter" :counter counter 
                 "Temperature Converter" :temperature-converter temperature-converter 
-                "Flight Booker" :flight-booker nop
-                "Timer" :timer nop
+                "Flight Booker" :flight-booker flight-booker
+                "Timer" :timer timer
                 "CRUD" :crud nop
                 "Circle Drawer" :circle-drawer nop
                 "Cells" :cells nop]))
@@ -71,9 +175,12 @@
 (defui ^:once RootComponent
   Object
   (initLocalState [this]
-    {:menu-selection :temperature-converter
+    {:menu-selection :timer
      :counter 0
-     ;; :celsius 0 :fahrenheit 0
+     :tick 0 :max-tick 100
+     :flight-type :one-way-flight
+     :leave-date "24.12.2020"
+     :return-date "24.12.2020"
      })
   (render [this]
     (let [{{:keys [menu-selection]} :state} (om-data this)]
