@@ -11,3 +11,8 @@ html {
 .ui.progress .bar {
     min-width: 0;
 }
+
+.ui.dimmer {
+    z-index: 5000000;
+    background-color: rgba(0, 0, 0, 0.00);
+}

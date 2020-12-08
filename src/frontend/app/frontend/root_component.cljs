@@ -10,7 +10,8 @@
    ;; [js.ag-grid-react :as ag-grid-class]
    ;; [js.react-data-grid :as react-data-grid-class]
    ;; [pagora.aum.modules.semantic.core :as s]
-   [frontend.app.frontend.semantic :as s]
+   [app.frontend.circle-drawer :refer [circle-drawer]]
+   [app.frontend.semantic :as s]
    ))
 
 ;;TODO:
@@ -148,8 +149,67 @@
      (s/button {:style {:marginTop "10px"}
                 :basic true
                 :onClick #(om/update-state! this assoc :tick 0)}
-               "Reset")])
-)
+               "Reset")]))
+
+(defn make-crud-list-item [this crud-selection {:keys [id first-name surname]}]
+  (s/list-item {:style {:color "#000000de"}
+                :onClick (fn []
+                           (om/update-state! this assoc :selected-id id)
+                           (om/update-state! this assoc :first-name first-name)
+                           (om/update-state! this assoc :surname surname))
+                :active (= crud-selection id)} (str surname ", " first-name)))
+
+(defn crud [this]
+  (let [{{:keys [selected-id crud-list first-name surname next-id filter-str]} :state} (om-data this)]
+    [:div
+     ;; Filter
+     (s/form (s/form-field {:inline true}
+                           (html
+                            [:label {:style {:min-width 70}} "Filter prefix"])
+                           (s/input {:onChange #(let [value (goog/getValueByKeys % "target" "value")]
+                                                  (om/update-state! this assoc :filter-str value))}))) [:br]
+     (s/grid
+         (s/row
+             ;; List of persons on the left
+             (s/column {:width 10}
+                 (s/segment {:style {:height 300
+                                     :overflowX "auto"
+                                     :overflowY "auto"}}
+                            (apply s/list {:selection true :verticalAlign "middle"}
+                                   (->> (vals crud-list)
+                                        (filter #(or (str/empty-or-nil? filter-str)
+                                                     (str/starts-with? (:surname %) filter-str)))
+                                        (map (partial make-crud-list-item this selected-id))))))
+           ;; First and last name inputs on the right
+           (s/column {:width 6}
+               (s/form (s/form-field {:inline true}
+                                     (html
+                                      [:label {:style {:min-width 70}} "First name"])
+                                     (s/input {:value (or first-name "")
+                                               :onChange #(let [value (goog/getValueByKeys % "target" "value")]
+                                                            (om/update-state! this assoc :first-name value))}))
+                       (s/form-field {:inline true}
+                                     (html
+                                      [:label {:style {:min-width 70}} "Surname"])
+                                     (s/input {:value (or surname "")
+                                               :onChange #(let [value (goog/getValueByKeys % "target" "value")]
+                                                            (om/update-state! this assoc :surname value))})))))) [:br]
+
+     ;; Cud buttons
+     [:div
+      (s/button {:basic true
+                 :onClick  #(do
+                              (om/update-state! this update :crud-list assoc
+                                                next-id {:id next-id :first-name first-name :surname surname})
+                              (om/update-state! this update :next-id inc))}
+                "Create")
+      (s/button {:basic true
+                 :onClick  #(om/update-state! this update-in [:crud-list selected-id] merge
+                                              {:first-name first-name :surname surname})}
+                "Update")
+      (s/button {:basic true
+                 :onClick  #(om/update-state! this update :crud-list dissoc selected-id)}
+                "Delete")]]))
 
 (defn nop [this] "not implemented")
 
@@ -165,8 +225,8 @@
                 "Temperature Converter" :temperature-converter temperature-converter 
                 "Flight Booker" :flight-booker flight-booker
                 "Timer" :timer timer
-                "CRUD" :crud nop
-                "Circle Drawer" :circle-drawer nop
+                "CRUD" :crud crud
+                "Circle Drawer" :circle-drawer circle-drawer
                 "Cells" :cells nop]))
 
 (def actions
@@ -175,27 +235,34 @@
 (defui ^:once RootComponent
   Object
   (initLocalState [this]
-    {:menu-selection :timer
+    {:menu-selection :circle-drawer
      :counter 0
      :tick 0 :max-tick 100
      :flight-type :one-way-flight
      :leave-date "24.12.2020"
      :return-date "24.12.2020"
+     :crud-list (array-map 1 {:id 1 :first-name "Hans" :surname "Emil"}
+                           2 {:id 2 :first-name "Max" :surname "Musterman"})
+     :next-id 3
+     :diameter 50
+     :circles [{:diameter 40 :filled? false :x 0 :y 0 :z-index 0}]
+     :next-z-index 1
      })
   (render [this]
     (let [{{:keys [menu-selection]} :state} (om-data this)]
       (html
        (s/container
-        {:style {:marginTop 30}}
-        (s/grid
-            (s/column {:width 3}
-                (apply s/menu {:fluid true :vertical true :tabular true}
-                       (map (fn [[name key _]]
-                              (make-menu-item this menu-selection name key))
-                            menu-items)))
-          (s/column {:width 12 :stretched false}
-              (html
-               ((actions menu-selection) this)))))))))
+        (s/grid {:style {:paddingTop 30}}
+          (s/row
+              (s/column {:width 4}
+                  (apply s/menu {:fluid true :vertical true :tabular true}
+                         (map (fn [[name key _]]
+                                (make-menu-item this menu-selection name key))
+                              menu-items)))
+              (s/column {:width 12 :stretched false}
+                  (html
+                   ((actions menu-selection) this)))))
+        )))))
 
 ;; (def menu (make-cmp Menu))
 

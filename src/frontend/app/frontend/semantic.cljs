@@ -1,4 +1,4 @@
-(ns frontend.app.frontend.semantic
+(ns app.frontend.semantic
   (:require
    [js.semantic-ui-react :as semantic-ui]
    [goog.object :as goog]
@@ -32,12 +32,19 @@
 (def dropdown       (component "Dropdown"))
 (def confirm        (component "Confirm"))
 (def modal          (component "Modal"))
-(def modal-header   (component "Modal Header"))
-(def modal-content  (component "Modal Content"))
-(def modal-description (component "Modal Description"))
-(def modal-actions  (component "Modal Actions"))
-(def modal-dimmer   (component "Modal Dimmer"))
+(def modal-header   (component "Modal" "Header"))
+(def modal-content  (component "Modal" "Content"))
+(def modal-description (component "Modal" "Description"))
+(def modal-actions  (component "Modal" "Actions"))
+(def modal-dimmer   (component "Modal" "Dimmer"))
 (def segment        (component "Segment"))
+(def form           (component "Form"))
+(def form-field     (component "Form" "Field"))
+(def input          (component "Input"))
+(def list           (component "List"))
+(def list-item      (component "List" "Item"))
+(def list-header    (component "List" "Header"))
+(def list-content   (component "List" "Content"))
 (def progress       (component "Progress"))
 (def dimmer         (component "Dimmer"))
 (def loader         (component "Loader"))
