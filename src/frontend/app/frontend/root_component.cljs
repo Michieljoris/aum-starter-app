@@ -10,14 +10,16 @@
    ;; [js.ag-grid-react :as ag-grid-class]
    ;; [js.react-data-grid :as react-data-grid-class]
    ;; [pagora.aum.modules.semantic.core :as s]
-   [app.frontend.circle-drawer :refer [circle-drawer]]
    [app.frontend.semantic :as s]
+   [app.frontend.circle-drawer :refer [circle-drawer]]
+   [app.frontend.cells :refer [cells]]
    ))
 
 ;;TODO:
-
+;; Put semantic back in aum
 ;; Temperature: When the user enters a non-numerical string into TC the value in
 ;; TF is not updated and vice versa.
+;; get state not via om-data, overkill without using computed and props
 
 
 (defn counter [this _]
@@ -53,8 +55,6 @@
    (temperature-input this :celsius :fahrenheit celsius->fahrenheit)
    [:span {:class "pad-lef-5 pad-rig-5"} "="]
    (temperature-input this :fahrenheit :celsius fahrenheit->celsius)])
-
-
 
 (defn date? [m]
   (.isValid m) )
@@ -227,7 +227,7 @@
                 "Timer" :timer timer
                 "CRUD" :crud crud
                 "Circle Drawer" :circle-drawer circle-drawer
-                "Cells" :cells nop]))
+                "Cells" :cells cells]))
 
 (def actions
   (into {} (map (fn [[_ k f]] [k f]) menu-items)))
@@ -237,7 +237,7 @@
   (query [this] [:client/reload-key])
   Object
   (initLocalState [this]
-    {:menu-selection :circle-drawer
+    {:menu-selection :cells ;;default menu selection
      :counter 0
      :tick 0 :max-tick 100
      :flight-type :one-way-flight
