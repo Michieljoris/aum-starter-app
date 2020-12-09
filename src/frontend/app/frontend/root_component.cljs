@@ -20,7 +20,7 @@
 ;; TF is not updated and vice versa.
 
 
-(defn counter [this]
+(defn counter [this _]
   (let [{{:keys [counter]} :state} (om-data this)]
     [:div (s/button {:basic true
                      :style {:marginRight 10}
@@ -48,7 +48,7 @@
                           (om/update-state! this assoc other-type (conversion-fn value)))}]
      [:div {:class "ui basic label"} label]]))
 
-(defn temperature-converter [this]
+(defn temperature-converter [this _]
   [:div
    (temperature-input this :celsius :fahrenheit celsius->fahrenheit)
    [:span {:class "pad-lef-5 pad-rig-5"} "="]
@@ -76,7 +76,7 @@
               :onChange #(let [value (goog/getValueByKeys % "target" "value")]
                            (om/update-state! this assoc date-type value))} ]]))
 
-(defn flight-booker [this]
+(defn flight-booker [this _]
   (let [{{:keys [flight-type leave-date return-date]} :state} (om-data this)
         leave-moment (js/moment leave-date "DD.MM.YYYY" true)
         return-moment (js/moment return-date "DD.MM.YYYY" true)
@@ -118,7 +118,7 @@
                   :return-flight (str "You booked a return flight on " leave-date " and " return-date))
        :actions [{:key "ok", :content "OK", :positive true }]})]))
 
-(defn timer [this]
+(defn timer [this _]
   (let [{{:keys [tick ticker max-tick]} :state} (om-data this)]
     ;;TODO: turn off ticker in other guis
     (when (not ticker)
@@ -159,7 +159,7 @@
                            (om/update-state! this assoc :surname surname))
                 :active (= crud-selection id)} (str surname ", " first-name)))
 
-(defn crud [this]
+(defn crud [this _]
   (let [{{:keys [selected-id crud-list first-name surname next-id filter-str]} :state} (om-data this)]
     [:div
      ;; Filter
@@ -233,6 +233,8 @@
   (into {} (map (fn [[_ k f]] [k f]) menu-items)))
 
 (defui ^:once RootComponent
+  static om/IQuery
+  (query [this] [:client/reload-key])
   Object
   (initLocalState [this]
     {:menu-selection :circle-drawer
@@ -244,9 +246,6 @@
      :crud-list (array-map 1 {:id 1 :first-name "Hans" :surname "Emil"}
                            2 {:id 2 :first-name "Max" :surname "Musterman"})
      :next-id 3
-     :diameter 50
-     :circles [{:diameter 40 :filled? false :x 0 :y 0 :z-index 0}]
-     :next-z-index 1
      })
   (render [this]
     (let [{{:keys [menu-selection]} :state} (om-data this)]
@@ -261,7 +260,7 @@
                               menu-items)))
               (s/column {:width 12 :stretched false}
                   (html
-                   ((actions menu-selection) this)))))
+                   ((actions menu-selection) this {})))))
         )))))
 
 ;; (def menu (make-cmp Menu))
