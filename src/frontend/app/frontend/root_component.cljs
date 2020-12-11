@@ -4,6 +4,7 @@
    [pagora.aum.om.next :as om :refer-macros [defui]]
    [taoensso.timbre :as timbre]
    [pagora.aum.frontend.util :refer [make-cmp om-data]]
+   [app.frontend.cells :refer [Cells]]
    [goog.object :as goog]
    [cuerdas.core :as str]
    [js.react :as react]
@@ -234,7 +235,8 @@
 
 (defui ^:once RootComponent
   static om/IQuery
-  (query [this] [:client/reload-key])
+  (query [this] [:client/reload-key
+                 {:cells-data (om/get-query Cells)}])
   Object
   (initLocalState [this]
     {:menu-selection :cells ;;default menu selection
@@ -248,20 +250,30 @@
      :next-id 3
      })
   (render [this]
-    (let [{{:keys [menu-selection]} :state} (om-data this)]
+    (let [{{:keys [menu-selection]} :state
+           props :props} (om-data this)]
+      (timbre/info :#pp {:root-query (om/get-query this)})
+      ;; (timbre/info :#pp {:props props})
+
+
       (html
-       (s/container
-        (s/grid {:style {:paddingTop 30}}
-          (s/row
-              (s/column {:width 4}
-                  (apply s/menu {:fluid true :vertical true :tabular true}
-                         (map (fn [[name key _]]
-                                (make-menu-item this menu-selection name key))
-                              menu-items)))
-              (s/column {:width 12 :stretched false}
-                  (html
-                   ((actions menu-selection) this {})))))
-        )))))
+       (cells this :cells-data)
+       )
+      ;; (comment
+      ;;  (html
+      ;;   (s/container
+      ;;    (s/grid {:style {:paddingTop 30}}
+      ;;      (s/row
+      ;;          (s/column {:width 4}
+      ;;              (apply s/menu {:fluid true :vertical true :tabular true}
+      ;;                     (map (fn [[name key _]]
+      ;;                            (make-menu-item this menu-selection name key))
+      ;;                          menu-items)))
+      ;;        (s/column {:width 12 :stretched false}
+      ;;            (html
+      ;;             ((actions menu-selection) this {})))))
+      ;;    )))
+      )))
 
 ;; (def menu (make-cmp Menu))
 

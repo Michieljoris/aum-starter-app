@@ -6,187 +6,100 @@
    [pagora.aum.frontend.util :refer [make-cmp om-data]]
    [goog.object :as goog]
    [cuerdas.core :as str]
-   [cljs.reader :refer [read-string]]
-   [instaparse.core :as insta]
+   [app.frontend.compute-cells :refer [parse-formula Emptie refs evaluate cell-str alphabet]]
    [app.frontend.semantic :as s]))
 
-(def alphabet "ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+(def cells-dimensions {:rows 100 :columns 26
+                       :view-port-size 600
+                       :grid-size 2500})
+;; (def cells-dimensions {:rows 4 :columns 4
+;;                        :view-port-size 600
+;;                        :grid-size 600})
 
-(defprotocol Formula
-  (evaluate   [this data])
-  (refs   [this data])
-  (to-str [this]))
+(defn update-cell [this event {:keys [r c] :as cell}]
+  (let [app-state (deref (om/app-state (om/get-reconciler this)))
+        get-dependents (fn collect-dependents [{:keys [observers]}]
+                         (apply conj observers (mapcat collect-dependents
+                                                       (map #(get-in app-state (conj [:cells/by-rc] %)) observers))))
 
-(defrecord Textual [value]
-  Formula
-  (evaluate   [this data] 0.0)
-  (refs   [this data] [])
-  (to-str [this] value))
+        dependents (get-dependents (get-in app-state [:cells/by-rc [r c]]))
+        dependents (map #(conj [:cells/by-rc] %) dependents)
+        content (or (goog/getValueByKeys event "target" "value") "")
+        mutation `(cells/update {:cell ~[r c] :content ~content})]
+    (om/update-state! this assoc :active? nil)
+    (om/transact! this (apply conj [mutation] dependents))))
 
-(defrecord Decimal [value]
-  Formula
-  (evaluate   [this data] value)
-  (refs   [this data] [])
-  (to-str [this] (str value)))
+(defui ^:once TableCell
+  static om/Ident
+  (ident [this {:keys [r c]}]
+    [:cells/by-rc [r c]])
+  static om/IQuery
+  (query [this] [:r :c :value :formula :content :observers])
+  Object
+  (render [this]
+    (let [{{:keys [r c content] :as cell} :props
+           {:keys [active?]} :state} (om-data this)
+          {:keys [grid-size columns]} cells-dimensions]
 
-(defrecord Coord [row column]
-  Formula
-  (evaluate   [this data] (:value (get data [row column])))
-  (refs   [this data] [(get data [row column])])
-  (to-str [this] (str (get alphabet column) row)))
+      (s/table-cell
+       {:id (+ r c)
+        :style {:maxWidth 0}
+        :onClick #(when (not active?)
+                   (om/update-state! this assoc :active? nil))
+        :onDoubleClick #(om/update-state! this assoc :active? true)}
 
-(defrecord Reange [coord1 coord2]
-  Formula
-  (evaluate   [this data] js/NaN)
-  (refs   [this data] (for [row (range (:row coord1) (inc (:row coord2)))
-                            col (range (:column coord1) (inc (:column coord2)))]
-                        (get data [row col])))
-  (to-str [this] (str (to-str coord1) ":" (to-str coord2))))
+       (html
+        (if active?
+          (s/input {:fluid true  :transparent true :autoFocus true
+                    :defaultValue content
+                    :onKeyPress #(let [char-code (goog/get % "which")]
+                                   (when (= (char char-code) \return)
+                                     (update-cell this % cell)))
+                    :onBlur #(update-cell this % cell)})
+          [:div {:style {:overflow "hidden"}}
+           [:span (cell-str cell)]]))))))
 
-(defn eval-list [formula data]
-  (if (= Reange (type formula))
-    (map #(:value %) (refs formula data))
-    [(evaluate formula data)]))
-
-(def op-table
-  {"add" #(+ %1 %2)
-   "sub" #(- %1 %2)
-   "div" #(/ %1 %2)
-   "mul" #(* %1 %2)
-   "mod" #(mod %1 %2)
-   "sum" +
-   "prod" *})
-
-(defrecord Application [function arguments]
-  Formula
-  (evaluate   [this data]
-    (let [argvals (mapcat #(eval-list % data) arguments)]
-      (try
-        (apply (get op-table function) argvals)
-        (catch :default e js/NaN))))
-  (refs   [this data] (mapcat #(refs % data) arguments))
-  (to-str [this] (str function "(" (str/join ", " (map to-str arguments)) ")")))
-
-(def Emptie (Textual. ""))
-
-(defn parse-formula [formula-str]
-  (let [result
-         ((insta/parser "
-          formula = decimal / textual / (<'='> expr)
-          expr    = range / cell / decimal / app
-          app     = ident <'('> (expr <','>)* expr <')'>
-          range   = cell <':'> cell
-          cell    = #'[A-Za-z]\\d+'
-          textual = #'[^=].*'
-          ident   = #'[a-zA-Z_]\\w*'
-          decimal = #'-?\\d+(\\.\\d*)?'
-          ") formula-str)]
-    (if (insta/failure? result)
-      (Textual. "Error" ;; (str (insta/get-failure result))
-                )
-      (insta/transform
-        {:decimal #(Decimal. (js/parseFloat %))
-         :ident   str
-         :textual #(Textual. %)
-         :cell    #(Coord. (read-string (subs % 1))
-                           (.indexOf alphabet (first %)))
-         :range   #(Reange. %1 %2)
-         :app     (fn [f & as]
-                    (Application. f (vec as)))
-         :expr    identity
-         :formula identity
-         } result))))
-
-(defn cell-at [this x y]
-  (get-in (om/get-state this) [:cells [x y]]))
-
-(defn cell-str [{value :value formula :formula}]
-  (if (= Textual (type formula))
-    (to-str formula)
-    (str value)))
-
-;; ==================================================
-
-(defn change-prop [this {:keys [r c value formula observers]}]
-  (let [cells (:cells (om/get-state this))
-        new-value  (evaluate formula cells)]
-    (when-not (or (= value new-value) (and (js/isNaN value) (js/isNaN new-value)))
-      (om/update-state! this assoc-in [:cells [r c] :value] new-value)
-      (doseq [[r c] observers] (change-prop this (cell-at this r c))))))
-
-(defn update-cell [this event r c cells]
-  (let [content (or (goog/getValueByKeys event "target" "value") "")
-        formula (if (empty? content)
-                  Emptie
-                  (parse-formula content))
-        oldform (:formula (cells [r c]))]
-    (doseq [cell (refs oldform cells)]
-      (om/update-state! this update-in [:cells [(:r cell) (:c cell)] :observers]
-                        (fn [obs] (remove #(= % [r c]) obs))))
-    (doseq [cell (refs formula cells)]
-      (om/update-state! this update-in [:cells [(:r cell) (:c cell)] :observers]
-             #(conj % [r c])))
-
-    (om/update-state! this update-in [:cells [r c]] assoc :formula formula :content content)
-    (change-prop this (cell-at this r c))))
-
-(defn table [this cells size]
-  (let [{:keys [active-cell]} (om/get-state this)]
-    [:div {:style {:width size :overflow "auto"
-                   :height size }}
-     [:div {:style {:width 2500}}
-      (s/table
-       {:definition true :compact "very" :celled true :size "small"}
-       (s/table-header {:fullWidth true }
-                       (apply s/table-row
-                              (s/table-header-cell)
-                              (map
-                               #(s/table-header-cell {:textAlign "center"} %)
-                               (seq alphabet))))
-       (apply s/table-body
-              (map
-               (fn [r]
-                 (apply s/table-row
-                        (s/table-cell {:collapsing true} r)
-                        (map (fn [c]
-                               (s/table-cell
-                                {:id (+ r c)
-                                 :style {:maxWidth (/ size 26)}
-                                 :onClick (fn []
-                                            (when (not= [r c] active-cell)
-                                              (om/update-state! this assoc :active-cell nil)))
-                                 :onKeyPress #(let [char-code (goog/get % "which")]
-                                                (when (= (char char-code) \return)
-                                                  (update-cell this % r c cells)
-                                                  (om/update-state! this assoc :active-cell nil)))
-                                 :onDoubleClick #(om/update-state! this assoc :active-cell [r c])}
-                               
-                                (html
-                                 (if (= active-cell [r c])
-                                   (s/input {:fluid true  :transparent true :autoFocus true
-                                             :defaultValue (get-in cells [[r c] :content])
-                                             :onBlur #(update-cell this % r c cells)})
-                                   [:div {:style {:overflow "hidden"}}
-                                    [:span (cell-str (cells [r c]))]]))))
-                             (range 26))))
-               (range 100))))]]))
-
-(defn make-data [height width]
-  (into {} (for [r (range height) c (range width)]
-             [[r c] {:r r :c c :value "" :formula Emptie :observers []}])))
+(def table-cell (make-cmp TableCell))
 
 (defui ^:once Cells
   static om/IQuery
-  (query [this] [])
+  (query [this] [{:cells (om/get-query TableCell)}])
   Object
-  (initLocalState [this]
-   {:cells (make-data 100 26)})
-  (render [this ]
-    (let [{{:keys [cells]} :state} (om-data this)]
+  (render [this]
+    (let [{{:keys [cells]}:props} (om-data this)
+          {:keys [view-port-size grid-size columns rows]} cells-dimensions]
+      (timbre/info :#pp {:cells-query (om/get-query this)})
       (html
-       (table this cells 600)))))
+       [:div {:style {:width view-port-size :overflow "auto"
+                      :height view-port-size}}
+        [:div {:style {:width grid-size}}
+         (s/table
+          {:definition true :compact "very" :celled true :size "small"}
+          (s/table-header {:fullWidth true}
+                          (apply s/table-row
+                                 (s/table-header-cell)
+                                 (map
+                                  #(s/table-header-cell {:textAlign "center"} %)
+                                  (take (:columns cells-dimensions) (seq alphabet)))))
+
+          (apply s/table-body
+                 (map (fn [r]
+                        (apply s/table-row
+                               (s/table-cell {:collapsing true} r)
+                               (map #(table-cell this (nth cells (+ (* r 4) %)))
+                                    (range columns))))
+                      (range rows))))]]))))
 
 (def cells (make-cmp Cells))
+
+
+
+
+
+
+
+
+
 
 ;;============================================
 ;; Scratchpad
@@ -199,8 +112,6 @@
     (:props (om-data this)))
   (render [this]
     (let [{:keys [state props]} (om-data this)]
-      (timbre/info :#pp props)
-
       (s/input {:fluid true  :transparent true
                 ;; :value (or (get-in (om/get-state this) [:cells [r c] :value]) "")
                 :defaultValue (or (:value (om/get-state this)) "")
@@ -247,3 +158,54 @@
       ;; ;;   ;; (js/console.log "to-str:" (to-str formula))
       ;; ;;   ;; (js/console.log (parse-formula "123.1"))
       ;;   )
+
+
+
+;; (defui ^:once Cell
+;;   static om/Ident
+;;   (ident [this {:keys [r c]}]
+;;     [:cells [r c]])
+;;   static om/IQuery
+;;   (query [this] [:r :c :value :formula])
+;;   Object
+;;   (render [this]
+;;     (let [{{:keys [r c value formula] :as cell} :props
+;;            {:keys [active?]} :state} (om-data this)]
+;;       (timbre/info "in Cell")
+
+;;       (timbre/info :#pp cell)
+
+;;       (html [:div "in cell"
+;;              ])
+;;    )))
+
+
+;; (def cell (make-cmp Cell))
+
+
+;; ==================================================
+
+(defn change-prop [this {:keys [r c value formula observers]}]
+  (let [cells (:cells (om/get-state this))
+        new-value  (evaluate formula cells)]
+    (when-not (or (= value new-value) (and (js/isNaN value) (js/isNaN new-value)))
+      (om/update-state! this assoc-in [:cells [r c] :value] new-value)
+      ;; (doseq [[r c] observers] (change-prop this (cell-at this r c)))
+      )))
+
+(defn update-cell-old [this event r c cells]
+  (let [content (or (goog/getValueByKeys event "target" "value") "")
+        formula (if (empty? content)
+                  Emptie
+                  (parse-formula content))
+        oldform (:formula (cells [r c]))]
+    (doseq [cell (refs oldform cells)]
+      (om/update-state! this update-in [:cells [(:r cell) (:c cell)] :observers]
+                        (fn [obs] (remove #(= % [r c]) obs))))
+    (doseq [cell (refs formula cells)]
+      (om/update-state! this update-in [:cells [(:r cell) (:c cell)] :observers]
+             #(conj % [r c])))
+
+    (om/update-state! this update-in [:cells [r c]] assoc :formula formula :content content)
+    ;; (change-prop this (cell-at this r c))
+    ))
