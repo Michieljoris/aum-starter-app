@@ -16,3 +16,6 @@ html {
     z-index: 5000000;
     background-color: rgba(0, 0, 0, 0.00);
 }
+
+.ui[class*="very compact"].table th {
+  padding: 0.4em 0.6em; }

@@ -40,6 +40,7 @@
                 :mvn/version "0.0.0"
                 }
 
+        instaparse {:mvn/version "1.4.10"}
         ;; clj-utils {:git/url "git@github.com:michieljoris/pagora.clj-utils"
         ;;            :sha "??"
         ;;            :mvn/version "0.0.0"
