@@ -1,12 +1,12 @@
-(ns app.frontend.circle-drawer
+(ns app.frontend.sevenguis.circle-drawer 
   (:require
    [sablono.core :as html :refer-macros [html]]
    [pagora.aum.om.next :as om :refer-macros [defui]]
    [taoensso.timbre :as timbre]
-   [pagora.aum.frontend.util :refer [make-cmp om-data]]
+   [pagora.aum.frontend.util :refer [make-cmp]]
    [goog.object :as goog]
    [cuerdas.core :as str]
-   [app.frontend.semantic :as s]))
+   [pagora.aum.modules.semantic.core :as s]))
 
 (defn make-circle [filled? {:keys [id radius x y]}]
   (let [diameter (* radius 2)]
@@ -114,7 +114,7 @@
       (om/update-state! this assoc :current-circle circle))))
 
 (defn canvas [this box-size circles]
-  (let [{{:keys [next-id show-size-menu? current-circle filled?]} :state} (om-data this)]
+  (let [{:keys [next-id show-size-menu? current-circle filled?]} (om/get-state this)]
     [:div {:style {:width box-size :height box-size :border "1px solid lightgrey"}
            :onContextMenu (fn [e]
                             (if show-size-menu? ;;turn off and update filling
@@ -149,7 +149,7 @@
      (map (partial make-circle filled?) (vals circles))]))
 
 (defn size-popup-menu [this]
- (let [{{:keys [click-x click-y current-circle]} :state} (om-data this)]
+  (let [{:keys [click-x click-y current-circle]} (om/get-state this)]
    (s/menu {:vertical true :compact true
             :style {:position "absolute" :top click-y :left click-x
                     :zIndex 6000000}}
@@ -181,7 +181,7 @@
      :filled? {}
      :next-id 1})
   (render [this]
-    (let [{{:keys [show-size-menu? history history-index current-circle]} :state} (om-data this)
+    (let [{:keys [show-size-menu? history history-index current-circle]} (om/get-state this)
           box-size 300
           max-radius 30
           circles (history history-index)]

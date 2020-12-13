@@ -1,10 +1,9 @@
 (ns app.frontend.mutations
  (:require
   [taoensso.timbre :as timbre]
-  [pagora.aum.om.next :refer [ref->any]]
   [pagora.aum.frontend.parser.mutate :refer [mutate]]
-  [app.frontend.compute-cells :refer [Emptie parse-formula refs evaluate]])
-  )
+  [app.frontend.cells-grammar :refer [Emptie parse-formula refs evaluate]]))
+
 (defn cell-at [state cell]
   (get-in @state [:cells/by-rc cell]))
 
@@ -33,6 +32,5 @@
 
 
 (defmethod mutate 'cells/update
-  [{:keys [state reconciler component] :as env} _ {:keys [cell content]}]
-  {:action (fn []
-             (update-cell state cell content))})
+  [{:keys [state] :as env} _ {:keys [cell content]}]
+  {:action #(update-cell state cell content)})

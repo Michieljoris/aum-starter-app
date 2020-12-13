@@ -1,4 +1,4 @@
-(ns app.frontend.compute-cells
+(ns app.frontend.cells-grammar
   (:require
    [taoensso.timbre :as timbre]
    [cuerdas.core :as str]
@@ -96,7 +96,3 @@
   (if (= Textual (type formula))
     (to-str formula)
     (str value)))
-
-(defn make-data [{:keys [rows columns]}]
-  (for [r (range rows) c (range columns)]
-    {:r r :c c :value "" :formula Emptie :observers [] :content ""}))
