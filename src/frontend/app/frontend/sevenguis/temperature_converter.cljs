@@ -3,7 +3,7 @@
    [sablono.core :as html :refer-macros [html]]
    [pagora.aum.om.next :as om :refer-macros [defui]]
    [taoensso.timbre :as timbre]
-   [pagora.aum.frontend.util :refer [make-cmp]]
+   [pagora.aum.frontend.util :refer [make-cmp om-data]]
    [goog.object :as goog]
    [cuerdas.core :as str]))
 
@@ -19,18 +19,21 @@
     [:div {:class "ui right labeled input"}
      [:input {:type "text"
               :style {:width 60}
-              :value (if-let [v (get state type)]
-                       (js/Math.round v) "")
-              :onChange #(let [value (goog/getValueByKeys % "target" "value")]
+              :value (if-let [v (get state type)] v "")
+              :onChange #(let [value (goog/getValueByKeys % "target" "value")
+                               number (js/Number value)]
                           (om/update-state! this assoc type value)
-                          (om/update-state! this assoc other-type (conversion-fn value)))}]
+                           (when-not (js/isNaN number)
+                             (om/update-state! this assoc other-type
+                                               (js/Math.round
+                                                (conversion-fn value)))))}]
      [:div {:class "ui basic label"} label]]))
 
 (defui ^:once TemperatureConverter
   Object
   (render [this]
     (html
-     [:div
+     [:div#temperature-converter
       (temperature-input this :celsius :fahrenheit celsius->fahrenheit)
       [:span {:class "pad-lef-5 pad-rig-5"} "="]
       (temperature-input this :fahrenheit :celsius fahrenheit->celsius)])))

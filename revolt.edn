@@ -104,9 +104,9 @@
                                                                   js.semantic-ui-react SemanticUIReact}}]}
                       ;;Compiler config gets merged with each build
                       :builds [{:id "main"
-                                :source-paths ["src" "src-frontend"]}]}
+                                :source-paths ["src" "src/frontend"]}]}
 
- :pagora.revolt.task/capsule {:exclude-paths #{"test" "src-frontend" "src-aum" "src-clj-utils" "src-revolt"}
+ :pagora.revolt.task/capsule {:exclude-paths #{"test" "src/frontend" "src/aum" "src/clj-utils" "src/revolt"}
                               ;; :aliases [:git-deps]
                               :name "app"
                               :package "pagora"

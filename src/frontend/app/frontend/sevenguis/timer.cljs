@@ -8,20 +8,28 @@
    [pagora.aum.modules.semantic.core :as s]))
 
 (defui ^:once Timer
+  static om/Ident
+  (ident [this props]
+    [:cmp :timer])
+  static om/IQuery
+  (query [this] [:client/gui])
   Object
   (initLocalState [this]
     {:tick 0 :max-tick 100})
   (render [this]
-    (let [{{:keys [tick ticker max-tick]} :state} (om-data this)]
-      ;;TODO: turn off ticker in other guis
-      (when (not ticker)
-        (om/update-state! this assoc :ticker
-                          (js/setInterval #(let [{{:keys [tick max-tick]} :state} (om-data this)]
-                                             (when (< tick max-tick)
-                                               (om/update-state! this update :tick inc))) 100)))
+    (let [{{:keys [tick ticker max-tick]} :state
+           {:keys [client/gui]} :props} (om-data this)]
+       (if (= gui :timer)
+         (when-not ticker
+           (om/update-state! this assoc :ticker
+                             (js/setInterval #(let [{{:keys [tick max-tick]} :state} (om-data this)]
+                                                (when (< tick max-tick)
+                                                  (om/update-state! this update :tick inc))) 100)))
+         (do (om/update-state! this assoc :ticker nil)
+             (js/clearInterval ticker)))
 
       (html
-       [:div
+       [:div#timer
         [:div "Elapsed time:"]
         (s/progress {:style {:marginBottom 20 :minWidth 0}
                      :value tick

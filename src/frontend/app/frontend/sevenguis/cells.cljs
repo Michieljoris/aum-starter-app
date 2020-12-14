@@ -8,15 +8,17 @@
    [app.frontend.cells-grammar :refer [cell-str alphabet]]
    [pagora.aum.modules.semantic.core :as s]))
 
-(def cells-dimensions {:rows 100 :columns 26
-                       :view-port-size 600
-                       :grid-size 2500})
-
-;; (def cells-dimensions {:rows 4 :columns 4
+;; (def cells-dimensions {:rows 100 :columns 26
 ;;                        :view-port-size 600
-;;                        :grid-size 600})
+;;                        :grid-size 2500})
+
+(def cells-dimensions {:rows 2 :columns 2
+                       :view-port-size 600
+                       :grid-size 600})
 
 (defn update-cell [this event {:keys [r c] :as cell}]
+  (timbre/info :#pp {:update-cell cell})
+
   (let [app-state (deref (om/app-state (om/get-reconciler this)))
         get-dependents (fn collect-dependents [{:keys [observers]}]
                          (apply conj observers (mapcat collect-dependents
@@ -39,6 +41,9 @@
   (render [this]
     (let [{{:keys [r c content] :as cell} :props
            {:keys [active?]} :state} (om-data this)]
+
+      (timbre/info :#pp {:table-cell cell})
+      (timbre/info :#pp (om/props this))
 
       (s/table-cell
        {:id (+ r c)
@@ -63,16 +68,17 @@
 (defui ^:once Cells
   static om/Ident
   (ident [this props]
-    [:cmp :Cells])
+    [:cmp :cells])
   static om/IQuery
   (query [this] [{:cells (om/get-query TableCell)}])
   Object
   (render [this]
     (let [{:keys [cells]} (om/props this)
           {:keys [view-port-size grid-size columns rows]} cells-dimensions]
-      ;; (timbre/info :#pp {:cells-query (om/get-query this)})
+      (timbre/info :#pp {:cells-cmp-props (om/props this)})
+
       (html
-       [:div {:style {:width view-port-size :overflow "auto"
+       [:div#cells {:style {:width view-port-size :overflow "auto"
                       :height view-port-size}}
         [:div {:style {:width grid-size}}
          (s/table
@@ -82,13 +88,19 @@
                                  (s/table-header-cell)
                                  (map
                                   #(s/table-header-cell {:textAlign "center"} %)
-                                  (take (:columns cells-dimensions) (seq alphabet)))))
+                                  (take columns (seq alphabet)))))
           (apply s/table-body
                  (map (fn [r]
                         (apply s/table-row
                                (s/table-cell {:collapsing true} r)
-                               (map #(table-cell this (nth cells (+ (* r 4) %)))
-                                    (range columns))))
+
+                               (map
+                                (fn [c]
+                                  (timbre/info :#pp {:calling :table-cell
+                                                     :with (nth cells (+ (* c columns) r))})
+
+                                  (table-cell this (nth cells (+ (* c columns) r))))
+                                (range columns))))
                       (range rows))))]]))))
 
 (def cells (make-cmp Cells))

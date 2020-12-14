@@ -3,7 +3,8 @@
    [sablono.core :as html :refer-macros [html]]
    [pagora.aum.om.next :as om :refer-macros [defui]]
    [taoensso.timbre :as timbre]
-   [pagora.aum.frontend.util :refer [make-cmp]]
+   [goog.object :as goog]
+   [pagora.aum.frontend.util :refer [make-cmp om-data]]
    [pagora.aum.modules.semantic.core :as s]))
 
 (defn date? [m]
@@ -39,8 +40,9 @@
           return-moment (js/moment return-date "DD.MM.YYYY" true)
           valid-leave-date? (date? leave-moment)
           valid-return-date? (date? return-moment)]
+
       (html
-       [:div
+       [:div#flight-booker
         ;; Select flight type
         (s/dropdown {:inline true
                      :options flight-options

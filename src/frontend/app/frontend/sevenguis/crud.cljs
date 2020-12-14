@@ -26,7 +26,7 @@
     (let [{:keys [selected-id crud-list first-name
                   surname next-id filter-str]} (om/get-state this)]
       (html
-       [:div
+       [:div#crud
         ;; Filter
         (s/form (s/form-field {:inline true}
                               (html

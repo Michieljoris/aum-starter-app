@@ -172,8 +172,6 @@
      [:div] xs))
 
 (defui ^:once CircleDrawer
-  static om/IQuery
-  (query [this] [])
   Object
   (initLocalState [this]
     {:history [{}]
@@ -186,7 +184,7 @@
           max-radius 30
           circles (history history-index)]
       (html
-       [:div {:style { :paddingLeft max-radius}}
+       [:div#circle-drawer {:style {:paddingLeft max-radius}}
 
         ;; Undo/redo buttons
         [:div {:class "pad-bot-30"
@@ -212,6 +210,5 @@
           ;; Canvas containing absolutely positioned circles
           (canvas this box-size circles)
           (when show-size-menu? (size-popup-menu this)))]))))
-
 
 (def circle-drawer (make-cmp CircleDrawer))

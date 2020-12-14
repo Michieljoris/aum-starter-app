@@ -20,7 +20,7 @@
 
 (set! s/*explain-out* expound/printer)
 
-(n/set-refresh-dirs "src" "libs-src" "src-frontend")
+(n/set-refresh-dirs "src" "libs-src" "src/frontend")
 ;; (n/disable-unload!)
 ;; (def pp pprint)
 ;; (n/refresh)

@@ -1,4 +1,4 @@
-(ns app.frontend.mutations
+(ns app.frontend.mutate
  (:require
   [taoensso.timbre :as timbre]
   [pagora.aum.frontend.parser.mutate :refer [mutate]]
@@ -30,7 +30,10 @@
     (swap! state update-in [:cells/by-rc cell] assoc :formula formula :content content)
     (change-prop state (cell-at state cell))))
 
-
 (defmethod mutate 'cells/update
   [{:keys [state] :as env} _ {:keys [cell content]}]
   {:action #(update-cell state cell content)})
+
+(defmethod mutate 'sevenguis/select
+  [{:keys [state] :as env} _ {:keys [gui]}]
+  {:action #(swap! state assoc :client/gui gui)})
