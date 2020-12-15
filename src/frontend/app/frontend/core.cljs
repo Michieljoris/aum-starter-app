@@ -19,8 +19,7 @@
   (let [app-state (om/tree->db RootComponent {:cells-data
                                               {:cells (into [] (make-cells-data cells-dimensions))}} true)
         aum-config (aum/init {:RootComponent RootComponent
-                              :app-state app-state})]
-    (timbre/info :#pp (:app-state app-state))
-
-    (timbre/info :#pp app-state)
+                              :app-state app-state
+                              :wait-for-connection? false
+                              })]
     (aum/go aum-config)))

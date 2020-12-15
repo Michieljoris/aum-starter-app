@@ -38,7 +38,8 @@
  :pagora.revolt.task/assets {:assets-paths ["assets"]
                              :exclude-paths ["assets/app"]
                              :public-path "public/"
-                             :gzip false
+                             :gzip? false
+                             :fingerprint? false
                              :update-with-exts ["html"]}
 
  :revolt.task/codox  {:source-paths ["src"]
