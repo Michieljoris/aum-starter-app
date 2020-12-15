@@ -28,23 +28,36 @@
          "target/assets"
          ]
 
- :deps {clj-utils {:local/root "../pagora.clj-utils"
-                   :mvn/version "0.0.0"
-                   }
+ :deps {
+        ;; clj-utils {:local/root "../pagora.clj-utils"
+        ;;            :mvn/version "0.0.0"
+        ;;            }
 
-        aum {:local/root "../pagora.aum"
+        ;; aum {:local/root "../pagora.aum"
+        ;;      :mvn/version "0.0.0"
+        ;;      }
+
+        ;; revolt {:local/root "../pagora.revolt"
+        ;;         :mvn/version "0.0.0"
+        ;;         }
+
+        instaparse {:mvn/version "1.4.10"}
+
+        aum {:git/url "https://github.com/Michieljoris/pagora.aum.git"
+             :sha "72cec32fd071ac2166cb457fdf428ccd878ef03a"
              :mvn/version "0.0.0"
              }
 
-        revolt {:local/root "../pagora.revolt"
+        clj-utils {:git/url "https://github.com/Michieljoris/pagora.clj-utils.git"
+                   :sha "4137e913cbfcc6c14abaf07ed36878355fd7a8ca"
+                   :mvn/version "0.0.0"
+                   }
+
+        revolt {:git/url "https://github.com/Michieljoris/pagora.revolt.git"
+                :sha "82b9ee0c552b5163186979dc0f58aba6f9ebdb35"
                 :mvn/version "0.0.0"
                 }
 
-        instaparse {:mvn/version "1.4.10"}
-        ;; clj-utils {:git/url "git@github.com:michieljoris/pagora.clj-utils"
-        ;;            :sha "??"
-        ;;            :mvn/version "0.0.0"
-        ;;            }
 
         }
 

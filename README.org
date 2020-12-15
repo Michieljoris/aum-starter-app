@@ -3,16 +3,20 @@
 - Based on [[https://github.com/Michieljoris/aum-starter-app][aum-starter-app]]
 - Cells non gui part is copied from https://github.com/eugenkiss/7guis-Clojure-Seesaw
 
-* Run
-
-    java -jar dist/app.jar
-
-* Run in dev mode
-
-Make sure node version manager is installed, then:
+* Install node version manager first, then in the repo:
 
     nvm install
     nvm use
+
+* Run production version:
+
+    bin/prod-install-js
+    SERVER_PORT=8090 java -jar dist/app.jar
+
+App is at localhost:8090/app
+
+* Run in dev mode
+
     bin/dev-install-js
     bin/dev-backend
 
@@ -27,5 +31,5 @@ The css of semantic ui downloads a google font:
 
 @import url(https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic&subset=latin);
 
- When working offline this blocks refreshing the page. A quick turnaround is to
+ When working offline this blocks refreshing the page. A quick work around is to
  comment out this import in node_modules/semantic-ui-css/semantic.css
