@@ -8,13 +8,13 @@
    [app.frontend.cells-grammar :refer [cell-str alphabet]]
    [pagora.aum.modules.semantic.core :as s]))
 
-;; (def cells-dimensions {:rows 100 :columns 26
-;;                        :view-port-size 600
-;;                        :grid-size 2500})
-
-(def cells-dimensions {:rows 2 :columns 2
+(def cells-dimensions {:rows 100 :columns 26
                        :view-port-size 600
-                       :grid-size 600})
+                       :grid-size 2500})
+
+;; (def cells-dimensions {:rows 2 :columns 2
+;;                        :view-port-size 600
+;;                        :grid-size 600})
 
 (defn update-cell [this event {:keys [r c] :as cell}]
   (let [app-state (deref (om/app-state (om/get-reconciler this)))

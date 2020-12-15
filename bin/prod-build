@@ -15,6 +15,12 @@ cmd="CLJ_ENV=prod clj -A:revolt "`
 echo "$(tput setaf 7)$cmd$(tput sgr0)"
 eval $cmd
 
+# Add wait-for-connection? false to map passed to aum/init, otherwise app will
+#hang waiting for websocket connection
+# Run a http server in frontend-build dir
+mkdir -p frontend-build
+cp resources/app.html ./frontend-build
+cp -r target/assets/public/app ./frontend-build
 
 
 

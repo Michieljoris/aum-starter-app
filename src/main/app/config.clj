@@ -13,6 +13,7 @@
 (defmethod aum/config :dev [_]
   {
    :db-password "irma"
+   :db-pool false
    })
 
 (defmethod aum/config :staging [_]
@@ -20,7 +21,9 @@
    })
 
 (defmethod aum/config :prod [_]
-  {:db-pool true  ;whether to use c3p0 pool connection
+  ;;7guis: setting pool to false will allow the app to start up
+  ;;even if there's no mysql service running
+  {:db-pool false ;whether to use c3p0 pool connection
    :db-pool-loglevel "INFO"
    :db-use-ssl false
    :min-pool-size 3
