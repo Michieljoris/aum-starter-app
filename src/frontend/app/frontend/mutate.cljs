@@ -2,7 +2,8 @@
  (:require
   [taoensso.timbre :as timbre]
   [pagora.aum.frontend.parser.mutate :refer [mutate]]
-  [app.frontend.cells-grammar :refer [Emptie parse-formula refs evaluate]]))
+  [app.frontend.sevenguis.cells :refer [cells-dimensions]]
+  [app.frontend.cells-grammar :refer [Emptie parse-formula refs evaluate Coord Textual]]))
 
 (defn cell-at [state cell]
   (get-in @state [:cells/by-rc cell]))
@@ -19,7 +20,14 @@
         formula (if (empty? content)
                   Emptie
                   (parse-formula content))
-        oldform (:formula (cells cell))]
+        formula (if (and (= Coord (type formula))
+                         (not (and
+                               (<= 0 (:row formula) (dec (:rows cells-dimensions)))
+                               (<= 0 (:column formula) (dec (:columns cells-dimensions))))))
+                  (Textual. "REF!!")
+                  formula)
+        oldform (:formula (cells cell))]   
+
     (doseq [{:keys [r c]} (refs oldform cells)]
       (swap! state update-in [:cells/by-rc [r c] :observers]
                         (fn [obs] (remove #(= % cell) obs))))

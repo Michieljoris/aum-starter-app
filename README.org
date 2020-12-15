@@ -1,16 +1,31 @@
+* Implementation of 7guis
+- Code is in src/frontend/app/frontend
+- Based on [[https://github.com/Michieljoris/aum-starter-app][aum-starter-app]]
+- Cells non gui part is copied from https://github.com/eugenkiss/7guis-Clojure-Seesaw
 
-This is a minimal app demonstrating the [[https://github.com/Michieljoris/pagora.aum][aum]] library.
+* Run
 
-Aum is a somewhat opiniated library built on top of om next meant to be used
-to build full stack apps in clojure/script. The backend implements a generic
-resolver of om next queries against a sql database. The frontend lets you
-build components with localized queries for data. The underlying frontend
-part of the aum library then works out what needs to be requested from the
-backend and what is already available. Many of the practical considerations
-when it comes to building a actual production app have been incorporated
-into the library such as security, database management, networking,
-environment management, build system, internationalization, state management
-etc. There is also a data inspector, test runner and fullstack testing
-(emulating backend in frontend).
+    java -jar dist/app.jar
 
-See documentation at [[http://www.axion5.net/slate/]]
+* Run in dev mode
+
+Make sure node version manager is installed, then:
+
+    nvm install
+    nvm use
+    bin/dev-install-js
+    bin/dev-backend
+
+And in another terminal:
+
+    bin/dev-frontend
+
+App is at localhost:8080/app
+
+* Good to know
+The css of semantic ui downloads a google font:
+
+@import url(https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic&subset=latin);
+
+ When working offline this blocks refreshing the page. A quick turnaround is to
+ comment out this import in node_modules/semantic-ui-css/semantic.css

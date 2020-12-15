@@ -17,8 +17,6 @@
                        :grid-size 600})
 
 (defn update-cell [this event {:keys [r c] :as cell}]
-  (timbre/info :#pp {:update-cell cell})
-
   (let [app-state (deref (om/app-state (om/get-reconciler this)))
         get-dependents (fn collect-dependents [{:keys [observers]}]
                          (apply conj observers (mapcat collect-dependents
@@ -42,11 +40,8 @@
     (let [{{:keys [r c content] :as cell} :props
            {:keys [active?]} :state} (om-data this)]
 
-      (timbre/info :#pp {:table-cell cell})
-      (timbre/info :#pp (om/props this))
-
-      (s/table-cell
-       {:id (+ r c)
+       (s/table-cell
+        {:id (str r "-" c)
         :style {:maxWidth 0}
         :onClick #(when (not active?)
                    (om/update-state! this assoc :active? nil))
@@ -75,8 +70,6 @@
   (render [this]
     (let [{:keys [cells]} (om/props this)
           {:keys [view-port-size grid-size columns rows]} cells-dimensions]
-      (timbre/info :#pp {:cells-cmp-props (om/props this)})
-
       (html
        [:div#cells {:style {:width view-port-size :overflow "auto"
                       :height view-port-size}}
@@ -93,13 +86,7 @@
                  (map (fn [r]
                         (apply s/table-row
                                (s/table-cell {:collapsing true} r)
-
-                               (map
-                                (fn [c]
-                                  (timbre/info :#pp {:calling :table-cell
-                                                     :with (nth cells (+ (* c columns) r))})
-
-                                  (table-cell this (nth cells (+ (* c columns) r))))
+                               (map #(table-cell this (nth cells (+ (* r columns) %)))
                                 (range columns))))
                       (range rows))))]]))))
 

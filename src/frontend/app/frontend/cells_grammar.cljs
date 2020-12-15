@@ -14,7 +14,7 @@
 
 (defrecord Textual [value]
   Formula
-  (evaluate   [this data] 0.0)
+  (evaluate   [this data] value)
   (refs   [this data] [])
   (to-str [this] value))
 
@@ -77,7 +77,7 @@
           decimal = #'-?\\d+(\\.\\d*)?'
           ") formula-str)]
     (if (insta/failure? result)
-      (Textual. "Error" ;; (str (insta/get-failure result))
+      (Textual. "Parse error" ;; (str (insta/get-failure result))
                 )
       (insta/transform
         {:decimal #(Decimal. (js/parseFloat %))

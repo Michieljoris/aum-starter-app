@@ -20,5 +20,7 @@
                                               {:cells (into [] (make-cells-data cells-dimensions))}} true)
         aum-config (aum/init {:RootComponent RootComponent
                               :app-state app-state})]
+    (timbre/info :#pp (:app-state app-state))
+
     (timbre/info :#pp app-state)
     (aum/go aum-config)))

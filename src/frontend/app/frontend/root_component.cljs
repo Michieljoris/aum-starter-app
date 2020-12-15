@@ -25,8 +25,7 @@
                               (set! (.. current-el -style -display) "block"))
                            ;; We need to update the timer cmp to make sure it
                            ;; only runs when it's selected
-                           (om/transact! this [`(sevenguis/select {:gui ~key}) [:cmp :timer]
-                                               [:cmp :cells]]))}))
+                           (om/transact! this [`(sevenguis/select {:gui ~key}) [:cmp :timer]]))}))
 
 ;;Quick and dirty menu
 (def menu-items
@@ -39,6 +38,11 @@
                 "Cells" :cells cells :cells-data]))
 
 (defui ^:once Menu
+  static om/Ident
+  (ident [this props]
+    [:cmp :Menu])
+  static om/IQuery
+  (query [this] [:client/gui])
   Object
   (initLocalState [this]
     {:gui :counter}) ;;default gui
