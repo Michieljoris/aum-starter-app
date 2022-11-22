@@ -10,7 +10,7 @@
     "lz-string": "^1.4.4",
     "webpack": "^4.29.0",
     "webpack-bundle-analyzer": "^3.3.2",
-    "webpack-cli": "^3.2.1",
+    "webpack-cli": "^3.3.12",
     "webpack-merge": "^4.2.1",
     "webpack-visualizer-plugin": "^0.1.11",
     "karma-cli": "^1.0.1"
